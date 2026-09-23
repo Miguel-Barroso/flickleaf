@@ -98,6 +98,21 @@ try {
   const tokens = extract(demo.window.document).tokens;
   const headingIndex = tokens.findIndex(token => token.heading && token.text === 'A pace of your own');
   assert.ok(headingIndex >= 0);
+  assert.equal(await page.locator('.section-ticks span').count(), tokens.filter(token => token.heading).length);
+  await page.getByRole('button', { name: 'Play', exact: true }).click();
+  await page.getByLabel('Jump to section').focus();
+  assert.match(await page.locator('#state').textContent(), /Paused/);
+  await page.getByLabel('Jump to section').selectOption(String(headingIndex));
+  assert.equal(await word.textContent(), 'A pace of your own');
+  assert.match(await page.locator('#state').textContent(), /Paused/);
+  const progressBox = await page.locator('.progress').boundingBox();
+  const headingX = progressBox.x + 8 + headingIndex / (tokens.length - 1) * (progressBox.width - 16);
+  await page.mouse.move(headingX + 1, progressBox.y + progressBox.height / 2);
+  assert.equal(await page.locator('.section-preview').textContent(), 'A pace of your own');
+  assert.ok(await page.locator('.section-preview').isVisible());
+  await page.locator('#sections').hover();
+  assert.equal(await page.locator('.section-preview').isVisible(), false);
+
   await page.locator('.progress').evaluate((el, index) => { el.value = String(index); el.dispatchEvent(new Event('input', { bubbles: true })); }, headingIndex);
   assert.equal(await word.textContent(), 'A pace of your own');
   assert.ok(await page.locator('.heading-label').isVisible());
@@ -112,6 +127,11 @@ try {
   assert.equal(await page.locator('dialog').evaluate(el => el.scrollWidth > el.clientWidth), false);
   await page.screenshot({ path: '.test-results/reader-mobile.png' });
   const bounds = await word.boundingBox(); assert.ok(bounds.x >= 0 && bounds.x + bounds.width <= 390);
+  await page.keyboard.press('Escape');
+  await page.evaluate(() => { document.body.innerHTML = '<article><p>' + 'A quiet day gives us time to read and think. '.repeat(30) + '</p></article>'; });
+  await page.addScriptTag({ url: '/content.js' });
+  assert.equal(await page.locator('.section-nav').isVisible(), false);
+  assert.equal(await page.locator('.section-ticks span').count(), 0);
   await page.keyboard.press('Escape');
   await page.evaluate(() => { document.body.innerHTML = '<button id="source">Source</button>'; });
   await page.addScriptTag({ url: '/content.js' }); assert.ok(await page.locator('.error').isVisible());

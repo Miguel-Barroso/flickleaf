@@ -37,3 +37,19 @@ header{display:flex;align-items:center;justify-content:space-between;gap:20px}.b
 .mark{width:32px;height:32px;border:0;border-radius:0;color:var(--ink)}
 .mark svg{display:block;width:30px;height:30px}
 .brand{letter-spacing:-.7px}
+
+.timeline{position:relative;margin:12px 0 4px}
+.timeline .progress{--progress:0%;appearance:none;-webkit-appearance:none;height:28px;margin:0;background:transparent}
+.progress::-webkit-slider-runnable-track{height:3px;border-radius:3px;background:linear-gradient(to right,var(--ink) var(--progress),var(--line) var(--progress))}
+.progress::-moz-range-track{height:3px;border-radius:3px;background:linear-gradient(to right,var(--ink) var(--progress),var(--line) var(--progress))}
+.progress::-webkit-slider-thumb{appearance:none;width:16px;height:16px;margin-top:-6.5px;border:0;border-radius:50%;background:var(--ink)}
+.progress::-moz-range-thumb{width:16px;height:16px;border:0;border-radius:50%;background:var(--ink)}
+.section-ticks{position:absolute;left:8px;right:8px;top:0;pointer-events:none}
+.section-ticks span{position:absolute;width:1px;height:8px;background:var(--muted);transform:translateX(-50%);opacity:.7}
+.section-ticks .minor{height:4px;top:4px;opacity:.45}
+.section-nav{display:flex;align-items:center;gap:12px;margin:0 0 15px;color:var(--muted);font-size:11px}
+.section-nav[hidden],.section-preview[hidden]{display:none}
+.section-nav select{min-width:0;flex:1;min-height:36px;font:inherit;font-size:12px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 10px;text-overflow:ellipsis}
+.section-nav select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
+.section-preview{position:absolute;bottom:calc(100% + 10px);left:0;max-width:100%;padding:8px 12px;background:var(--ink);color:var(--paper);border-radius:8px;font-size:12px;line-height:1.5;pointer-events:none;z-index:1;overflow-wrap:anywhere}
+.reading .section-nav:has(select:focus){opacity:1}

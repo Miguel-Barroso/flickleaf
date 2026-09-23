@@ -15,6 +15,10 @@ Requires Firefox 142 or newer. The built extension is in `dist/`.
 
 Temporary add-ons are removed when Firefox restarts. A distributable release still needs Mozilla signing. Internal browser pages, the add-on store, and other protected pages cannot be read; the extension icon shows `!` when Firefox rejects access.
 
+## Section navigation
+
+The progress bar shows a tick at each heading: taller marks for main sections, shorter marks for subsections. Hover over the bar to preview the section at that position. Use the **Section** picker underneath to jump precisely to a heading, including on touch screens or pages with closely packed headings. Jumping pauses playback at the heading card; Play resumes from there. The picker follows the current section as you read or scrub. Pages without headings keep a simple slider.
+
 ## Reading speed limits
 
 The **Min / Max** fields default to **300 / 900 WPM**. They cap the base reading pace in Direct, Freewheel, reverse scrolling, and hands-off playback. You can choose limits between 50 and 1,500 WPM. Changing either limit takes effect immediately; if you move one past the other, the other follows so the range stays valid. Blank or invalid entries restore the previous value.
