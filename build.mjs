@@ -8,5 +8,5 @@ if (process.argv.includes("--serve")) {
   const ctx = await context(options);
   await ctx.watch();
   await ctx.serve({ servedir: "dist", host: "127.0.0.1", port: 4173 });
-  console.log("Reader playground: http://127.0.0.1:4173/demo.html");
+  console.log("Flickleaf playground: http://127.0.0.1:4173/demo.html");
 } else { await build(options); }

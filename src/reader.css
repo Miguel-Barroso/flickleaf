@@ -1,9 +1,9 @@
 :host{all:initial;color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}
-dialog{--paper:#f6f3ec;--ink:#263b33;--muted:#72796e;--line:#dcded2;--accent:#ac5433;position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--paper);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;overflow:auto;overscroll-behavior:contain}
+dialog{--paper:#f6f3ec;--ink:#263b33;--muted:#72796e;--line:#dcded2;--accent:#426b45;position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--paper);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;overflow:auto;overscroll-behavior:contain}
 dialog:focus{outline:none}
 dialog::backdrop{background:#f6f3ec}
-dialog.dark{--paper:#18251f;--ink:#eeeade;--muted:#a3b0a6;--line:#3d4b41;--accent:#edab86;color-scheme:dark}
+dialog.dark{--paper:#18251f;--ink:#eeeade;--muted:#a3b0a6;--line:#3d4b41;--accent:#acd49b;color-scheme:dark}
 button,input{font:inherit}button{color:inherit;cursor:pointer;border:1px solid var(--line);background:transparent;border-radius:100px;min-height:44px;padding:10px 19px;touch-action:manipulation}button:active{transform:scale(.97)}button:focus-visible,input:focus-visible{outline:2px solid var(--accent);outline-offset:5px}
 @media(hover:hover){button:hover{background:color-mix(in srgb,var(--ink) 6%,transparent)}}
 .frame{min-height:100%;display:flex;flex-direction:column;padding:32px 48px 24px}
@@ -33,3 +33,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:20px}.b
 .speed-limits{display:flex;justify-content:center;align-items:center;gap:10px;margin-top:12px;font-size:11px;color:var(--muted)}
 .speed-limits label{display:flex;align-items:center;gap:7px}
 .speed-limits input{width:70px;min-height:36px;border:1px solid var(--line);border-radius:8px;padding:6px;background:transparent;color:var(--ink);font-variant-numeric:tabular-nums}
+
+.mark{width:32px;height:32px;border:0;border-radius:0;color:var(--ink)}
+.mark svg{display:block;width:30px;height:30px}
+.brand{letter-spacing:-.7px}

@@ -1,6 +1,6 @@
-# RSVP Reader
+# Flickleaf
 
-Put the words in one place. Let your hand control the pace.
+Flick. Read. Find your pace.
 
 A local-first Firefox extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
 
@@ -10,7 +10,7 @@ Requires Firefox 142 or newer. The built extension is in `dist/`.
 
 1. Open `about:debugging#/runtime/this-firefox` in Firefox.
 2. Choose **Load Temporary Add-on…** and select `dist/manifest.json`.
-3. Open an article, then click **RSVP Reader** in Firefox's extensions menu.
+3. Open an article, then click **Flickleaf** in Firefox's extensions menu.
 4. If extraction misses the text you want, select a passage and click the extension again.
 
 Temporary add-ons are removed when Firefox restarts. A distributable release still needs Mozilla signing. Internal browser pages, the add-on store, and other protected pages cannot be read; the extension icon shows `!` when Firefox rejects access.
@@ -94,3 +94,5 @@ This is the first desktop Firefox prototype. Chrome/Safari packaging, saved pref
 Mozilla's extension linter currently reports four `UNSAFE_VAR_ASSIGNMENT` warnings inside the bundled Readability library (two each in the content and playground bundles). These are its detached-document parsing operations; the reader itself renders article text only. Review this again when updating Readability.
 
 API references: [Mozilla Readability](https://github.com/mozilla/readability), [script injection](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/executeScript), [background scripts](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background).
+
+The extension keeps its original internal Firefox ID (`rsvp-reader@local.invalid`) so this rename remains an update to the same add-on. Its public name and icon are Flickleaf.
