@@ -71,6 +71,18 @@ try {
   assert.equal(await page.getByRole('button', { name: 'Freewheel', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.locator('.stage').hover(); await page.mouse.wheel(0, 100);
   await page.waitForTimeout(3000); assert.match(await page.locator('#state').textContent(), /Coasting/);
+  assert.ok(await page.locator('dialog.reading').count());
+  assert.ok(Number(await page.locator('.scroll-feel').evaluate(el => getComputedStyle(el).opacity)) < 0.3);
+  const stageBox = await page.locator('.stage').boundingBox();
+  const mx = stageBox.x + stageBox.width / 2, my = stageBox.y + stageBox.height / 2;
+  await page.mouse.move(mx + 2, my + 2);
+  await page.mouse.move(mx - 2, my - 2);
+  await page.waitForTimeout(100);
+  assert.ok(await page.locator('dialog.reading').count(), 'tiny mouse jitter keeps controls faded');
+  await page.mouse.move(mx + 50, my, { steps: 5 });
+  await page.waitForTimeout(100);
+  assert.equal(await page.locator('dialog.reading').count(), 0, 'deliberate movement reveals controls');
+
   await page.keyboard.press('Space'); assert.match(await page.locator('#state').textContent(), /Paused/);
   const coastStop = await page.locator('#count').textContent();
   await page.waitForTimeout(300); assert.equal(await page.locator('#count').textContent(), coastStop);

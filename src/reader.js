@@ -107,7 +107,24 @@ export function openReader(article, onClose = () => {}) {
   listen($('#slower'), 'click', () => speed(engine.speed - 25));
   listen($('#faster'), 'click', () => speed(engine.speed + 25));
   listen($('#context'), 'click', () => { engine.pause(); context = !context; showContext(); render(); });
-  listen(dialog, 'pointermove', () => { awake = performance.now(); });
+  let mouseSample = null;
+  listen(dialog, 'pointermove', event => {
+    if (event.pointerType !== 'mouse' || event.buttons) return;
+    const now = performance.now();
+    // Ignore wheel-hand jitter. Reveal only for a purposeful displacement,
+    // not the accumulated distance of many tiny back-and-forth movements.
+    if (!mouseSample || now - mouseSample.at > 300) {
+      mouseSample = { x: event.clientX, y: event.clientY, at: now };
+      return;
+    }
+    if (Math.hypot(event.clientX - mouseSample.x, event.clientY - mouseSample.y) >= 24) {
+      awake = now;
+      mouseSample = { x: event.clientX, y: event.clientY, at: now };
+    }
+  });
+  listen(dialog, 'pointerdown', event => {
+    if (event.target.closest('button,input')) awake = performance.now();
+  });
   listen(dialog, 'wheel', event => {
     if (event.ctrlKey || event.target.closest('input')) return;
     event.preventDefault();
