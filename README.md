@@ -13,7 +13,13 @@ Requires Firefox 142 or newer. The built extension is in `dist/`.
 3. Open an article, then click **Flickleaf** in Firefox's extensions menu.
 4. If extraction misses the text you want, select a passage and click the extension again.
 
-Temporary add-ons are removed when Firefox restarts. A distributable release still needs Mozilla signing. Internal browser pages, the add-on store, and other protected pages cannot be read; the extension icon shows `!` when Firefox rejects access.
+Temporary add-ons are removed when Firefox restarts. A distributable release still needs Mozilla signing. Internal browser pages, the add-on store, and other protected pages cannot be read; Flickleaf opens the paste view when Firefox rejects access.
+
+## Paste your own text
+
+Click **Paste text** in the reader, or right-click the Flickleaf toolbar icon and choose **Paste text into Flickleaf**. Paste a document, notes, or any other text, optionally add a title, and choose **Start reading**. The playground also provides `paste.html`.
+
+Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown headings (`# Heading`, `## Subheading`, up to six levels) become heading cards and section markers. Plain text and HTML-like strings are treated as text. All existing playback and speed controls apply. Close the reader to return to your draft. Text stays in the tab and is never uploaded or saved by Flickleaf; closing or reloading the tab may discard it.
 
 ## Section navigation
 
@@ -89,7 +95,7 @@ Browser tests use `/Applications/Chromium.app/Contents/MacOS/Chromium` by defaul
 - `src/content.js`: extension entry and page-session position memory.
 - `src/background.js`: user-initiated active-tab injection and restricted-page feedback.
 
-The extension asks only for `activeTab` and `scripting`. Article text is assigned with `textContent`; extracted HTML is never inserted into the live page. Firefox's modal dialog isolates keyboard focus without rewriting the underlying article. No article or reading state is sent anywhere.
+The extension asks for `activeTab`, `scripting`, and `menus` (for the toolbar’s Paste text menu). Article text is assigned with `textContent`; extracted HTML is never inserted into the live page. Firefox's modal dialog isolates keyboard focus without rewriting the underlying article. No article or reading state is sent anywhere.
 
 ## Current limits and next steps
 

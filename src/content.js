@@ -1,5 +1,6 @@
 import { extract } from './extract.js';
 import { openReader } from './reader.js';
+const openPaste = () => browser.runtime.sendMessage({ type: 'open-paste' });
 const key = '__rsvpReaderSession';
 if (globalThis[key]?.close) globalThis[key].close();
 else {
@@ -11,7 +12,7 @@ else {
     globalThis[key] = openReader(article, index => {
       globalThis.__rsvpReaderPosition = { identity, index };
       globalThis[key] = null;
-    });
+    }, openPaste);
   }
-  catch (error) { globalThis[key] = openReader({ error: error.message }, () => { globalThis[key] = null; }); }
+  catch (error) { globalThis[key] = openReader({ error: error.message }, () => { globalThis[key] = null; }, openPaste); }
 }

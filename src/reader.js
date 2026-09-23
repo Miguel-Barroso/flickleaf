@@ -1,7 +1,7 @@
 import { Playback } from './core.js';
 import css from './reader.css';
 
-export function openReader(article, onClose = () => {}) {
+export function openReader(article, onClose = () => {}, onPaste = null) {
   const previousFocus = document.activeElement;
   const host = document.createElement('div');
   host.dataset.rsvpReader = '';
@@ -11,7 +11,7 @@ export function openReader(article, onClose = () => {}) {
   dialog.setAttribute('aria-label', 'Flickleaf');
   // This template is static. Article strings are assigned only via textContent.
   dialog.innerHTML = `<div class="frame">
-    <header class="chrome"><div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 23C4 12 13 5 27 5c0 14-6 23-17 19" fill="currentColor"/><path d="M5 28 20 13" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/><path d="m5 28 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Flickleaf</div><div class="header-actions"><button class="quiet" id="theme" aria-label="Switch to dark theme">◐</button><button id="close">Close <span aria-hidden="true">↗</span></button></div></header>
+    <header class="chrome"><div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 23C4 12 13 5 27 5c0 14-6 23-17 19" fill="currentColor"/><path d="M5 28 20 13" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/><path d="m5 28 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Flickleaf</div><div class="header-actions"><button id="paste" hidden>Paste text</button><button class="quiet" id="theme" aria-label="Switch to dark theme">◐</button><button id="close">Close <span aria-hidden="true">↗</span></button></div></header>
     <section class="article chrome"><span class="eyebrow">Find your reading rhythm.</span><h1></h1><p id="meta"></p></section>
     <main class="stage" aria-label="Reading area. Scroll or drag to control the pace."><div class="focus-line" aria-hidden="true"></div><span class="heading-label eyebrow" hidden>Section</span><div class="word" aria-live="off"></div><div class="focus-line lower" aria-hidden="true"></div><div class="context" hidden></div></main>
     <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="direct" aria-pressed="true">Direct</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>Esc</kbd> to leave</p></div>
@@ -30,6 +30,10 @@ export function openReader(article, onClose = () => {}) {
     onClose(engine?.index);
   };
   listen($('#close'), 'click', close);
+  if (onPaste) {
+    $('#paste').hidden = false;
+    listen($('#paste'), 'click', () => { engine?.pause(); onPaste(); });
+  }
   listen(dialog, 'cancel', event => { event.preventDefault(); close(); });
   listen($('#theme'), 'click', () => {
     const dark = dialog.classList.toggle('dark');
@@ -173,6 +177,7 @@ export function openReader(article, onClose = () => {}) {
       return;
     }
     if (event.altKey || event.metaKey || event.ctrlKey) return;
+    if (event.target.closest('#paste') && (event.code === 'Space' || event.key === 'Enter')) return;
     if (event.target.closest('input,select,textarea,[contenteditable]')) return;
     if (event.code === 'Space' || event.key === 'Enter') {
       // Prevent native button activation as well as page scrolling. A held key
@@ -186,7 +191,7 @@ export function openReader(article, onClose = () => {}) {
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); seek(engine.index + 1); }
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
-  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
+  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
   let pointer = null, y = 0;
   listen($('.stage'), 'pointerdown', event => {
     if (pointer !== null || event.button !== 0) return;

@@ -6,7 +6,7 @@ import { JSDOM } from 'jsdom';
 import { extract } from '../src/extract.js';
 const server = createServer(async (req, res) => {
   const name = new URL(req.url, 'http://localhost').pathname.split('/').at(-1) || 'demo.html';
-  try { res.setHeader('Content-Type', name.endsWith('.js') ? 'text/javascript' : 'text/html'); res.end(await readFile(new URL(`../dist/${name}`, import.meta.url))); }
+  try { res.setHeader('Content-Type', name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html'); res.end(await readFile(new URL(`../dist/${name}`, import.meta.url))); }
   catch { res.statusCode = 404; res.end(); }
 }).listen(0, '127.0.0.1');
 await new Promise(resolve => server.once('listening', resolve));
@@ -136,6 +136,27 @@ try {
   await page.evaluate(() => { document.body.innerHTML = '<button id="source">Source</button>'; });
   await page.addScriptTag({ url: '/content.js' }); assert.ok(await page.locator('.error').isVisible());
   await page.keyboard.press('Escape'); assert.equal(await page.locator('dialog').count(), 0);
+  await page.goto(`http://127.0.0.1:${server.address().port}/paste.html`);
+  await page.getByRole('button', { name: 'Start reading' }).click();
+  assert.match(await page.locator('#error').textContent(), /Paste some text/);
+  const corpus = '# First section\n\nHello from a document.\nA wrapped line.\n\n## Next section\n\n<script>window.pasteExecuted=true</script> Literal text.';
+  await page.locator('#source').fill(corpus);
+  await page.locator('#source').press('End');
+  await page.keyboard.press('Enter');
+  await page.keyboard.type('More words');
+  assert.equal(await page.locator('dialog').count(), 0, 'Enter edits the corpus');
+  await page.locator('#title').fill('My notes');
+  await page.getByRole('button', { name: 'Start reading' }).click();
+  assert.equal(await page.locator('.article h1').textContent(), 'My notes');
+  assert.equal(await word.textContent(), 'First section');
+  assert.equal(await page.locator('#sections option').count(), 2);
+  assert.equal(await page.evaluate(() => window.pasteExecuted), undefined);
+  await page.keyboard.press('Escape');
+  assert.ok((await page.locator('#source').inputValue()).includes('More words'));
+  assert.equal(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth), false);
+  await page.screenshot({ path: '.test-results/paste-mobile.png' });
+  await page.setViewportSize({ width: 1440, height: 1000 });
+  await page.screenshot({ path: '.test-results/paste-desktop.png' });
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');
 } finally { await browser.close(); server.close(); }
