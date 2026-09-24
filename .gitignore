@@ -5,3 +5,4 @@ artifacts/
 .DS_Store
 
 dist-web/
+dist-chrome/

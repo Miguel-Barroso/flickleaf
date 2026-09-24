@@ -1,3 +1,4 @@
+import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium, webkit } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile, mkdir } from 'node:fs/promises';
@@ -49,6 +50,7 @@ try {
       await page.screenshot({ path: `.test-results/web-reader-${name}.png` });
       await page.locator('#close').click();
       assert.equal(await page.locator('#source').inputValue(), corpus);
+      await checkHeadingFocus(page);
       await page.getByRole('link', { name: 'About', exact: true }).click();
       assert.ok(await page.getByRole('heading', { name: 'Reading, at your pace.' }).isVisible());
       assert.equal(await page.getByRole('link', { name: 'View on GitHub' }).getAttribute('href'), 'https://github.com/Miguel-Barroso/flickleaf');

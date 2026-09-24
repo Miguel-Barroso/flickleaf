@@ -4,7 +4,7 @@ Flick. Read. Find your pace.
 
 [Read in your browser](https://miguelbarroso.com/flickleaf/) · [About Flickleaf](https://miguelbarroso.com/flickleaf/about/)
 
-A local-first Firefox extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
+A local-first web reader and Firefox/Chrome extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
 
 ## Try it in Firefox
 
@@ -22,6 +22,16 @@ Temporary add-ons are removed when Firefox restarts. A distributable release sti
 Click **Paste text** in the reader, or right-click the Flickleaf toolbar icon and choose **Paste text into Flickleaf**. Paste a document, notes, or any other text, optionally add a title, and choose **Start reading**. The playground also provides `paste.html`.
 
 Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown headings (`# Heading`, `## Subheading`, up to six levels) become heading cards and section markers. Plain text and HTML-like strings are treated as text. All existing playback and speed controls apply. Close the reader to return to your draft. Text stays in the tab and is never uploaded or saved by Flickleaf; closing or reloading the tab may discard it.
+
+## Try it in Chrome
+
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+
+1. Open `chrome://extensions` and enable **Developer mode**.
+2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
+3. Pin Flickleaf, open an article, and click its leaf icon.
+
+The Chrome version shares all reading controls and the paste-text view with Firefox. Right-click the icon for **Paste text into Flickleaf**. Browser-protected pages open the paste view instead. This is a manual-install build, not a Chrome Web Store release. Keep the unzipped folder in place. For updates, replace its contents and press Reload on the extension card.
 
 ## Section navigation
 
@@ -46,7 +56,7 @@ For tuning: Direct uses gain 4 and a 420 ms exponential decay constant; Freewhee
 
 ## Headings and section rhythm
 
-Headings appear as complete cards labeled Section or Subsection. Body paragraphs remain one word at a time. Cards receive at least five base-word intervals, or their word count plus two, whichever is longer. The preceding body word receives another 1.5 intervals before the section change. At 300 WPM, a five-word heading stays for about 1.4 seconds, and the added section pause is 0.3 seconds. These are tunable starting values, not scientifically validated optimal timings.
+Headings appear as complete cards labeled Section or Subsection, centered at the same focal point as body words. They keep the surrounding controls dim during reading; a heading never reveals the background on its own. Body paragraphs remain one word at a time. Cards receive at least five base-word intervals, or their word count plus two, whichever is longer. The preceding body word receives another 1.5 intervals before the section change. At 300 WPM, a five-word heading stays for about 1.4 seconds, and the added section pause is 0.3 seconds. These are tunable starting values, not scientifically validated optimal timings.
 
 Arrow keys step over a heading as one card; the word counter still includes every word in it. Scroll, reverse, seek, and hands-off controls continue to work on cards. There is no forced manual confirmation at each section.
 
@@ -101,7 +111,7 @@ The extension asks for `activeTab`, `scripting`, and `menus` (for the toolbar’
 
 ## Current limits and next steps
 
-This is the first desktop Firefox prototype. Chrome/Safari packaging, saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
+This is the first desktop Firefox prototype. Safari extension packaging, saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
 
 Mozilla's extension linter currently reports four `UNSAFE_VAR_ASSIGNMENT` warnings inside the bundled Readability library (two each in the content and playground bundles). These are its detached-document parsing operations; the reader itself renders article text only. Review this again when updating Readability.
 
@@ -116,3 +126,7 @@ The extension keeps its original internal Firefox ID (`rsvp-reader@local.invalid
 Run `npm run build:web` to generate `dist-web/flickleaf/`. Serve `dist-web` as a web root so absolute `/flickleaf/` paths resolve. `npm run test:web` checks Chromium and WebKit, including 390×844 and 375×667 phone layouts. Install matching test browsers with `npx playwright install chromium webkit` if needed.
 
 Publish the generated `flickleaf` directory into the site's persistent web root. The hosting repository tracks a release copy and deployment notes. This version requires a connection to load; it does not register a service worker or provide offline caching.
+
+## Cross-platform releases
+
+Reader changes apply to web, Firefox, and Chrome together. `npm run build:all` builds all three targets; `npm run test:browser`, `npm run test:web`, and `npm run test:chrome` verify them. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.

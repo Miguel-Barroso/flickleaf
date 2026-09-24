@@ -1,6 +1,7 @@
+import { extension } from './extension-api.js';
 import { extract } from './extract.js';
 import { openReader } from './reader.js';
-const openPaste = () => browser.runtime.sendMessage({ type: 'open-paste' });
+const openPaste = () => extension.runtime.sendMessage({ type: 'open-paste' });
 const key = '__rsvpReaderSession';
 if (globalThis[key]?.close) globalThis[key].close();
 else {
