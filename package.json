@@ -10,7 +10,9 @@
     "dev": "node build.mjs --serve",
     "test:browser": "node tests/browser.mjs",
     "lint:extension": "web-ext lint --source-dir dist",
-    "package": "npm run build && web-ext build --source-dir dist --artifacts-dir artifacts --overwrite-dest"
+    "package": "npm run build && web-ext build --source-dir dist --artifacts-dir artifacts --overwrite-dest",
+    "build:web": "node build-web.mjs",
+    "test:web": "node tests/web.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0"

@@ -170,7 +170,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen(dialog, 'keydown', event => {
     if (event.key === 'Escape') return;
     if (event.key === 'Tab') {
-      const items = [...root.querySelectorAll('button,input,select')].filter(el => !el.closest('[hidden]'));
+      const items = [...root.querySelectorAll('button,input,select,summary')].filter(el => !el.closest('[hidden]') && el.getClientRects().length);
       const first = items[0], end = items.at(-1);
       if (event.shiftKey && root.activeElement === first) { event.preventDefault(); end.focus(); }
       else if (!event.shiftKey && root.activeElement === end) { event.preventDefault(); first.focus(); }
@@ -191,7 +191,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); seek(engine.index + 1); }
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
-  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
+  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
   let pointer = null, y = 0;
   listen($('.stage'), 'pointerdown', event => {
     if (pointer !== null || event.button !== 0) return;

@@ -3,3 +3,5 @@ dist/
 artifacts/
 .test-results/
 .DS_Store
+
+dist-web/

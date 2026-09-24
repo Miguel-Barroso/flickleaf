@@ -2,6 +2,8 @@
 
 Flick. Read. Find your pace.
 
+[Read in your browser](https://miguelbarroso.com/flickleaf/) · [About Flickleaf](https://miguelbarroso.com/flickleaf/about/)
+
 A local-first Firefox extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
 
 ## Try it in Firefox
@@ -106,3 +108,11 @@ Mozilla's extension linter currently reports four `UNSAFE_VAR_ASSIGNMENT` warnin
 API references: [Mozilla Readability](https://github.com/mozilla/readability), [script injection](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/executeScript), [background scripts](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background).
 
 The extension keeps its original internal Firefox ID (`rsvp-reader@local.invalid`) so this rename remains an update to the same add-on. Its public name and icon are Flickleaf.
+
+## Web version
+
+`web/` is the standalone paste reader at `/flickleaf/`, with an About page at `/flickleaf/about/`. It shares the tokenizer and playback UI with the extension. Phone layouts have a compact settings disclosure. No text is uploaded or persisted by the app.
+
+Run `npm run build:web` to generate `dist-web/flickleaf/`. Serve `dist-web` as a web root so absolute `/flickleaf/` paths resolve. `npm run test:web` checks Chromium and WebKit, including 390×844 and 375×667 phone layouts. Install matching test browsers with `npx playwright install chromium webkit` if needed.
+
+Publish the generated `flickleaf` directory into the site's persistent web root. The hosting repository tracks a release copy and deployment notes. This version requires a connection to load; it does not register a service worker or provide offline caching.

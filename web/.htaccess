@@ -1,0 +1,9 @@
+# Keep directory redirects HTTPS behind the site's TLS-terminating proxy.
+<IfModule mod_rewrite.c>
+DirectorySlash Off
+RewriteEngine On
+RewriteOptions AllowNoSlash
+RewriteCond %{REQUEST_URI} ^/flickleaf(?:/about)?$
+RewriteRule ^ https://miguelbarroso.com%{REQUEST_URI}/ [R=301,L]
+</IfModule>
+Options -Indexes
