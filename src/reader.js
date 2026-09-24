@@ -1,8 +1,10 @@
 import { Playback } from './core.js';
+import { lockPageScroll } from './scroll-lock.js';
 import css from './reader.css';
 
 export function openReader(article, onClose = () => {}, onPaste = null) {
   const previousFocus = document.activeElement;
+  let unlockScroll = () => {};
   const host = document.createElement('div');
   host.dataset.rsvpReader = '';
   const root = host.attachShadow({ mode: 'open' });
@@ -25,7 +27,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   let frame, closed = false, engine, last = performance.now(), awake = performance.now(), context = false;
   const close = () => {
     if (closed) return; closed = true;
-    cancelAnimationFrame(frame); abort.abort(); dialog.close(); host.remove();
+    cancelAnimationFrame(frame); abort.abort(); dialog.close(); host.remove(); unlockScroll();
     if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
     onClose(engine?.index);
   };
@@ -39,7 +41,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     const dark = dialog.classList.toggle('dark');
     $('#theme').setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} theme`);
   });
-  dialog.showModal();
+  unlockScroll = lockPageScroll();
+  try { dialog.showModal(); }
+  catch (error) { unlockScroll(); host.remove(); throw error; }
   if (article.error) {
     $('.article').remove(); $('.bottom').remove();
     $('.stage').className = 'error';
@@ -194,15 +198,35 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
   let pointer = null, y = 0;
   listen($('.stage'), 'pointerdown', event => {
-    if (pointer !== null || event.button !== 0) return;
+    if (event.pointerType === 'touch' || pointer !== null || event.button !== 0) return;
     pointer = event.pointerId; y = event.clientY; $('.stage').setPointerCapture(pointer);
-    engine.pause(); $('#play').blur(); dialog.focus();
+    engine.pause(); context = false; showContext(); $('#play').blur(); dialog.focus({ preventScroll: true });
   });
   listen($('.stage'), 'pointermove', event => {
     if (event.pointerId !== pointer) return;
     engine.impulse((y - event.clientY) * 2); y = event.clientY;
   });
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) listen($('.stage'), event, e => { if (e.pointerId === pointer) pointer = null; });
+  // Use a non-passive touch listener so WebKit cannot turn a reading swipe
+  // into native page panning. Touch is handled only here, not twice via pointers.
+  let touch = null, touchY = 0;
+  listen($('.stage'), 'touchstart', event => {
+    if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
+    touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
+    engine.pause(); context = false; showContext();
+    $('#play').blur(); dialog.focus({ preventScroll: true });
+  }, { passive: true });
+  listen($('.stage'), 'touchmove', event => {
+    if (touch === null || event.touches.length !== 1) return;
+    const current = [...event.touches].find(item => item.identifier === touch);
+    if (!current) return;
+    if (event.cancelable) event.preventDefault();
+    engine.impulse((touchY - current.clientY) * 2); touchY = current.clientY;
+  }, { passive: false });
+  listen($('.stage'), 'touchend', event => {
+    if ([...event.changedTouches].some(item => item.identifier === touch)) touch = null;
+  });
+  listen($('.stage'), 'touchcancel', () => { touch = null; engine.pause(); });
   listen(document, 'visibilitychange', () => { if (document.hidden) { engine.pause(); render(); } last = performance.now(); });
   listen(window, 'blur', () => { engine.pause(); context = false; showContext(); render(); });
   const tick = now => { engine.tick(now - last); last = now; render(); frame = requestAnimationFrame(tick); };

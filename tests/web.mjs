@@ -1,3 +1,4 @@
+import { checkTouchScroll } from './touch-scroll.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium, webkit } from 'playwright';
 import { createServer } from 'node:http';
@@ -16,6 +17,7 @@ await mkdir('.test-results', { recursive: true });
 try {
   for (const [name, type, options] of [
     ['desktop', chromium, { viewport: { width: 1440, height: 1000 } }],
+    ['android', chromium, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true }],
     ['iphone', webkit, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }],
     ['small-phone', webkit, { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true }],
   ]) {
@@ -51,6 +53,7 @@ try {
       await page.locator('#close').click();
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
+      if (options.hasTouch) await checkTouchScroll(page, type === chromium);
       await page.getByRole('link', { name: 'About', exact: true }).click();
       assert.ok(await page.getByRole('heading', { name: 'Reading, at your pace.' }).isVisible());
       assert.equal(await page.getByRole('link', { name: 'View on GitHub' }).getAttribute('href'), 'https://github.com/Miguel-Barroso/flickleaf');

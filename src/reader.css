@@ -1,6 +1,6 @@
 :host{all:initial;color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif}
 *{box-sizing:border-box}
-dialog{--paper:#f6f3ec;--ink:#263b33;--muted:#72796e;--line:#dcded2;--accent:#426b45;position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--paper);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;overflow:auto;overscroll-behavior:contain}
+dialog{--paper:#f6f3ec;--ink:#263b33;--muted:#72796e;--line:#dcded2;--accent:#426b45;position:fixed;inset:0;width:100vw;height:100dvh;max-width:none;max-height:none;margin:0;padding:0;border:0;background:var(--paper);color:var(--ink);font:14px/1.5 system-ui,-apple-system,sans-serif;overflow:auto;overscroll-behavior:none}
 dialog:focus{outline:none}
 dialog::backdrop{background:#f6f3ec}
 dialog.dark{--paper:#18251f;--ink:#eeeade;--muted:#a3b0a6;--line:#3d4b41;--accent:#acd49b;color-scheme:dark}

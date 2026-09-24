@@ -25,7 +25,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.1.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -130,3 +130,6 @@ Publish the generated `flickleaf` directory into the site's persistent web root.
 ## Cross-platform releases
 
 Reader changes apply to web, Firefox, and Chrome together. `npm run build:all` builds all three targets; `npm run test:browser`, `npm run test:web`, and `npm run test:chrome` verify them. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.
+
+
+Touch swipes in the reading area control playback and cannot pan the underlying page. The page is locked while the reader is open (including errors), then its previous scroll position and inline styles are restored on close. The reader itself can still scroll to reach controls on short screens.
