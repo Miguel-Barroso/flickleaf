@@ -1,3 +1,4 @@
+import { checkPDFInput, checkPDFCancel } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkTouchScroll } from './touch-scroll.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
@@ -9,7 +10,7 @@ const server = createServer(async (req, res) => {
   let path = new URL(req.url, 'http://localhost').pathname;
   if (path.endsWith('/')) path += 'index.html';
   try {
-    res.setHeader('Content-Type', path.endsWith('.js') ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : path.endsWith('.svg') ? 'image/svg+xml' : 'text/html');
+    res.setHeader('Content-Type', (path.endsWith('.js') || path.endsWith('.mjs')) ? 'text/javascript' : path.endsWith('.css') ? 'text/css' : path.endsWith('.svg') ? 'image/svg+xml' : 'text/html');
     res.end(await readFile(new URL(`../dist-web${path}`, import.meta.url)));
   } catch { res.statusCode = 404; res.end(); }
 }).listen(0, '127.0.0.1');
@@ -54,6 +55,8 @@ try {
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
+  await checkPDFInput(page);
+      if (name === 'desktop') await checkPDFCancel(page);
       if (options.hasTouch) await checkTouchScroll(page, type === chromium);
       await page.getByRole('link', { name: 'About', exact: true }).click();
       assert.ok(await page.getByRole('heading', { name: 'Reading, at your pace.' }).isVisible());

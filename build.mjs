@@ -1,3 +1,4 @@
+import { copyPDFAssets } from './pdf-assets.mjs';
 import { build, context } from "esbuild";
 import { cp, mkdir, rm, readFile, writeFile } from "node:fs/promises";
 const chrome = process.argv.includes("--chrome");
@@ -5,6 +6,7 @@ const outdir = chrome ? "dist-chrome" : "dist";
 await rm(outdir, { recursive: true, force: true });
 await mkdir(outdir, { recursive: true });
 await cp("public", outdir, { recursive: true });
+await copyPDFAssets(outdir);
 if (chrome) {
   const manifest = JSON.parse(await readFile('public/manifest.json', 'utf8'));
   delete manifest.browser_specific_settings;

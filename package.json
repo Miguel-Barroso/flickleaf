@@ -1,6 +1,6 @@
 {
   "name": "flickleaf",
-  "version": "0.2.2",
+  "version": "0.3.0",
   "private": true,
   "type": "module",
   "description": "A browser reader where your hand controls the pace.",
@@ -19,7 +19,8 @@
     "test:chrome": "node tests/chrome.mjs"
   },
   "dependencies": {
-    "@mozilla/readability": "^0.6.0"
+    "@mozilla/readability": "^0.6.0",
+    "pdfjs-dist": "6.3.289"
   },
   "devDependencies": {
     "esbuild": "^0.28.2",

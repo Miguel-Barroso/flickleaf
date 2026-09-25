@@ -4,7 +4,7 @@
 <header><img src="icon.svg" width="36" height="36" alt=""> <span>Flickleaf</span></header>
 <p class="eyebrow">BRING YOUR OWN WORDS</p><h1>Anything you want to read.</h1>
 <p class="intro">A chapter, your notes, a passage worth sitting with. Paste it here and find your pace.</p>
-<form><label for="title">Title <span>(optional)</span></label><input id="title" type="text" placeholder="Your pasted text" maxlength="200">
+<form><div class="pdf-input"><button type="button" id="open-pdf">Open PDF</button><input id="pdf-file" type="file" accept=".pdf,application/pdf" aria-label="Choose a PDF" hidden><button type="button" id="cancel-pdf" hidden>Cancel</button><span class="pdf-note">Read locally. Nothing uploaded.</span></div><p id="pdf-status" role="status" aria-live="polite"></p><label for="title">Title <span>(optional)</span></label><input id="title" type="text" placeholder="Your pasted text" maxlength="200">
 <label for="source">Your text</label><textarea id="source" rows="12" placeholder="Paste your text here…" aria-describedby="help error" spellcheck="false"></textarea>
 <p id="help">Blank lines separate paragraphs. Use # before a heading to mark a section.</p>
 <p id="error" role="alert"></p><div class="actions"><button type="submit">Start reading <span aria-hidden="true">→</span></button><span>Stays in this tab. Never uploaded.</span></div></form>

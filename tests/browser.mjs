@@ -1,3 +1,4 @@
+import { checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium } from 'playwright';
@@ -7,8 +8,8 @@ import assert from 'node:assert/strict';
 import { JSDOM } from 'jsdom';
 import { extract } from '../src/extract.js';
 const server = createServer(async (req, res) => {
-  const name = new URL(req.url, 'http://localhost').pathname.split('/').at(-1) || 'demo.html';
-  try { res.setHeader('Content-Type', name.endsWith('.js') ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html'); res.end(await readFile(new URL(`../dist/${name}`, import.meta.url))); }
+  const name = new URL(req.url, 'http://localhost').pathname.slice(1) || 'demo.html';
+  try { res.setHeader('Content-Type', (name.endsWith('.js') || name.endsWith('.mjs')) ? 'text/javascript' : name.endsWith('.css') ? 'text/css' : 'text/html'); res.end(await readFile(new URL(`../dist/${name}`, import.meta.url))); }
   catch { res.statusCode = 404; res.end(); }
 }).listen(0, '127.0.0.1');
 await new Promise(resolve => server.once('listening', resolve));
@@ -161,6 +162,7 @@ try {
   await page.screenshot({ path: '.test-results/paste-desktop.png' });
   await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
+  await checkPDFInput(page);
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');
 } finally { await browser.close(); server.close(); }

@@ -25,7 +25,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.2.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.3.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -113,7 +113,7 @@ The extension asks for `activeTab`, `scripting`, and `menus` (for the toolbar’
 
 This is the first desktop Firefox prototype. Safari extension packaging, saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
 
-Mozilla's extension linter currently reports four `UNSAFE_VAR_ASSIGNMENT` warnings inside the bundled Readability library (two each in the content and playground bundles). These are its detached-document parsing operations; the reader itself renders article text only. Review this again when updating Readability.
+Mozilla's extension linter currently reports 13 warnings and no errors: four existing Readability parsing warnings, a dynamic import of our fixed local PDF.js asset path, and eight warnings in PDF.js/its compatibility helpers. All parser code is packaged locally; PDF bytes cannot choose an import URL. PDF rendering, scripting, and actions are not invoked; only text extraction is used. Include the dependency sources and these notes in store review, and reassess warnings when dependencies change.
 
 API references: [Mozilla Readability](https://github.com/mozilla/readability), [script injection](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/scripting/executeScript), [background scripts](https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/manifest.json/background).
 
@@ -135,3 +135,7 @@ Reader changes apply to web, Firefox, and Chrome together. `npm run build:all` b
 Touch swipes in the reading area control playback and cannot pan the underlying page. The page is locked while the reader is open (including errors), then its previous scroll position and inline styles are restored on close. The reader itself can still scroll to reach controls on short screens.
 
 During autoplay, the shared reader requests a screen wake lock. It releases the lock on pause, stepping/seeking, manual scrolling, tab/window departure, end of text, or close. Unsupported browsers and denied requests do not interrupt reading; device power-saving settings and page permissions can prevent sleep protection. Resume autoplay to request it again.
+
+## Local PDFs
+
+Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is bundled locally, with its worker, CMaps and standard fonts; there is no external CDN or document-upload endpoint. File bytes go directly from File.arrayBuffer to the parser. Extracted text is editable before playback, with page markers for navigation. Limits: 25 MB / 300 pages. Scans need OCR elsewhere; locked PDFs need an unlocked copy. Multi-column reading order is not guaranteed. Failed or canceled imports preserve the existing draft. Nothing is saved to browser storage.

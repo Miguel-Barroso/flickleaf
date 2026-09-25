@@ -1,3 +1,4 @@
+import { checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { chromium } from 'playwright';
 import { resolve } from 'node:path';
@@ -20,6 +21,7 @@ try {
   await page.goto(`chrome-extension://${id}/paste.html`);
   await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
+  await checkPDFInput(page);
   const newPage = context.waitForEvent('page');
   const response = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'open-paste' }));
   assert.equal(response.ok, true);

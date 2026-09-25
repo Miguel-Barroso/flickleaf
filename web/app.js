@@ -1,3 +1,4 @@
+import { setupPDFInput } from '../src/pdf-input.js';
 import { openReader } from '../src/reader.js';
 import { pastedArticle } from '../src/pasted-text.js';
 import mobileCSS from './reader-mobile.css';
@@ -5,6 +6,7 @@ const form = document.querySelector('#paste-form');
 const source = document.querySelector('#source');
 const title = document.querySelector('#title');
 const error = document.querySelector('#error');
+const pdfInput = setupPDFInput({ form, source, title, error });
 let session;
 const sample = `# A pace of your own
 
@@ -27,7 +29,7 @@ document.querySelector('#sample').addEventListener('click', () => {
 });
 form.addEventListener('submit', event => {
   event.preventDefault();
-  if (session) return;
+  if (session || pdfInput.busy) return;
   error.textContent = '';
   try {
     const article = pastedArticle(source.value, title.value);
