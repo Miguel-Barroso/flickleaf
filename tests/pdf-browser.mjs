@@ -16,7 +16,7 @@ export function pdfFixture(pages = ['Private manuscript first page.', 'The secon
   pdf += `trailer\n<< /Size ${objects.length + 1} /Root 1 0 R >>\nstartxref\n${start}\n%%EOF`;
   return Buffer.from(pdf);
 }
-export async function checkPDFInput(page) {
+export async function checkPDFInput(page, { hostingSecurity = false } = {}) {
   const workers = []; const recordWorker = worker => workers.push(worker.url()); page.on('worker', recordWorker);
   const requests = []; const record = request => requests.push({ url: request.url(), method: request.method(), body: request.postData() });
   page.on('request', record);
@@ -47,6 +47,12 @@ export async function checkPDFInput(page) {
     assert.ok(workers.some(url => url.includes('pdf.worker.mjs')), 'PDF extraction uses a local background worker');
     assert.ok(requests.length > 0, 'local parser assets were loaded');
     for (const request of requests) {
+      const recorded = JSON.stringify(request);
+      for (const value of ['private-manuscript', 'Private manuscript first page.', 'The second page stays local.']) {
+        for (const representation of [value, encodeURIComponent(value), Buffer.from(value).toString('base64')]) assert.ok(!recorded.includes(representation), 'document data is absent from requests');
+      }
+      const url = new URL(request.url);
+      if (hostingSecurity && url.origin === new URL(page.url()).origin && url.pathname.startsWith('/cdn-cgi/challenge-platform/')) continue;
       assert.equal(request.method, 'GET', 'PDF opening does not upload data');
       assert.equal(request.body, null);
       assert.ok(request.url.startsWith(new URL('pdfjs/', page.url()).href), `only local PDF assets requested: ${request.url}`);
