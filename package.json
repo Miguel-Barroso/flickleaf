@@ -14,9 +14,12 @@
     "build:web": "node build-web.mjs",
     "test:web": "node tests/web.mjs",
     "build:chrome": "node build.mjs --chrome",
-    "build:all": "npm run build && npm run build:chrome && npm run build:web",
+    "build:all": "npm run build && npm run build:chrome && npm run build:web && npm run build:safari",
     "package:chrome": "npm run build:chrome && web-ext build --source-dir dist-chrome --artifacts-dir artifacts --filename flickleaf-chrome-{version}.zip --overwrite-dest",
-    "test:chrome": "node tests/chrome.mjs"
+    "test:chrome": "node tests/chrome.mjs",
+    "build:safari": "node build.mjs --safari",
+    "package:safari": "npm run build:safari && node package-safari.mjs",
+    "test:safari": "node tests/safari.mjs"
   },
   "dependencies": {
     "@mozilla/readability": "^0.6.0",

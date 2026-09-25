@@ -4,7 +4,7 @@ Flick. Read. Find your pace.
 
 [Read in your browser](https://miguelbarroso.com/flickleaf/) · [About Flickleaf](https://miguelbarroso.com/flickleaf/about/)
 
-A local-first web reader and Firefox/Chrome extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
+A local-first web reader and Firefox/Chrome/Safari extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
 
 ## Try it in Firefox
 
@@ -111,7 +111,7 @@ The extension asks for `activeTab`, `scripting`, and `menus` (for the toolbar’
 
 ## Current limits and next steps
 
-This is the first desktop Firefox prototype. Safari extension packaging, saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
+This is the first desktop Firefox prototype. Saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
 
 Mozilla's extension linter currently reports 13 warnings and no errors: four existing Readability parsing warnings, a dynamic import of our fixed local PDF.js asset path, and eight warnings in PDF.js/its compatibility helpers. All parser code is packaged locally; PDF bytes cannot choose an import URL. PDF rendering, scripting, and actions are not invoked; only text extraction is used. Include the dependency sources and these notes in store review, and reassess warnings when dependencies change.
 
@@ -129,7 +129,7 @@ Publish the generated `flickleaf` directory into the site's persistent web root.
 
 ## Cross-platform releases
 
-Reader changes apply to web, Firefox, and Chrome together. `npm run build:all` builds all three targets; `npm run test:browser`, `npm run test:web`, and `npm run test:chrome` verify them. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.
+Reader changes apply to web, Firefox, Chrome, and Safari together. `npm run build:all` builds all four targets; `npm run test:browser`, `npm run test:web`, and `npm run test:chrome` verify them. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.
 
 
 Touch swipes in the reading area control playback and cannot pan the underlying page. The page is locked while the reader is open (including errors), then its previous scroll position and inline styles are restored on close. The reader itself can still scroll to reach controls on short screens.
@@ -139,3 +139,13 @@ During autoplay, the shared reader requests a screen wake lock. It releases the 
 ## Local PDFs
 
 Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is bundled locally, with its worker, CMaps and standard fonts; there is no external CDN or document-upload endpoint. File bytes go directly from File.arrayBuffer to the parser. Extracted text is editable before playback, with page markers for navigation. Limits: 25 MB / 300 pages. Scans need OCR elsewhere; locked PDFs need an unlocked copy. Multi-column reading order is not guaranteed. Failed or canceled imports preserve the existing draft. Nothing is saved to browser storage.
+
+## Safari on Mac, iPhone, and iPad
+
+The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
+
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.3.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+
+On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
+
+The Safari target requests only `activeTab` and `scripting`; its touch-friendly popup replaces the desktop context menu. The MV3 background runs as an event-driven service worker. PDF processing remains local. WebKit checks exercise the built JavaScript and PDF worker; they do not replace testing an installed extension on physical Apple devices.

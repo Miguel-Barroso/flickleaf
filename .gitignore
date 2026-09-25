@@ -6,3 +6,6 @@ artifacts/
 
 dist-web/
 dist-chrome/
+
+dist-safari/
+safari-build/

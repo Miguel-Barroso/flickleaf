@@ -2,22 +2,28 @@ import { copyPDFAssets } from './pdf-assets.mjs';
 import { build, context } from "esbuild";
 import { cp, mkdir, rm, readFile, writeFile } from "node:fs/promises";
 const chrome = process.argv.includes("--chrome");
-const outdir = chrome ? "dist-chrome" : "dist";
+const safari = process.argv.includes("--safari");
+const outdir = safari ? "dist-safari" : chrome ? "dist-chrome" : "dist";
 await rm(outdir, { recursive: true, force: true });
 await mkdir(outdir, { recursive: true });
 await cp("public", outdir, { recursive: true });
 await copyPDFAssets(outdir);
-if (chrome) {
+if (safari) await cp("safari/public", outdir, { recursive: true });
+if (chrome || safari) {
   const manifest = JSON.parse(await readFile('public/manifest.json', 'utf8'));
   delete manifest.browser_specific_settings;
-  manifest.minimum_chrome_version = '120';
+  if (chrome) manifest.minimum_chrome_version = '120';
   manifest.permissions = manifest.permissions.map(permission => permission === 'menus' ? 'contextMenus' : permission);
-  manifest.background = { service_worker: 'background.js' };
+  manifest.background = safari ? { service_worker: 'safari-background.js' } : { service_worker: 'background.js' };
+  if (safari) {
+    manifest.permissions = ['activeTab', 'scripting'];
+    manifest.action.default_popup = 'safari-popup.html';
+  }
   manifest.icons = Object.fromEntries([16, 32, 48, 128].map(size => [size, `icons/icon-${size}.png`]));
   manifest.action.default_icon = manifest.icons;
   await writeFile(`${outdir}/manifest.json`, JSON.stringify(manifest, null, 2) + '\n');
 }
-const options = { entryPoints: ["src/content.js", "src/background.js", "src/demo.js", "src/paste.js"], bundle: true, outdir, format: "iife", target: [chrome ? "chrome120" : "firefox142"], loader: { ".css": "text" }, legalComments: "eof" };
+const options = { entryPoints: ["src/content.js", "src/background.js", "src/demo.js", "src/paste.js", ...(safari ? ["src/safari-popup.js", "src/safari-background.js"] : [])], bundle: true, outdir, format: "iife", target: [safari ? "safari18.4" : chrome ? "chrome120" : "firefox142"], loader: { ".css": "text" }, legalComments: "eof" };
 if (process.argv.includes("--serve")) {
   const ctx = await context(options);
   await ctx.watch();
