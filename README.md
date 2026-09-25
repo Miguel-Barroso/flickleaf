@@ -25,7 +25,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.1.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.2.2.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -121,7 +121,7 @@ The extension keeps its original internal Firefox ID (`rsvp-reader@local.invalid
 
 ## Web version
 
-`web/` is the standalone paste reader at `/flickleaf/`, with an About page at `/flickleaf/about/`. It shares the tokenizer and playback UI with the extension. Phone layouts have a compact settings disclosure. No text is uploaded or persisted by the app.
+`web/` is the standalone paste reader at `/flickleaf/`, with an About page at `/flickleaf/about/`. It shares the tokenizer and playback UI with the extension. Pace limits and scroll modes stay directly visible on every platform. No text is uploaded or persisted by the app.
 
 Run `npm run build:web` to generate `dist-web/flickleaf/`. Serve `dist-web` as a web root so absolute `/flickleaf/` paths resolve. `npm run test:web` checks Chromium and WebKit, including 390×844 and 375×667 phone layouts. Install matching test browsers with `npx playwright install chromium webkit` if needed.
 
@@ -133,3 +133,5 @@ Reader changes apply to web, Firefox, and Chrome together. `npm run build:all` b
 
 
 Touch swipes in the reading area control playback and cannot pan the underlying page. The page is locked while the reader is open (including errors), then its previous scroll position and inline styles are restored on close. The reader itself can still scroll to reach controls on short screens.
+
+During autoplay, the shared reader requests a screen wake lock. It releases the lock on pause, stepping/seeking, manual scrolling, tab/window departure, end of text, or close. Unsupported browsers and denied requests do not interrupt reading; device power-saving settings and page permissions can prevent sleep protection. Resume autoplay to request it again.

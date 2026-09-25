@@ -36,14 +36,6 @@ form.addEventListener('submit', event => {
     session = openReader(article, () => { session = null; form.querySelector('[type="submit"]').focus({ preventScroll: true }); });
     const root = document.querySelector('[data-rsvp-reader]').shadowRoot;
     const style = document.createElement('style'); style.textContent = mobileCSS; root.append(style);
-    const settings = document.createElement('details'); settings.className = 'reader-settings chrome';
-    const summary = document.createElement('summary'); summary.textContent = 'Pace & scroll settings'; settings.append(summary);
-    root.querySelector('.hint').before(settings);
-    settings.append(root.querySelector('.scroll-feel'), root.querySelector('.speed-limits'));
-    // Keep the existing keyboard focus loop aware of native disclosure controls.
-    settings.addEventListener('keydown', event => {
-      if (event.target === summary && ['Enter', ' '].includes(event.key)) event.stopPropagation();
-    });
     if (matchMedia('(pointer: coarse)').matches) {
       root.querySelector('.hint').textContent = 'Swipe up to move forward · Swipe down to go back · Tap Play for a steady pace';
       root.querySelector('.stage').setAttribute('aria-label', 'Reading area. Swipe up to move forward or down to go back.');

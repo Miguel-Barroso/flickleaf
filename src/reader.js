@@ -1,3 +1,4 @@
+import { AutoplayWakeLock } from './wake-lock.js';
 import { Playback } from './core.js';
 import { lockPageScroll } from './scroll-lock.js';
 import css from './reader.css';
@@ -5,6 +6,7 @@ import css from './reader.css';
 export function openReader(article, onClose = () => {}, onPaste = null) {
   const previousFocus = document.activeElement;
   let unlockScroll = () => {};
+  const wakeLock = new AutoplayWakeLock();
   const host = document.createElement('div');
   host.dataset.rsvpReader = '';
   const root = host.attachShadow({ mode: 'open' });
@@ -27,7 +29,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   let frame, closed = false, engine, last = performance.now(), awake = performance.now(), context = false;
   const close = () => {
     if (closed) return; closed = true;
-    cancelAnimationFrame(frame); abort.abort(); dialog.close(); host.remove(); unlockScroll();
+    wakeLock.dispose(); cancelAnimationFrame(frame); abort.abort(); dialog.close(); host.remove(); unlockScroll();
     if (previousFocus?.isConnected) previousFocus.focus({ preventScroll: true });
     onClose(engine?.index);
   };
@@ -78,6 +80,8 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   }
   let rendered = -1;
   const render = () => {
+    wakeLock.setActive(engine.mode === 'play' && !document.hidden);
+    $('#play').title = wakeLock.status === 'active' ? 'Autoplay · keeping screen awake' : wakeLock.status === 'unavailable' ? 'Screen sleep prevention is unavailable in this browser or page' : 'Toggle autoplay';
     if (rendered !== engine.index) {
       rendered = engine.index;
       const token = article.tokens[engine.index];

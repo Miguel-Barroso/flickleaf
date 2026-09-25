@@ -1,3 +1,4 @@
+import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { chromium } from 'playwright';
 import { resolve } from 'node:path';
 import assert from 'node:assert/strict';
@@ -18,6 +19,7 @@ try {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(`chrome-extension://${id}/paste.html`);
   await checkHeadingFocus(page);
+  await checkAutoplayWakeLock(page);
   const newPage = context.waitForEvent('page');
   const response = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'open-paste' }));
   assert.equal(response.ok, true);

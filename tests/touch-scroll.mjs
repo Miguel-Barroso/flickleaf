@@ -63,11 +63,8 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   await swipe(true);
   assert.ok(Number(await page.locator('.progress').inputValue()) < forward, 'reverse swipe rewinds');
   assert.deepEqual(await page.evaluate(() => ({ x: scrollX, y: scrollY, top: document.body.getBoundingClientRect().top })), locked, 'background remains fixed');
-  if (await page.locator('.reader-settings').count()) {
-    await page.locator('.reader-settings summary').click();
-    await page.locator('#max-speed').scrollIntoViewIfNeeded();
-    assert.ok(await page.locator('#max-speed').isVisible(), 'settings remain reachable');
-  }
+  await page.locator('#max-speed').scrollIntoViewIfNeeded();
+  assert.ok(await page.locator('#max-speed').isVisible(), 'settings remain reachable');
   await page.locator('#close').click();
   assert.deepEqual(await page.evaluate(snapshot), before, 'close restores scroll position and preexisting inline styles');
   // A second session must not retain a stale lock or listener.

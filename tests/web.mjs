@@ -1,3 +1,4 @@
+import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkTouchScroll } from './touch-scroll.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium, webkit } from 'playwright';
@@ -36,16 +37,15 @@ try {
       assert.equal(await page.locator('.word').textContent(), 'A pace of your own');
       assert.equal(await page.locator('#sections option').count(), 3);
       assert.equal(await page.locator('dialog').evaluate(el => el.scrollWidth > el.clientWidth), false);
+      for (const control of ['#direct', '#freewheel', '#min-speed', '#max-speed']) assert.ok(await page.locator(control).isVisible());
       const playBox = await page.locator('#play').boundingBox();
       assert.ok(playBox.y + playBox.height <= options.viewport.height, 'Play fits the initial viewport');
       await page.locator('#play').click();
       await page.waitForTimeout(1600);
       await page.locator('#play').click();
       assert.notEqual(await page.locator('.word').textContent(), 'A pace of your own');
-      await page.getByText('Pace & scroll settings', { exact: true }).click();
       await page.locator('#max-speed').fill('600'); await page.locator('#max-speed').press('Tab');
       assert.equal(await page.locator('#speed').getAttribute('max'), '600');
-      await page.getByText('Pace & scroll settings', { exact: true }).click();
       await page.getByLabel('Jump to section').selectOption({ label: 'Find your place' });
       assert.equal(await page.locator('.word').textContent(), 'Find your place');
       await page.locator('dialog').evaluate(el => { el.scrollTop = 0; });
@@ -53,6 +53,7 @@ try {
       await page.locator('#close').click();
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
+  await checkAutoplayWakeLock(page);
       if (options.hasTouch) await checkTouchScroll(page, type === chromium);
       await page.getByRole('link', { name: 'About', exact: true }).click();
       assert.ok(await page.getByRole('heading', { name: 'Reading, at your pace.' }).isVisible());

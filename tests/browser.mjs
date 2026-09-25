@@ -1,3 +1,4 @@
+import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium } from 'playwright';
 import { createServer } from 'node:http';
@@ -159,6 +160,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: '.test-results/paste-desktop.png' });
   await checkHeadingFocus(page);
+  await checkAutoplayWakeLock(page);
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');
 } finally { await browser.close(); server.close(); }
