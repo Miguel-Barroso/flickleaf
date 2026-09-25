@@ -60,3 +60,6 @@ header{display:flex;align-items:center;justify-content:space-between;gap:20px}.b
 .stage>.focus-line.lower{top:calc(50% + 82px);margin:0}
 
 .word-frame>.context{position:absolute;top:calc(100% + 24px);left:50%;transform:translateX(-50%);width:min(660px,100%);margin:0}
+
+.preferences{display:flex;align-items:center;justify-content:center;gap:8px;flex-wrap:wrap;margin-top:8px;font-size:11px;color:var(--muted)}
+.preferences button{font-size:11px;padding:6px 10px;min-height:36px}

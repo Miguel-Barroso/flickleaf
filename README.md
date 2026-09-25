@@ -25,7 +25,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.3.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.4.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -41,7 +41,7 @@ The progress bar shows a tick at each heading: taller marks for main sections, s
 
 The **Min / Max** fields default to **300 / 900 WPM**. They cap the base reading pace in Direct, Freewheel, reverse scrolling, and hands-off playback. You can choose limits between 50 and 1,500 WPM. Changing either limit takes effect immediately; if you move one past the other, the other follows so the range stays valid. Blank or invalid entries restore the previous value.
 
-Wheel momentum still decays naturally. When it would produce a pace below the minimum, reading holds at your minimum until the wheel settles, then pauses. Pause remains immediate. Punctuation and heading pauses still apply, so the average number of words shown per minute can be below your minimum base pace. Limits reset to 300–900 when you reopen the reader.
+Wheel momentum still decays naturally. When it would produce a pace below the minimum, reading holds at your minimum until the wheel settles, then pauses. Pause remains immediate. Punctuation and heading pauses still apply, so the average number of words shown per minute can be below your minimum base pace. Limits start at 300–900 and are remembered locally when storage is available.
 
 ## Two scroll modes
 
@@ -50,7 +50,7 @@ Choose **Direct** or **Freewheel** below the playback controls.
 - **Direct** keeps the original short glide and close control.
 - **Freewheel** adds more momentum per flick and coasts much longer. Repeated flicks accelerate; opposite scrolling brakes first, then reverses. Space, Enter, Pause, seeking, or switching modes stops momentum immediately. Leaving the tab/window also stops it.
 
-Freewheel is a software approximation of a freely spinning wheel, not a hardware-specific Logitech simulation. A moderate flick can coast for roughly 20 seconds; input from different wheels and trackpads varies. Both modes respect your minimum and maximum pace and retain heading timing. Hands-off Play still runs at the configured WPM. The mode resets to Direct when the reader is reopened.
+Freewheel is a software approximation of a freely spinning wheel, not a hardware-specific Logitech simulation. A moderate flick can coast for roughly 20 seconds; input from different wheels and trackpads varies. Both modes respect your minimum and maximum pace and retain heading timing. Hands-off Play still runs at the configured WPM. Your selected mode is remembered locally when storage is available.
 
 For tuning: Direct uses gain 4 and a 420 ms exponential decay constant; Freewheel uses gain 6 and a 6,000 ms decay constant, with stronger opposing-input braking and a 20 WPM stop threshold. These constants live in `src/core.js`.
 
@@ -80,7 +80,7 @@ Space and Enter control playback even after clicking a button. While editing the
 
 ## Development
 
-Use Node.js 22 or newer and npm.
+Use Node.js 24 and npm for the locked dependency versions.
 
 ```sh
 npm ci
@@ -107,11 +107,11 @@ Browser tests use `/Applications/Chromium.app/Contents/MacOS/Chromium` by defaul
 - `src/content.js`: extension entry and page-session position memory.
 - `src/background.js`: user-initiated active-tab injection and restricted-page feedback.
 
-The extension asks for `activeTab`, `scripting`, and `menus` (for the toolbar’s Paste text menu). Article text is assigned with `textContent`; extracted HTML is never inserted into the live page. Firefox's modal dialog isolates keyboard focus without rewriting the underlying article. No article or reading state is sent anywhere.
+The extension asks for `activeTab`, `scripting`, `storage`, and `menus` (for the toolbar’s Paste text menu). Article text is assigned with `textContent`; extracted HTML is never inserted into the live page. Firefox's modal dialog isolates keyboard focus without rewriting the underlying article. No article or reading state is sent anywhere.
 
 ## Current limits and next steps
 
-This is the first desktop Firefox prototype. Saved preferences, persistent reading history, and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
+Persistent reading history and fixed recognition-point alignment are not implemented. Japanese uses `Intl.Segmenter`, but multilingual pacing still needs user testing. Touch drag is implemented; physical phone testing remains to be done. RSVP is a different presentation mode, not a promise of faster comprehension or less fatigue.
 
 Mozilla's extension linter currently reports 13 warnings and no errors: four existing Readability parsing warnings, a dynamic import of our fixed local PDF.js asset path, and eight warnings in PDF.js/its compatibility helpers. All parser code is packaged locally; PDF bytes cannot choose an import URL. PDF rendering, scripting, and actions are not invoked; only text extraction is used. Include the dependency sources and these notes in store review, and reassess warnings when dependencies change.
 
@@ -138,14 +138,26 @@ During autoplay, the shared reader requests a screen wake lock. It releases the 
 
 ## Local PDFs
 
-Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is bundled locally, with its worker, CMaps and standard fonts; there is no external CDN or document-upload endpoint. File bytes go directly from File.arrayBuffer to the parser. Extracted text is editable before playback, with page markers for navigation. Limits: 25 MB / 300 pages. Scans need OCR elsewhere; locked PDFs need an unlocked copy. Multi-column reading order is not guaranteed. Failed or canceled imports preserve the existing draft. Nothing is saved to browser storage.
+Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is bundled locally, with its worker, CMaps and standard fonts; there is no external CDN or document-upload endpoint. File bytes go directly from File.arrayBuffer to the parser. Extracted text is editable before playback, with page markers for navigation. Limits: 25 MB / 300 pages. Scans need OCR elsewhere; locked PDFs need an unlocked copy. Multi-column reading order is not guaranteed. Failed or canceled imports preserve the existing draft. PDF files and extracted text are never saved to browser storage.
 
 ## Safari on Mac, iPhone, and iPad
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.3.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.4.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 
-The Safari target requests only `activeTab` and `scripting`; its touch-friendly popup replaces the desktop context menu. The MV3 background runs as an event-driven service worker. PDF processing remains local. WebKit checks exercise the built JavaScript and PDF worker; they do not replace testing an installed extension on physical Apple devices.
+The Safari target requests `activeTab`, `scripting`, and `storage`; its touch-friendly popup replaces the desktop context menu. The MV3 background runs as an event-driven service worker. PDF processing remains local. WebKit checks exercise the built JavaScript and PDF worker; they do not replace testing an installed extension on physical Apple devices.
+
+## Local preferences
+
+Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, and theme on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Only these settings are saved—never document text, PDFs, filenames, page URLs, or reading history. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
+
+## Roadmap and releases
+
+See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). The next release prioritizes local preferences, automated checks, and store readiness. Development packages remain unsigned until the separate store/signing process is completed.
+
+## License
+
+Flickleaf is [MIT licensed](LICENSE). Bundled dependencies retain their own licenses and notices.

@@ -1,0 +1,32 @@
+name: Validate
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_call:
+permissions:
+  contents: read
+jobs:
+  reader:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+      - run: npm ci
+      - run: npx playwright install --with-deps chromium webkit
+      - run: node scripts/check-release.mjs
+      - run: npm run build:all
+      - run: npm test
+      - name: Test Firefox-target reader in bundled Chromium
+        run: |
+          CHROMIUM_PATH=$(node --input-type=module -e "import { chromium } from 'playwright'; console.log(chromium.executablePath())")
+          export CHROMIUM_PATH
+          npm run test:browser
+      - run: npm run test:chrome
+      - run: npm run test:web
+      - run: npm run test:safari
+      - run: npm run lint:extension

@@ -1,3 +1,4 @@
+import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { chromium } from 'playwright';
@@ -22,6 +23,7 @@ try {
   await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
+  await checkPreferences(page);
   const newPage = context.waitForEvent('page');
   const response = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'open-paste' }));
   assert.equal(response.ok, true);

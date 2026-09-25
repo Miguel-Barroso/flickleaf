@@ -1,0 +1,39 @@
+name: Bug report
+description: Report a reading, import, or installation problem.
+title: "[Bug] "
+body:
+  - type: markdown
+    attributes:
+      value: "Please use a public sample or short invented text. Do not attach private PDFs, documents, access tokens, or sensitive URLs."
+  - type: input
+    id: version
+    attributes:
+      label: Flickleaf version and installation method
+      placeholder: "For example: 0.3.0, Firefox temporary add-on, or web app"
+    validations:
+      required: true
+  - type: input
+    id: environment
+    attributes:
+      label: Browser, operating system, and device
+      placeholder: "Include browser version and whether this is a physical phone or simulator."
+    validations:
+      required: true
+  - type: textarea
+    id: steps
+    attributes:
+      label: Steps to reproduce
+      description: Include input method (wheel, trackpad, touch, keyboard) and reading settings if relevant.
+    validations:
+      required: true
+  - type: textarea
+    id: expected
+    attributes:
+      label: Expected and actual behavior
+    validations:
+      required: true
+  - type: textarea
+    id: sample
+    attributes:
+      label: Optional public sample or screenshot
+      description: For PDFs, include page count, file size, and whether text can be selected. Redact personal content from screenshots.

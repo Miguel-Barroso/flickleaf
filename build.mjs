@@ -8,6 +8,7 @@ await rm(outdir, { recursive: true, force: true });
 await mkdir(outdir, { recursive: true });
 await cp("public", outdir, { recursive: true });
 await copyPDFAssets(outdir);
+await cp("LICENSE", `${outdir}/LICENSE`);
 if (safari) await cp("safari/public", outdir, { recursive: true });
 if (chrome || safari) {
   const manifest = JSON.parse(await readFile('public/manifest.json', 'utf8'));
@@ -16,7 +17,7 @@ if (chrome || safari) {
   manifest.permissions = manifest.permissions.map(permission => permission === 'menus' ? 'contextMenus' : permission);
   manifest.background = safari ? { service_worker: 'safari-background.js' } : { service_worker: 'background.js' };
   if (safari) {
-    manifest.permissions = ['activeTab', 'scripting'];
+    manifest.permissions = ['activeTab', 'scripting', 'storage'];
     manifest.action.default_popup = 'safari-popup.html';
   }
   manifest.icons = Object.fromEntries([16, 32, 48, 128].map(size => [size, `icons/icon-${size}.png`]));

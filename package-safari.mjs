@@ -9,6 +9,7 @@ await writeFile(project, (await readFile(project, 'utf8'))
   .replace(/MACOSX_DEPLOYMENT_TARGET = [\d.]+;/g, 'MACOSX_DEPLOYMENT_TARGET = 15.4;')
   .replace(/MARKETING_VERSION = [\d.]+;/g, `MARKETING_VERSION = ${version};`));
 await copyFile('README.md', 'safari-build/Flickleaf/README.md');
+await copyFile('LICENSE', 'safari-build/Flickleaf/LICENSE');
 await mkdir('artifacts', { recursive: true });
 execFileSync('ditto', ['-c', '-k', '--sequesterRsrc', '--keepParent', 'safari-build/Flickleaf', `artifacts/flickleaf-safari-${version}-xcode.zip`]);
 console.log('Open safari-build/Flickleaf/Flickleaf.xcodeproj to sign and install on a Mac or iPhone.');
