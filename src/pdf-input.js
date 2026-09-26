@@ -1,9 +1,12 @@
+import { pdfLines, formatPDFPages } from './pdf-cleanup.js';
+import { setupPDFCleanup } from './pdf-cleanup-ui.js';
 // File bytes go directly to PDF.js in a local worker, never to a network endpoint.
 export function setupPDFInput({ form, source, title, error }) {
   const input = document.querySelector('#pdf-file');
   const open = document.querySelector('#open-pdf');
   const cancel = document.querySelector('#cancel-pdf');
   const status = document.querySelector('#pdf-status');
+  const cleanup = setupPDFCleanup({ source, status });
   const assets = new URL('pdfjs/', document.currentScript.src);
   let run = 0, task = null, busy = false;
   const controls = [...form.querySelectorAll('button,input,textarea')].filter(el => el !== cancel);
@@ -52,21 +55,14 @@ export function setupPDFInput({ form, source, title, error }) {
         status.textContent = `Reading page ${number} of ${pdf.numPages} locally…`;
         const page = await pdf.getPage(number);
         const content = await page.getTextContent();
-        const lines = []; let line = '';
-        for (const item of content.items) {
-          if (typeof item.str !== 'string') continue;
-          line += item.str + ' ';
-          if (item.hasEOL) { lines.push(line.trim()); line = ''; }
-        }
-        if (line.trim()) lines.push(line.trim());
-        const text = lines.join('\n').trim();
-        if (/[\p{L}\p{N}]/u.test(text)) pages.push(`# Page ${number}\n\n${text}`);
+        const lines = pdfLines(content, page.getViewport({ scale: 1 }));
+        if (lines.some(line => /[\p{L}\p{N}]/u.test(line.text))) pages.push({ number, lines });
         else empty++;
         page.cleanup();
       }
       if (current !== run) return;
       if (!pages.length) throw new Error('No readable text was found. Scanned or image-only PDFs need OCR first; Flickleaf does not run OCR.');
-      source.value = pages.join('\n\n'); title.value = file.name.replace(/\.pdf$/i, '').slice(0, 200);
+      source.value = formatPDFPages(pages); cleanup.setPages(pages); title.value = file.name.replace(/\.pdf$/i, '').slice(0, 200);
       status.textContent = `${pdf.numPages} pages opened locally. Review the text, then start reading.${empty ? ` ${empty} pages had no readable text and were skipped; they may need OCR.` : ''}`;
     } catch (reason) {
       if (current !== run) return;

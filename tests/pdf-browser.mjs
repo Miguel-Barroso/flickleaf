@@ -3,8 +3,11 @@ export function pdfFixture(pages = ['Private manuscript first page.', 'The secon
   const font = 3 + pages.length * 2;
   const objects = ['<< /Type /Catalog /Pages 2 0 R >>', `<< /Type /Pages /Kids [${pages.map((_, i) => `${3 + i * 2} 0 R`).join(' ')}] /Count ${pages.length} >>`];
   for (const [i, text] of pages.entries()) {
-    const escaped = text.replace(/[()\\]/g, value => '\\' + value);
-    const stream = text ? `BT /F1 16 Tf 50 740 Td (${escaped}) Tj ET` : '';
+    const parts = Array.isArray(text) ? text : [{ text, y: 740 }];
+    const stream = parts.filter(part => part.text).map(part => {
+      const escaped = part.text.replace(/[()\\]/g, value => '\\' + value);
+      return `BT /F1 16 Tf 50 ${part.y} Td (${escaped}) Tj ET`;
+    }).join('\n');
     objects.push(`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 612 792] /Resources << /Font << /F1 ${font} 0 R >> >> /Contents ${4 + i * 2} 0 R >>`);
     objects.push(`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`);
   }
@@ -35,6 +38,10 @@ export async function checkPDFInput(page, { hostingSecurity = false } = {}) {
     assert.equal(await page.locator('.word').textContent(), 'Page 2');
     await page.locator('#close').click();
     assert.equal(await page.locator('#source').inputValue(), draft);
+    assert.equal(await page.locator('#pdf-preview').isVisible(), true);
+    await page.locator('#pdf-preview').click();
+    assert.match(await page.locator('#pdf-clean-summary').textContent(), /No cleanup suggestions/);
+    await page.locator('#pdf-keep').click();
     await page.locator('#pdf-file').setInputFiles({ name: 'bad.pdf', mimeType: 'application/pdf', buffer: Buffer.from('not a PDF') });
     await page.waitForFunction(() => document.querySelector('#error').textContent.length > 0);
     assert.equal(await page.locator('#source').inputValue(), draft, 'invalid PDF preserves the draft');
@@ -80,4 +87,41 @@ export async function checkPDFCancel(page) {
     assert.equal(await other.locator('#source').inputValue(), 'Keep my existing text.');
     assert.equal(other.workers().length, 0, 'canceled import never starts parsing');
   } finally { release(); await other.close(); }
+}
+
+export async function checkPDFCleanup(page) {
+  const accept = dialog => dialog.accept(); page.on('dialog', accept);
+  try {
+    const pages = Array.from({ length: 4 }, (_, i) => [
+      {text:'Field notes', y:740}, {text:`Body passage ${i + 1}.`, y:650},
+      {text:'under-',y:628}, {text:'standing matters.',y:612}, {text:`Page ${i + 1} of 4`,y:30}
+    ]);
+    await page.locator('#pdf-file').setInputFiles({name:'cleanup.pdf',mimeType:'application/pdf',buffer:pdfFixture(pages)});
+    await page.waitForFunction(() => /opened locally/.test(document.querySelector('#pdf-status').textContent) || document.querySelector('#error').textContent);
+    assert.equal(await page.locator('#error').textContent(),'');
+    const original=await page.locator('#source').inputValue();
+    assert.ok(original.includes('Field notes')); assert.ok(original.includes('Page 4 of 4'));
+    assert.equal(await page.locator('#pdf-clean-hyphens').isChecked(),false);
+    await page.locator('#pdf-preview').click();
+    assert.match(await page.locator('#pdf-clean-summary').textContent(), /4 repeated margin lines · 4 page numbers · 0 hyphen joins/);
+    assert.equal(await page.locator('#source').inputValue(),original,'preview never edits the draft');
+    const preview=await page.locator('#pdf-clean-text').inputValue();
+    assert.ok(!preview.includes('Field notes')); assert.ok(preview.includes('under-\nstanding'));
+    await page.locator('#pdf-clean-hyphens').check();
+    assert.equal(await page.locator('#pdf-preview-panel').isVisible(),false,'option changes invalidate the preview');
+    await page.locator('#pdf-preview').click();
+    assert.match(await page.locator('#pdf-clean-summary').textContent(), /4 hyphen joins/);
+    await page.locator('#pdf-apply').click();
+    const clean=await page.locator('#source').inputValue();
+    assert.ok(clean.includes('understanding matters.')); assert.ok(clean.includes('# Page 4'));
+    await page.getByRole('button',{name:'Start reading'}).click();
+    await page.getByLabel('Jump to section').selectOption({label:'Page 4'});
+    assert.equal(await page.locator('.word').textContent(),'Page 4'); await page.locator('#close').click();
+    await page.locator('#pdf-undo').click();
+    assert.equal(await page.locator('#source').inputValue(),original,'undo restores exact original extraction');
+    await page.locator('#pdf-preview').click();
+    await page.locator('#source').fill('My manual edits stay intact.');
+    assert.equal(await page.locator('.pdf-cleanup').isVisible(),false,'manual editing discards stale suggestions');
+    assert.equal(await page.locator('#source').inputValue(),'My manual edits stay intact.');
+  } finally { page.off('dialog',accept); }
 }

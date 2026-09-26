@@ -3,7 +3,7 @@ import { webkit } from 'playwright';
 import { createServer } from 'node:http';
 import { readFile } from 'node:fs/promises';
 import assert from 'node:assert/strict';
-import { checkPDFInput } from './pdf-browser.mjs';
+import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 const manifest = JSON.parse(await readFile('dist-safari/manifest.json'));
 assert.deepEqual(manifest.permissions, ['activeTab', 'scripting', 'storage']);
@@ -42,6 +42,7 @@ try {
   await page.goto(`${base}/paste.html`);
   await checkHeadingFocus(page);
   await checkPDFInput(page);
+  await checkPDFCleanup(page);
   await checkPreferences(page);
   console.log('Safari WebKit: popup success/denial, paste action, heading focus, and local PDF worker passed (extension APIs mocked).');
 } finally { await browser.close(); server.close(); }

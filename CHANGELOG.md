@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.5.0
+
+- Preview local PDF cleanup for repeated margin headers/footers and page numbers, then explicitly apply or undo it.
+- Offer optional line-end hyphen joining, off by default.
+- Preserve page navigation and discard stale suggestions after manual edits.
+- Record a real-device release checklist and roadmap status.
+
 ## 0.4.0
 
 - Remember reading pace, speed limits, scroll mode, and theme locally across web, Firefox, Chrome, and Safari, with a reset control. Document text and PDFs remain unsaved.

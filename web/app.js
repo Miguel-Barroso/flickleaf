@@ -25,7 +25,7 @@ The little marks above the progress bar show where sections begin. Choose a head
 Close the reader whenever you want to return to the full passage. Your rhythm belongs to you.`;
 document.querySelector('#sample').addEventListener('click', () => {
   if (source.value.trim() && !confirm('Replace the text in this tab with the sample?')) return;
-  source.value = sample; title.value = 'A pace of your own'; error.textContent = ''; source.focus();
+  source.value = sample; source.dispatchEvent(new Event('input')); title.value = 'A pace of your own'; error.textContent = ''; source.focus();
 });
 form.addEventListener('submit', event => {
   event.preventDefault();

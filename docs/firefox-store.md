@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status: preparation only. No AMO submission or Mozilla approval has been completed by this work. Recheck this document against the exact release package before submitting. Prepared for 0.4.0. Policy references checked 26 September 2026.
+Status: preparation only. No AMO submission or Mozilla approval has been completed by this work. Recheck this document against the exact release package before submitting. Prepared for 0.5.0. Policy references checked 26 September 2026.
 
 ## Listing copy
 
@@ -15,6 +15,8 @@ Flickleaf puts the words in one place and lets your hand control the pace. Open 
 Set a comfortable pace and minimum/maximum speed. Headings stay centered, with section pauses and navigation markers so you can find your place. Pause to see surrounding text whenever you need context.
 
 Paste your own text or open a text-based PDF. PDF processing happens on your device: the file, filename, and extracted text are not uploaded. Review and edit extracted text before reading. PDFs are limited to 25 MB and 300 pages; scanned documents need OCR elsewhere, password-protected documents need an unlocked copy, and complex column layouts may require cleanup.
+
+Preview optional cleanup for repeated PDF headers, footers, and page numbers before applying changes. Hyphen joining is optional and should be reviewed. Cleanup and undo stay local.
 
 Reading preferences are saved locally on this browser. Flickleaf does not save document text, PDF files, or a persistent reading history. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
 

@@ -25,7 +25,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.4.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.5.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -144,7 +144,7 @@ Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is 
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.4.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.5.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 
@@ -161,3 +161,9 @@ See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md),
 ## License
 
 Flickleaf is [MIT licensed](LICENSE). Bundled dependencies retain their own licenses and notices.
+
+## PDF cleanup preview
+
+After opening a PDF, choose **Preview cleanup**. Flickleaf suggests removing short headers or footers repeated in the same margin on at least three pages and 60% of readable pages, and numeric page labels in the margins. Body numbers are kept. The preview leaves your draft unchanged; **Apply cleanup** uses the suggested text, and **Undo cleanup** restores the original extraction.
+
+Joining words split by a line-end hyphen is off by default because genuine compound words can be changed. If enabled, it joins nearby lowercase text lines within the same page. Review the result. Cleanup does not fix columns, tables, OCR, or arbitrary PDF reading order. Page navigation markers stay in place. Manually editing the draft discards cleanup suggestions and undo state; reopen the PDF to create new suggestions. Original and proposed text exist only in the current tab and are never uploaded or persisted.

@@ -1,5 +1,5 @@
 import { checkPreferences } from './preferences-browser.mjs';
-import { checkPDFInput } from './pdf-browser.mjs';
+import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
 import { chromium } from 'playwright';
@@ -164,6 +164,7 @@ try {
   await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
+  await checkPDFCleanup(page);
   await checkPreferences(page);
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');

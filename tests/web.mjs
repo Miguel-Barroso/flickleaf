@@ -1,5 +1,5 @@
 import { checkPreferences } from './preferences-browser.mjs';
-import { checkPDFInput, checkPDFCancel } from './pdf-browser.mjs';
+import { checkPDFCleanup, checkPDFInput, checkPDFCancel } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
 import { checkTouchScroll } from './touch-scroll.mjs';
 import { checkHeadingFocus } from './heading-focus.mjs';
@@ -57,6 +57,7 @@ try {
       await checkHeadingFocus(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
+  await checkPDFCleanup(page);
   await checkPreferences(page);
       if (name === 'desktop') await checkPDFCancel(page);
       if (options.hasTouch) await checkTouchScroll(page, type === chromium);
