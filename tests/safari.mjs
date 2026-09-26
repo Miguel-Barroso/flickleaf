@@ -1,3 +1,4 @@
+import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { webkit } from 'playwright';
 import { createServer } from 'node:http';
@@ -44,5 +45,6 @@ try {
   await checkPDFInput(page);
   await checkPDFCleanup(page);
   await checkPreferences(page);
+  await checkParagraphView(page);
   console.log('Safari WebKit: popup success/denial, paste action, heading focus, and local PDF worker passed (extension APIs mocked).');
 } finally { await browser.close(); server.close(); }

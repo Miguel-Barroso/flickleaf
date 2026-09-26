@@ -14,23 +14,23 @@ export function tokenize(blocks, language = 'en') {
   blocks.forEach((block, paragraph) => {
     const text = block.text.replace(/\s+/gu, ' ').trim();
     const local = [];
-    let prefix = '';
+    let prefix = '', prefixStart = null;
     for (const part of segmenter.segment(text)) {
       if (part.isWordLike) {
-        local.push({ text: prefix + part.segment, paragraph, heading: block.heading });
-        prefix = '';
+        local.push({ text: prefix + part.segment, paragraph, heading: block.heading, start: prefixStart ?? part.index, end: part.index + part.segment.length });
+        prefix = ''; prefixStart = null;
       } else if (part.segment.trim()) {
-        if (/[“‘「『（(\[]/u.test(part.segment) || !local.length) prefix += part.segment;
-        else local.at(-1).text += part.segment;
+        if (/[“‘「『（(\[]/u.test(part.segment) || !local.length) { prefix += part.segment; prefixStart ??= part.index; }
+        else { local.at(-1).text += part.segment; local.at(-1).end = part.index + part.segment.length; }
       }
     }
-    if (prefix && local.length) local.at(-1).text += prefix;
+    if (prefix && local.length) { local.at(-1).text += prefix; local.at(-1).end = text.length; }
     if (block.heading && local.length) {
       // Headings stay together; weights follow the user's chosen WPM.
       const previous = tokens.at(-1);
       if (previous && !previous.heading) previous.weight += 1.5;
       tokens.push({ text, paragraph, heading: true, level: block.level || 2,
-        wordCount: local.length, weight: Math.max(5, local.length + 2) });
+        start: 0, end: text.length, wordCount: local.length, weight: Math.max(5, local.length + 2) });
       return;
     }
     local.forEach((token, i) => {

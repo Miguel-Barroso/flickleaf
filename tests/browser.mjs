@@ -1,3 +1,4 @@
+import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
@@ -166,6 +167,7 @@ try {
   await checkPDFInput(page);
   await checkPDFCleanup(page);
   await checkPreferences(page);
+  await checkParagraphView(page);
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');
 } finally { await browser.close(); server.close(); }

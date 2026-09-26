@@ -1,3 +1,4 @@
+import { setupParagraphView } from './paragraph-view.js';
 import { createPreferencesStore, DEFAULT_PREFERENCES } from './preferences.js';
 import { AutoplayWakeLock } from './wake-lock.js';
 import { Playback } from './core.js';
@@ -21,7 +22,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   dialog.innerHTML = `<div class="frame">
     <header class="chrome"><div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 23C4 12 13 5 27 5c0 14-6 23-17 19" fill="currentColor"/><path d="M5 28 20 13" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/><path d="m5 28 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Flickleaf</div><div class="header-actions"><button id="paste" hidden>Paste text</button><button class="quiet" id="theme" aria-label="Switch to dark theme">◐</button><button id="close">Close <span aria-hidden="true">↗</span></button></div></header>
     <section class="article chrome"><span class="eyebrow">Find your reading rhythm.</span><h1></h1><p id="meta"></p></section>
+    <div class="view-switch chrome mode-switch" role="group" aria-label="Reading view"><button id="word-view" aria-pressed="true">Words</button><button id="paragraph-view" aria-pressed="false">Paragraphs</button></div>
     <main class="stage" aria-label="Reading area. Scroll or drag to control the pace."><div class="focus-line" aria-hidden="true"></div><div class="word-frame"><span class="heading-label eyebrow" hidden>Section</span><div class="word" aria-live="off"></div><div class="context" hidden></div></div><div class="focus-line lower" aria-hidden="true"></div></main>
+    <section class="paragraph-pane" hidden tabindex="0" aria-label="Paragraph reading view" aria-describedby="paragraph-help"><p id="paragraph-help">Your current word is highlighted. Select a word to move your place; use ← and → to step. Play returns to Words.</p><button id="earlier-passage">Earlier passage</button><div class="paragraph-content"></div><button id="later-passage">Later passage</button></section>
     <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="direct" aria-pressed="true">Direct</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><div class="preferences chrome"><span id="preferences-status" role="status">Loading preferences…</span><button class="quiet" id="clear-preferences">Clear saved preferences</button></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>Esc</kbd> to leave</p></div>
     <footer class="chrome"><span>FLICK. READ. FIND YOUR PACE.</span><span>One word. Right here.</span></footer>
   </div>`;
@@ -30,6 +33,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const text = (selector, value) => { const node = $(selector); if (node.textContent !== value) node.textContent = value; };
   const abort = new AbortController();
   const listen = (target, event, fn, options = {}) => target.addEventListener(event, fn, { ...options, signal: abort.signal });
+  let view = 'words', paragraphView;
   let frame, closed = false, engine, last = performance.now(), awake = performance.now(), context = false;
   const close = () => {
     if (closed) return; closed = true;
@@ -52,7 +56,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   try { dialog.showModal(); }
   catch (error) { unlockScroll(); host.remove(); throw error; }
   if (article.error) {
-    $('.article').remove(); $('.bottom').remove();
+    $('.article').remove(); $('.bottom').remove(); $('.view-switch').remove(); $('.paragraph-pane').remove();
     $('.stage').className = 'error';
     $('.error').replaceChildren();
     const title = document.createElement('h1'); title.textContent = 'A different way in.';
@@ -111,11 +115,20 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
         el.textContent = token.text + ' '; $('.context').append(el);
       });
     }
-    text('#play', engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
+    if (view === 'paragraphs') paragraphView.render(engine.index);
+    text('#play', view === 'paragraphs' ? 'Play words' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
     text('#state', engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
     dialog.classList.toggle('reading', engine.mode !== 'paused' && performance.now() - awake > 1600 && !context);
   };
-  const toggle = () => { context = false; showContext(); engine.toggle(); render(); };
+  const setView = mode => {
+    engine.pause(); context = false; showContext(); view = mode;
+    $('.stage').hidden = mode === 'paragraphs'; $('.paragraph-pane').hidden = mode !== 'paragraphs';
+    $('#context').hidden = mode === 'paragraphs'; dialog.classList.toggle('paragraph-mode', mode === 'paragraphs');
+    $('#word-view').setAttribute('aria-pressed', String(mode === 'words')); $('#paragraph-view').setAttribute('aria-pressed', String(mode === 'paragraphs'));
+    awake = performance.now(); render();
+    if (mode === 'paragraphs') { paragraphView.render(engine.index, true); $('.paragraph-pane').focus({ preventScroll: true }); }
+  };
+  const toggle = () => { if (view === 'paragraphs') setView('words'); context = false; showContext(); engine.toggle(); render(); };
   const seek = index => { engine.seek(index); awake = performance.now(); render(); };
   const speed = value => { if (Number.isFinite(value)) engine.setSpeed(value); $('#speed').value = String(engine.speed); savePreferences(); render(); };
   const showContext = () => { $('.context').hidden = !context; $('#context').setAttribute('aria-pressed', String(context)); };
@@ -175,7 +188,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     if (event.target.closest('button,input,select')) awake = performance.now();
   });
   listen(dialog, 'wheel', event => {
-    if (event.ctrlKey || event.target.closest('input,select')) return;
+    if (view === 'paragraphs' || event.ctrlKey || event.target.closest('input,select')) return;
     event.preventDefault();
     context = false; showContext();
     engine.impulse(event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1));
@@ -190,8 +203,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       return;
     }
     if (event.altKey || event.metaKey || event.ctrlKey) return;
-    if (event.target.closest('#paste,#clear-preferences,#theme') && (event.code === 'Space' || event.key === 'Enter')) return;
+    if (event.target.closest('#paste,#clear-preferences,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage') && (event.code === 'Space' || event.key === 'Enter')) return;
     if (event.target.closest('input,select,textarea,[contenteditable]')) return;
+    if (view === 'paragraphs' && event.target.closest('.paragraph-pane') && ['ArrowUp','ArrowDown','PageUp','PageDown','Home','End'].includes(event.key)) return;
     if (event.code === 'Space' || event.key === 'Enter') {
       // Prevent native button activation as well as page scrolling. A held key
       // must not repeatedly switch playback on and off.
@@ -204,7 +218,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); seek(engine.index + 1); }
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
-  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,#clear-preferences,#theme,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
+  listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#paste,#clear-preferences,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
   let pointer = null, y = 0;
   listen($('.stage'), 'pointerdown', event => {
     if (event.pointerType === 'touch' || pointer !== null || event.button !== 0) return;
@@ -273,6 +287,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     if (result.ok && engine.mode === 'paused') applyPreferences(result.value);
     text('#preferences-status', preferences.temporary ? 'Private session: preference changes are temporary.' : result.ok ? 'Preferences stay on this device.' : 'Preferences are temporary; storage is unavailable.');
   });
+  paragraphView = setupParagraphView(article, $('.paragraph-pane'), seek, abort.signal);
+  listen($('#word-view'), 'click', () => setView('words'));
+  listen($('#paragraph-view'), 'click', () => setView('paragraphs'));
   const tick = now => { engine.tick(now - last); last = now; render(); frame = requestAnimationFrame(tick); };
   render(); frame = requestAnimationFrame(tick); dialog.tabIndex = -1; dialog.focus();
   return { close, engine };

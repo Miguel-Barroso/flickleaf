@@ -10,13 +10,14 @@ Agreed 25 September 2026; updated 26 September 2026.
 - 0.5.0: Local PDF cleanup preview, explicit apply and undo, repeated margin/page-number suggestions, and optional line-end hyphen joining.
 - 0.5.0: Real-device release checklist.
 
+- 0.6.0: Paragraph view with exact position switching, native scrolling, and bounded passages.
+
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The owner does not yet have a Mozilla developer account and asked us to prepare everything before submission. Once the account is ready, review and submit; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
-2. Add a normal paragraph view that keeps the reading position when switching to or from single-word playback. This helps readers review dense material without saving personal text.
-3. Offer optional local reading-position resume. Saving document text must be a separate explicit choice, with deletion controls and updated privacy documentation.
-4. Improve contributor onboarding with a short demo and screenshots.
-5. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
+1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The owner created a Mozilla developer account; the signed-in Developer Hub is at the public-listing upload step. Finish validation and submit; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
+2. Offer optional local reading-position resume. Saving document text must be a separate explicit choice, with deletion controls and updated privacy documentation.
+3. Improve contributor onboarding with a short demo and screenshots.
+4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
 
 ## Guardrails
 

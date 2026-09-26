@@ -1,3 +1,4 @@
+import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
 import { checkAutoplayWakeLock } from './wake-lock-browser.mjs';
@@ -25,6 +26,7 @@ try {
   await checkPDFInput(page);
   await checkPDFCleanup(page);
   await checkPreferences(page);
+  await checkParagraphView(page);
   const newPage = context.waitForEvent('page');
   const response = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'open-paste' }));
   assert.equal(response.ok, true);

@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status: preparation only. No AMO submission or Mozilla approval has been completed by this work. Recheck this document against the exact release package before submitting. Prepared for 0.5.0. Policy references checked 26 September 2026.
+Status: preparation only. No AMO submission or Mozilla approval has been completed by this work. Recheck this document against the exact release package before submitting. Prepared for 0.6.0. Policy references checked 26 September 2026.
 
 ## Listing copy
 
@@ -12,7 +12,7 @@ Status: preparation only. No AMO submission or Mozilla approval has been complet
 
 Flickleaf puts the words in one place and lets your hand control the pace. Open an article and click the leaf to read it, or select a passage first. Scroll forward or backward, choose a gentle glide or longer freewheel motion, or press Play for hands-off reading.
 
-Set a comfortable pace and minimum/maximum speed. Headings stay centered, with section pauses and navigation markers so you can find your place. Pause to see surrounding text whenever you need context.
+Set a comfortable pace and minimum/maximum speed. Headings stay centered, with section pauses and navigation markers so you can find your place. Pause to see surrounding text whenever you need context. Switch to Paragraphs for a normal passage view with your current word highlighted, then return to Words without losing your place.
 
 Paste your own text or open a text-based PDF. PDF processing happens on your device: the file, filename, and extracted text are not uploaded. Review and edit extracted text before reading. PDFs are limited to 25 MB and 300 pages; scanned documents need OCR elsewhere, password-protected documents need an unlocked copy, and complex column layouts may require cleanup.
 
@@ -80,7 +80,7 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 ## Before submission
 
 - [x] The author selected MIT for Flickleaf; include the top-level LICENSE and retain dependency license notices in the release.
-- [ ] Confirm the Mozilla developer account and acceptance of its developer agreement by the account owner.
+- [x] Mozilla developer account is signed in; submission proceeds directly to public distribution/upload without another agreement screen.
 - [ ] Verify listing name/slug availability and desktop compatibility in AMO.
 - [ ] Verify preference-only storage, reset behavior, private browsing, and the `storage` permission; keep data-collection declaration accurate.
 - [ ] Run automated checks and a real Firefox smoke test of the packaged add-on, including the PDF worker. Chromium/WebKit checks do not replace Firefox testing.

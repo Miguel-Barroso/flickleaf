@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.6.0
+
+- Add Paragraphs view with highlighted position, normal scrolling, word selection, and exact return to single-word reading.
+- Bound long documents to passages while keeping section navigation and keyboard controls.
+- Preserve extracted punctuation and spacing through shared token source ranges.
+
 ## 0.5.0
 
 - Preview local PDF cleanup for repeated margin headers/footers and page numbers, then explicitly apply or undo it.
