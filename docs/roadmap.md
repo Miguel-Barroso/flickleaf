@@ -14,7 +14,7 @@ Agreed 25 September 2026; updated 26 September 2026.
 
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The owner created a Mozilla developer account; the signed-in Developer Hub is at the public-listing upload step. Finish validation and submit; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
+1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package passed AMO validation and listing details were saved; matching source was selected and Continue clicked. Verify the final confirmation once the Mac is unlocked, then handle Mozilla review and signed-install checks; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
 2. Offer optional local reading-position resume. Saving document text must be a separate explicit choice, with deletion controls and updated privacy documentation.
 3. Improve contributor onboarding with a short demo and screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.

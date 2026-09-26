@@ -1,6 +1,12 @@
 # Firefox store preparation
 
-Status: preparation only. No AMO submission or Mozilla approval has been completed by this work. Recheck this document against the exact release package before submitting. Prepared for 0.6.0. Policy references checked 26 September 2026.
+Status: 0.6.0 package uploaded to AMO with 0 errors and 13 warnings. Listing details saved under `flickleaf`; matching source selected and final Continue clicked. Final confirmation is not yet verified because the Mac locked. No Mozilla approval is claimed. Policy references checked 26 September 2026.
+
+Release revision: `cb716ac` (`v0.6.0`). Local build: Node v26.10.0, npm 11.19.1, macOS arm64. A clean `npm ci && npm run build` from the submitted source archive matched every unpacked file in `dist/`. Firefox smoke checks passed for paste fallback, paragraph view, keyboard return to autoplay, and local two-page PDF extraction. All automated suites and GitHub release validation passed, including unsigned Safari macOS/iOS compilation.
+
+Submitted package SHA-256: `d0c934ad2f55ca0ee5b66fd9b72bf07367f6cdb1e00cedc143411dadba36b4dc`. Submitted source SHA-256: `b18f800b79ff761d2ea90c7a2c93cb2532c7e742009f2056001ddb4c9cd9687f`. These are the local AMO archives; CI ZIP container checksums can differ.
+
+Resume in the signed-in Developer Hub and verify the final source submission and review status before claiming completion. Listing uses MIT, Feeds/News/Blogging, GitHub issue support, the privacy statement below, and desktop Firefox only.
 
 ## Listing copy
 
@@ -81,13 +87,13 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 
 - [x] The author selected MIT for Flickleaf; include the top-level LICENSE and retain dependency license notices in the release.
 - [x] Mozilla developer account is signed in; submission proceeds directly to public distribution/upload without another agreement screen.
-- [ ] Verify listing name/slug availability and desktop compatibility in AMO.
+- [x] Verify listing name/slug availability and desktop compatibility in AMO.
 - [ ] Verify preference-only storage, reset behavior, private browsing, and the `storage` permission; keep data-collection declaration accurate.
-- [ ] Run automated checks and a real Firefox smoke test of the packaged add-on, including the PDF worker. Chromium/WebKit checks do not replace Firefox testing.
-- [ ] Create clean reproducible source/package archives from the same release revision; record build environment and checksums.
+- [x] Run automated checks and a real Firefox smoke test of the packaged add-on, including the PDF worker. Chromium/WebKit checks do not replace Firefox testing.
+- [x] Create clean reproducible source/package archives from the same release revision; record build environment and checksums.
 - [ ] Review every linter warning and include dependency/reviewer notes above; resolve any reviewer request before calling the release approved.
 - [ ] Capture accurate screenshots and finalize listing/privacy wording against actual shipped behavior.
 - [ ] Upload the listed Firefox package and matching source, complete AMO validation, and inspect the final listing before publishing.
 - [ ] After Mozilla signs/approves it, test the signed installation and replace temporary-install guidance with the actual AMO link.
 
-Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Store submission and developer agreements are deliberately left for the owner.
+Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Store submission is authorized in the current task; verify its final status before calling it complete.
