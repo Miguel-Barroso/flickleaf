@@ -101,3 +101,7 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 - [ ] After Mozilla signs/approves it, test the signed installation and replace temporary-install guidance with the actual AMO link.
 
 Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Submission is complete; approval and public availability must be verified separately.
+
+## 0.7.0 follow-up (not submitted)
+
+0.6.0 remains the package under review. Before submitting 0.7.0, update its privacy/listing copy to disclose the optional single text-fingerprint/index bookmark, explicit save/resume/delete, no sync or stored text, and no bookmark access in private extension sessions. Do not reuse the preference-only persistence claim for 0.7.0. Build matching source and record new hashes.

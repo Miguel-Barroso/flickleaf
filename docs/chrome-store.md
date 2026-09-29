@@ -1,6 +1,6 @@
 # Chrome Web Store preparation
 
-Prepared 29 September 2026 for 0.6.0. No Chrome developer account, uploaded item, payment, or store approval has been verified. This document is submission material, not a claim of publication.
+Prepared 29 September 2026; updated for 0.7.0. No Chrome developer account, uploaded item, payment, or store approval has been verified. This document is submission material, not a claim of publication.
 
 ## Listing
 
@@ -10,20 +10,20 @@ Summary: Read articles and local PDFs one word at a time, with scrolling or hand
 
 Single purpose: Present user-selected articles, pasted text, and local PDF text in a reader with adjustable pace and paragraph context.
 
-Use the feature description and privacy statement in [Firefox store materials](firefox-store.md), replacing the Firefox minimum/protected-page wording with desktop Chrome 120 or newer. Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/.
+For 0.7.0, disclose the optional bookmark described in README (including deletion and fingerprint privacy); the older preference-only privacy statement must be updated. Use the feature description in [Firefox store materials](firefox-store.md), replacing the Firefox minimum/protected-page wording with desktop Chrome 120 or newer. Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/.
 
 ## Permission justifications
 
 - `activeTab`: temporary access to the page only after the user invokes Flickleaf.
 - `scripting`: insert the reader in that selected page.
 - `contextMenus`: expose Paste text from the extension toolbar context menu.
-- `storage`: save only pace, speed limits, scroll mode, and theme locally, without sync.
+- `storage`: save pace, speed limits, scroll mode, theme, and an explicitly saved single text-fingerprint/index bookmark locally, without sync.
 
 No blanket host access, remotely hosted executable code, accounts, analytics, or document uploads. Page text and PDFs are processed locally. Verify the final Chrome manifest and privacy-form definitions when submitting; do not conflate on-device processing with transmission or claim the website receives no ordinary requests.
 
 ## Package and review
 
-Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.6.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
+Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.7.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
 
 Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Prepare an extension icon, a 440×280 promotional tile, and at least one 1280×800 (or supported 640×400) screenshot of the actual Chrome build. The captures in `docs/images/` are web-reader documentation images, not Chrome store evidence; capture the packaged extension before upload.
 

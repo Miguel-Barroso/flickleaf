@@ -12,7 +12,7 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ## Availability — 29 September 2026
 
-The web reader is live at version 0.6.0. Firefox 0.6.0 and its matching source have been submitted to Mozilla; the Developer Hub reports **Awaiting Review**. The [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) is currently visible to the signed-in author, but may show “page not found” publicly until publication. It is not yet an approved store release.
+The web reader is live at version 0.7.0. Firefox 0.6.0 and its matching source have been submitted to Mozilla; the Developer Hub reports **Awaiting Review**. The [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) is currently visible to the signed-in author, but may show “page not found” publicly until publication. It is not yet an approved store release.
 
 Chrome remains a manual developer install. Safari remains an unsigned Xcode project; there is no Chrome Web Store or App Store release. GitHub release packages are currently drafts, so public users should build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
@@ -35,7 +35,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.6.0.zip`.
+Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.7.0.zip`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -156,7 +156,7 @@ Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is 
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.6.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.7.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 
@@ -164,11 +164,11 @@ The Safari target requests `activeTab`, `scripting`, and `storage`; its touch-fr
 
 ## Local preferences
 
-Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, and theme on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Only these settings are saved—never document text, PDFs, filenames, page URLs, or reading history. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
+Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, and theme on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Preferences save only these settings—never document text, PDFs, filenames, or page URLs. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
 
 ## Roadmap and releases
 
-See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). Local preferences, automated release checks, PDF cleanup, and paragraph view have shipped. Next are Mozilla review and signed-install verification, Chrome store preparation, optional local position resume, and contributor onboarding. Development packages remain unsigned until the separate store/signing process is completed.
+See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). Local preferences, automated release checks, PDF cleanup, and paragraph view have shipped. Next are Mozilla review and signed-install verification, Chrome store submission, and physical-device checks. Optional position bookmarks and contributor onboarding are now implemented. Development packages remain unsigned until the separate store/signing process is completed.
 
 ## License
 
@@ -184,4 +184,12 @@ Joining words split by a line-end hyphen is off by default because genuine compo
 
 Choose **Paragraphs** to pause and read the surrounding passage normally. Your current word is highlighted; switching back to **Words** keeps that exact position. Select a word to move your place, or use Left/Right while the paragraph area has focus. Scrolling and touch swipes in this view pan the passage instead of changing playback speed. **Play words**, Space, or Enter returns to single-word playback.
 
-The reader shows up to 600 tokens around your place; **Earlier passage** and **Later passage** move through long documents. Section navigation works in both views. Paragraphs retain extracted punctuation and spacing but do not recreate original PDF layouts, images, or tables. The view choice and reading position remain in the current session; no document history is saved.
+The reader shows up to 600 tokens around your place; **Earlier passage** and **Later passage** move through long documents. Section navigation works in both views. Paragraphs retain extracted punctuation and spacing but do not recreate original PDF layouts, images, or tables. The view choice remains in the current session; reading position persists only when you choose Save place, and no document text is saved.
+
+## Save a reading place (0.7.0)
+
+Choose **Save place** to store your current position on this device. This is opt-in: reading alone never saves a bookmark. There is one bookmark per web origin or extension installation; saving replaces the previous one. Reopen the same article, paste the same text, or reimport the same PDF, then choose **Resume saved place**. Resume pauses at the saved word; it never moves you automatically. Save again to update your place.
+
+Only a SHA-256 fingerprint of the tokenized text, the token index, and a format version are stored locally. No document text, title, filename, URL, timestamp, or PDF bytes are saved. A fingerprint can identify a known matching text; it is not encryption or an anonymous record. Changed text or extraction may not match. **Delete saved place** removes the bookmark without changing preferences. **Clear saved preferences** does not delete the bookmark. There is no sync. Private extension sessions neither read nor write bookmarks; web private-mode storage follows the browser’s own isolation and lifetime. If storage or hashing is unavailable, reading continues without bookmarking.
+
+The submitted Firefox 0.6.0 package does not include this feature; its review remains separate from the 0.7.0 development packages.

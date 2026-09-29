@@ -1,3 +1,4 @@
+import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { webkit } from 'playwright';
@@ -46,5 +47,6 @@ try {
   await checkPDFCleanup(page);
   await checkPreferences(page);
   await checkParagraphView(page);
+      await checkReadingPosition(page);
   console.log('Safari WebKit: popup success/denial, paste action, heading focus, and local PDF worker passed (extension APIs mocked).');
 } finally { await browser.close(); server.close(); }

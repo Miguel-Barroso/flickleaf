@@ -1,3 +1,4 @@
+import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
@@ -168,6 +169,7 @@ try {
   await checkPDFCleanup(page);
   await checkPreferences(page);
   await checkParagraphView(page);
+      await checkReadingPosition(page);
   assert.deepEqual(errors, []);
   console.log('Browser checks passed: play/pause, stepping, context, themes, forward/reverse scrolling, focus restoration, repeated injection, mobile layout, extraction error.');
 } finally { await browser.close(); server.close(); }

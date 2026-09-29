@@ -1,5 +1,9 @@
 # Changelog
 
+## 0.7.0
+
+- Add explicit Save place, Resume saved place, and Delete saved place across the shared reader. One local fingerprint/position bookmark; no document storage, automatic saving, or sync. Private extension sessions cannot access bookmarks.
+
 ## 0.6.0
 
 - Add Paragraphs view with highlighted position, normal scrolling, word selection, and exact return to single-word reading.

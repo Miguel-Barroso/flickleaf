@@ -1,3 +1,4 @@
+import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFCleanup, checkPDFInput } from './pdf-browser.mjs';
@@ -27,6 +28,7 @@ try {
   await checkPDFCleanup(page);
   await checkPreferences(page);
   await checkParagraphView(page);
+      await checkReadingPosition(page);
   const newPage = context.waitForEvent('page');
   const response = await page.evaluate(() => chrome.runtime.sendMessage({ type: 'open-paste' }));
   assert.equal(response.ok, true);

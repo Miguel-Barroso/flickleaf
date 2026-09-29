@@ -1,3 +1,4 @@
+import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
 import { checkPDFCleanup, checkPDFInput, checkPDFCancel } from './pdf-browser.mjs';
@@ -61,6 +62,7 @@ try {
   await checkPDFCleanup(page);
   await checkPreferences(page);
   await checkParagraphView(page);
+      await checkReadingPosition(page);
       if (name === 'desktop') await checkPDFCancel(page);
       if (options.hasTouch) await checkTouchScroll(page, type === chromium);
       await page.getByRole('link', { name: 'About', exact: true }).click();

@@ -19,7 +19,7 @@ These are unretouched captures of the shared web reader, version 0.6.0, using Fl
 
 Paste a passage or choose **Open PDF**. PDFs are processed locally and must contain selectable text; the limit is 25 MB and 300 pages. Review extraction before reading. Optional cleanup previews repeated headers, footers, and page numbers. Hyphen joining can alter genuine compound words, so it stays optional.
 
-Only pace, limits, theme, and scroll mode are saved locally. Document text and reading history are not saved. You can clear saved preferences in the reader.
+Pace, limits, theme, and scroll mode are remembered locally. Document text is not saved. In 0.7.0, Save place optionally stores one text fingerprint and position locally; Delete saved place removes it. Reopen the same text to resume. You can clear saved preferences in the reader.
 
 ## Browser extensions
 
