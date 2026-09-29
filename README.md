@@ -6,6 +6,10 @@ Flick. Read. Find your pace.
 
 A local-first web reader and Firefox/Chrome/Safari extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. Text and PDFs are processed on your device, without accounts or document uploads. The website still requires hosting and ordinary page requests; extensions bundle their reader code locally.
 
+[One-minute guide](docs/quick-start.md) · [Contribute](CONTRIBUTING.md)
+
+![Flickleaf word reader](docs/images/words.png)
+
 ## Availability — 29 September 2026
 
 The web reader is live at version 0.6.0. Firefox 0.6.0 and its matching source have been submitted to Mozilla; the Developer Hub reports **Awaiting Review**. The [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) is currently visible to the signed-in author, but may show “page not found” publicly until publication. It is not yet an approved store release.

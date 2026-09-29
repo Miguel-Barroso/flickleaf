@@ -12,11 +12,13 @@ Agreed 25 September 2026; updated 29 September 2026.
 
 - 0.6.0: Paragraph view with exact position switching, native scrolling, and bounded passages.
 
+- Contributor onboarding: one-minute illustrated guide and CONTRIBUTING instructions. Chrome listing and permission materials prepared; account and submission remain pending.
+
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
+1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
 2. Offer optional local reading-position resume. Saving document text must be a separate explicit choice, with deletion controls and updated privacy documentation.
-3. Improve contributor onboarding with a short demo and screenshots.
+3. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
 
 ## Guardrails
