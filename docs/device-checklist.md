@@ -27,3 +27,5 @@ Record device, OS/browser version, package version/commit, date, and result for 
 ## Current evidence
 
 0.4.0 passed unit tests, Chromium/WebKit automation, actual Chromium extension loading, and unsigned Apple app compilation. Physical Safari/iPhone extension verification and signed browser-store installation are still pending. Add dated results rather than checking boxes based only on automated tests.
+
+On 26 September 2026, version 0.6.0 (`cb716ac`) passed 37 unit tests, all browser automation suites, and CI including unsigned macOS/iOS compilation. A real desktop Firefox temporary installation passed paste fallback, Paragraphs/Words switching, keyboard playback, and local two-page PDF extraction. These are smoke checks, not completion of every checklist item above; OS/browser versions were not recorded. Signed Firefox installation and physical Apple-device verification remain pending.

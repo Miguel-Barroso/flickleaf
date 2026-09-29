@@ -1,6 +1,6 @@
 # Flickleaf roadmap
 
-Agreed 25 September 2026; updated 26 September 2026.
+Agreed 25 September 2026; updated 29 September 2026.
 
 ## Completed
 
@@ -14,7 +14,7 @@ Agreed 25 September 2026; updated 26 September 2026.
 
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package passed AMO validation and listing details were saved; matching source was selected and Continue clicked. Verify the final confirmation once the Mac is unlocked, then handle Mozilla review and signed-install checks; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
+1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with Chrome. Safari signing and physical Apple-device testing remain pending.
 2. Offer optional local reading-position resume. Saving document text must be a separate explicit choice, with deletion controls and updated privacy documentation.
 3. Improve contributor onboarding with a short demo and screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.

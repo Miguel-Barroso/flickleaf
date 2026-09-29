@@ -4,18 +4,24 @@ Flick. Read. Find your pace.
 
 [Read in your browser](https://miguelbarroso.com/flickleaf/) · [About Flickleaf](https://miguelbarroso.com/flickleaf/about/)
 
-A local-first web reader and Firefox/Chrome/Safari extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. No accounts, servers, analytics, or remote code.
+A local-first web reader and Firefox/Chrome/Safari extension presenting article text one word at a time. Scroll or drag to control forward and reverse playback; let go to settle toward a pause. Text and PDFs are processed on your device, without accounts or document uploads. The website still requires hosting and ordinary page requests; extensions bundle their reader code locally.
+
+## Availability — 29 September 2026
+
+The web reader is live at version 0.6.0. Firefox 0.6.0 and its matching source have been submitted to Mozilla; the Developer Hub reports **Awaiting Review**. The [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) is currently visible to the signed-in author, but may show “page not found” publicly until publication. It is not yet an approved store release.
+
+Chrome remains a manual developer install. Safari remains an unsigned Xcode project; there is no Chrome Web Store or App Store release. GitHub release packages are currently drafts, so public users should build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
 ## Try it in Firefox
 
-Requires Firefox 142 or newer. The built extension is in `dist/`.
+Requires desktop Firefox 142 or newer. Clone this repository, run `npm ci` and `npm run build` (see Development), then load the generated `dist/` directory.
 
 1. Open `about:debugging#/runtime/this-firefox` in Firefox.
 2. Choose **Load Temporary Add-on…** and select `dist/manifest.json`.
 3. Open an article, then click **Flickleaf** in Firefox's extensions menu.
 4. If extraction misses the text you want, select a passage and click the extension again.
 
-Temporary add-ons are removed when Firefox restarts. A distributable release still needs Mozilla signing. Internal browser pages, the add-on store, and other protected pages cannot be read; Flickleaf opens the paste view when Firefox rejects access.
+Temporary add-ons are removed when Firefox restarts. The submitted 0.6.0 release is awaiting Mozilla review and signing. Internal browser pages, the add-on store, and other protected pages cannot be read; Flickleaf opens the paste view when Firefox rejects access.
 
 ## Paste your own text
 
@@ -25,7 +31,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. Download and unzip `flickleaf-chrome-0.6.0.zip`, or run `npm run build:chrome` to create `dist-chrome/`.
+Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.6.0.zip`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -76,7 +82,9 @@ Extraction filters navigation landmarks, forms, hidden elements, recognizable in
 | Hold Shift | Pause and temporarily show surrounding words |
 | Escape or Close | Return to the original page |
 
-Space and Enter control playback even after clicking a button. While editing the WPM input or using the progress slider, native input keys are preserved. Page Up / + increases pace by 25 WPM; Page Down / − decreases it, without starting paused playback. Held Space/Enter keys toggle only once. Reading starts paused. Switching tabs or windows pauses playback. Reopening the same article within a page session resumes the last word; refreshing the page clears it. The WPM setting is a base rate: punctuation and paragraph pauses reduce the effective average.
+These controls describe Words view. In Paragraphs, scrolling and touch pan the passage; Up/Down, Page Up/Page Down, Home/End retain native scrolling when the passage has focus. Left/Right step the current word; Play words or Space/Enter returns to Words playback. Mode and passage-navigation buttons retain their native Space/Enter activation.
+
+Space and Enter control playback outside editable fields and controls with native keyboard actions. While editing the WPM input or using the progress slider, native input keys are preserved. Page Up / + increases pace by 25 WPM; Page Down / − decreases it, without starting paused playback. Held Space/Enter keys toggle only once. Reading starts paused. Switching tabs or windows pauses playback. Reopening the same article within a page session resumes the last word; refreshing the page clears it. The WPM setting is a base rate: punctuation and paragraph pauses reduce the effective average.
 
 ## Development
 
@@ -129,7 +137,7 @@ Publish the generated `flickleaf` directory into the site's persistent web root.
 
 ## Cross-platform releases
 
-Reader changes apply to web, Firefox, Chrome, and Safari together. `npm run build:all` builds all four targets; `npm run test:browser`, `npm run test:web`, and `npm run test:chrome` verify them. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.
+Reader changes apply to web, Firefox, Chrome, and Safari together. `npm run build:all` builds all four targets; `npm run test:browser`, `npm run test:web`, `npm run test:chrome`, and `npm run test:safari` verify their supported test paths. Firefox-target tests use Chromium; Safari tests use WebKit with mocked extension APIs. Real browser/device checks remain separate. The Chrome test loads the actual extension in bundled Chromium, checks its service worker, paste menu, runtime messages and heading focus. `npm run package` builds the Firefox ZIP; `npm run package:chrome` builds the separate Chrome ZIP. Store publication is separate from these development packages.
 
 
 Touch swipes in the reading area control playback and cannot pan the underlying page. The page is locked while the reader is open (including errors), then its previous scroll position and inline styles are restored on close. The reader itself can still scroll to reach controls on short screens.
@@ -156,7 +164,7 @@ Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, and theme
 
 ## Roadmap and releases
 
-See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). The next release prioritizes local preferences, automated checks, and store readiness. Development packages remain unsigned until the separate store/signing process is completed.
+See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). Local preferences, automated release checks, PDF cleanup, and paragraph view have shipped. Next are Mozilla review and signed-install verification, Chrome store preparation, optional local position resume, and contributor onboarding. Development packages remain unsigned until the separate store/signing process is completed.
 
 ## License
 

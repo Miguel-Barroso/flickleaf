@@ -1,12 +1,16 @@
 # Firefox store preparation
 
-Status: 0.6.0 package uploaded to AMO with 0 errors and 13 warnings. Listing details saved under `flickleaf`; matching source selected and final Continue clicked. Final confirmation is not yet verified because the Mac locked. No Mozilla approval is claimed. Policy references checked 26 September 2026.
+Status checked 29 September 2026: **Awaiting Review**. Mozilla confirmed successful submission of 0.6.0, including the matching source. AMO validation reported 0 errors and 13 warnings. The author listing is visible; the public listing is not yet available. No Mozilla approval is claimed.
+
+[Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
+
+Mozilla says signing/publication can take up to 24 hours, or longer for manual review; it gives no firm manual-review deadline in its [distribution guidance](https://www.extensionworkshop.com/documentation/publish/signing-and-distribution-overview/). Watch for reviewer questions and the publication email.
 
 Release revision: `cb716ac` (`v0.6.0`). Local build: Node v26.10.0, npm 11.19.1, macOS arm64. A clean `npm ci && npm run build` from the submitted source archive matched every unpacked file in `dist/`. Firefox smoke checks passed for paste fallback, paragraph view, keyboard return to autoplay, and local two-page PDF extraction. All automated suites and GitHub release validation passed, including unsigned Safari macOS/iOS compilation.
 
 Submitted package SHA-256: `d0c934ad2f55ca0ee5b66fd9b72bf07367f6cdb1e00cedc143411dadba36b4dc`. Submitted source SHA-256: `b18f800b79ff761d2ea90c7a2c93cb2532c7e742009f2056001ddb4c9cd9687f`. These are the local AMO archives; CI ZIP container checksums can differ.
 
-Resume in the signed-in Developer Hub and verify the final source submission and review status before claiming completion. Listing uses MIT, Feeds/News/Blogging, GitHub issue support, the privacy statement below, and desktop Firefox only.
+Submission completion was verified in the signed-in Developer Hub on 29 September 2026. Publication and signed installation remain pending. Listing uses MIT, Feeds/News/Blogging, GitHub issue support, the privacy statement below, and desktop Firefox only.
 
 ## Listing copy
 
@@ -77,13 +81,13 @@ Dependencies:
 - `@mozilla/readability` 0.6.0: article extraction from a detached document clone; [upstream source](https://github.com/mozilla/readability). Use the exact version in package-lock.json for the submitted build.
 - `pdfjs-dist` 6.3.289: [published package](https://www.npmjs.com/package/pdfjs-dist/v/6.3.289), [upstream source](https://github.com/mozilla/pdf.js). `pdf-assets.mjs` copies the published legacy parser and worker unchanged, plus CMaps, standard fonts, and the PDF.js license. Dependency declarations and lockfile identify the public package distributions, as permitted by Mozilla's [third-party library guidance](https://extensionworkshop.com/documentation/publish/third-party-library-usage/).
 
-At the 0.3.0 baseline, `web-ext lint` reports 0 errors and 13 warnings. Four concern Readability parsing, one concerns the dynamic import in `src/pdf-input.js`, and eight concern PDF.js compatibility helpers/imports/Function constructors. This is not a guarantee of store acceptance. Re-run for the submitted version and attach the current report.
+For the submitted 0.6.0 package, `web-ext lint` reports 0 errors and 13 warnings. Four concern Readability parsing, one concerns the dynamic import in `src/pdf-input.js`, and eight concern PDF.js compatibility helpers/imports/Function constructors. This is not a guarantee of store acceptance. Re-run for the submitted version and attach the current report.
 
 The PDF import URL is built from the packaged paste script's URL and a fixed `pdfjs/` path; user file bytes cannot choose it. The native module worker is also a fixed local packaged URL. `getDocument` receives bytes directly with `isEvalSupported: false` and `useWasm: false`. Only `getTextContent` is used; PDF rendering, scripting, and actions are not invoked. These options do not remove compatibility code from the distributed library, so reviewers still need its source and the warning explanation. Extracted article/PDF strings reach the live reader as text, not executable markup.
 
 Test walkthrough: invoke on an article, select a passage and invoke again, change pace and reopen, toggle Play/pause, seek a heading, open Paste text, import a small text PDF, cancel an import, try a scanned or malformed PDF, and reset preferences. Inspect traffic to confirm parsing uses only packaged resources. Verify private browsing does not persist settings.
 
-## Before submission
+## Submission and follow-up checklist
 
 - [x] The author selected MIT for Flickleaf; include the top-level LICENSE and retain dependency license notices in the release.
 - [x] Mozilla developer account is signed in; submission proceeds directly to public distribution/upload without another agreement screen.
@@ -93,7 +97,7 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 - [x] Create clean reproducible source/package archives from the same release revision; record build environment and checksums.
 - [ ] Review every linter warning and include dependency/reviewer notes above; resolve any reviewer request before calling the release approved.
 - [ ] Capture accurate screenshots and finalize listing/privacy wording against actual shipped behavior.
-- [ ] Upload the listed Firefox package and matching source, complete AMO validation, and inspect the final listing before publishing.
+- [x] Upload the Firefox package and matching source, complete AMO validation, and verify submission confirmation and the author listing.
 - [ ] After Mozilla signs/approves it, test the signed installation and replace temporary-install guidance with the actual AMO link.
 
-Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Store submission is authorized in the current task; verify its final status before calling it complete.
+Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Submission is complete; approval and public availability must be verified separately.
