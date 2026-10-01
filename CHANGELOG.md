@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.7.1
 
 - Fix Save place on plain `http:` pages in the extensions: the fingerprint no longer depends on Web Crypto, and produces the same value, so existing bookmarks still match.
 - Ignore paragraph-view clicks that end a drag, so selecting text never moves your place.

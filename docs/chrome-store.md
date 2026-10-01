@@ -23,7 +23,7 @@ No blanket host access, remotely hosted executable code, accounts, analytics, or
 
 ## Package and review
 
-Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.7.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
+Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.7.1.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
 
 Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Prepare an extension icon, a 440×280 promotional tile, and at least one 1280×800 (or supported 640×400) screenshot of the actual Chrome build. The captures in `docs/images/` are web-reader documentation images, not Chrome store evidence; capture the packaged extension before upload.
 
