@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status checked 29 September 2026: **Awaiting Review**. Mozilla confirmed successful submission of 0.6.0, including the matching source. AMO validation reported 0 errors and 13 warnings. The author listing is visible; the public listing is not yet available. No Mozilla approval is claimed.
+Status checked 1 October 2026: **0.6.0 Approved and publicly listed**. Preparing 0.7.0 with explicit PNG manifest icons and the existing leaf listing icon. Submission status below will be updated after confirmation.
 
 [Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
 
@@ -28,7 +28,7 @@ Paste your own text or open a text-based PDF. PDF processing happens on your dev
 
 Preview optional cleanup for repeated PDF headers, footers, and page numbers before applying changes. Hyphen joining is optional and should be reviewed. Cleanup and undo stay local.
 
-Reading preferences are saved locally on this browser. Flickleaf does not save document text, PDF files, or a persistent reading history. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
+Reading preferences are saved locally on this browser. In 0.7.0, Save place optionally stores one local bookmark: a text fingerprint and word position. Reopen the same text and choose Resume saved place to return while paused. Delete saved place removes it independently of preferences. No document text, PDF files, titles, filenames, URLs, or reading history are stored; bookmarks are not synced. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
 
 Flickleaf is an alternative way to present text, not a promise of faster comprehension. It requires Firefox 142 or newer. Firefox-protected pages cannot be read directly; paste text instead.
 
@@ -44,7 +44,7 @@ Suggested category: Productivity. Do not claim Firefox for Android support until
 
 Flickleaf processes selected page text, pasted text, and PDFs locally. It does not transmit document content, filenames, browsing history, preferences, identifiers, or usage analytics to the developer or a third party. PDF.js, its worker, fonts, and character maps are included in the extension package.
 
-Only reading preferences (pace, pace limits, scroll mode, and theme) are saved in browser-local extension storage, not browser sync. Document text and PDF bytes remain in the current tab's memory. Reopening the reader on the same page can retain the current position for that page session; refreshing or closing the page clears it. No persistent reading history is created. Reset preferences to remove saved settings. Private browsing must not write preferences or reading data to persistent storage.
+Reading preferences (pace, pace limits, scroll mode, and theme) are saved in browser-local extension storage, not browser sync. Starting in 0.7.0, choosing Save place also stores one bookmark containing a SHA-256 text fingerprint, token index, and format version. It stores no text, title, filename, URL, timestamp, or PDF bytes. Saving is explicit and replaces the previous bookmark. Reopen the same text to resume while paused; Delete saved place removes the bookmark separately from preferences. Private extension sessions cannot read or write bookmarks. Document text and PDF bytes remain in the current tab's memory. Reopening the reader on the same page can retain the current position for that page session; refreshing or closing the page clears it. No persistent reading history is created. Reset preferences to remove saved settings. Private browsing must not write preferences or reading data to persistent storage.
 
 Opening the separate website or GitHub sends ordinary website requests to those services. The website's hosting provider can run browser security checks. Those services are separate from local extension parsing; Flickleaf does not attach a PDF or its extracted text to those requests.
 
@@ -57,7 +57,7 @@ Verify the preference claims against the final release package before copying th
 | `activeTab` | Temporarily access the page after you invoke Flickleaf. |
 | `scripting` | Insert the reader into that page. |
 | `menus` | Add Paste text to the toolbar icon's context menu. |
-| `storage` | Remember only reading preferences locally. |
+| `storage` | Remember reading preferences and one explicitly saved bookmark locally. |
 
 No blanket host permission, remote service, account, native messaging, or document-upload endpoint is needed. Preserve `rsvp-reader@local.invalid`: it is the existing internal Firefox add-on ID despite the public rename. An AMO name/slug availability check remains necessary at submission.
 
@@ -102,6 +102,6 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 
 Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Submission is complete; approval and public availability must be verified separately.
 
-## 0.7.0 follow-up (not submitted)
+## 0.7.0 submission preparation
 
-0.6.0 remains the package under review. Before submitting 0.7.0, update its privacy/listing copy to disclose the optional single text-fingerprint/index bookmark, explicit save/resume/delete, no sync or stored text, and no bookmark access in private extension sessions. Do not reuse the preference-only persistence claim for 0.7.0. Build matching source and record new hashes.
+0.6.0 is approved. 0.7.0 includes explicit PNG icons for the Firefox manifest and the optional local bookmark described above. Use matching source from the icon-fix commit, rather than the earlier v0.7.0 tag. Validation: 42 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.
