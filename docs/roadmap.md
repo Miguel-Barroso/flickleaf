@@ -1,6 +1,6 @@
 # Flickleaf roadmap
 
-Agreed 25 September 2026; updated 29 September 2026.
+Agreed 25 September 2026; updated 1 October 2026.
 
 ## Completed
 
@@ -14,11 +14,13 @@ Agreed 25 September 2026; updated 29 September 2026.
 
 - Contributor onboarding: one-minute illustrated guide and CONTRIBUTING instructions. Chrome listing and permission materials prepared; account and submission remain pending.
 
-- 0.7.0: Opt-in single local bookmark, exact-text matching, explicit resume, and independent deletion. No document storage.
+- 0.7.0: Opt-in single local bookmark, exact-text matching, explicit resume, and independent deletion. No document storage. Submitted to Mozilla on 1 October 2026.
+
+- 0.7.1: Saved places on plain `http:` pages, drag-safe paragraph selection, roman-numeral and two-page PDF cleanup, and a [maintainability plan](maintainability.md).
 
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
+1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. 0.6.0 is approved and publicly listed; 0.7.0 is awaiting review, with 0.7.1 to follow. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
 2. Validate bookmarks on physical devices and gather feedback before expanding to multiple saved places. Saving document text remains a separate, unimplemented feature requiring explicit choice.
 3. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.

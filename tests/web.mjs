@@ -26,7 +26,7 @@ try {
     ['iphone', webkit, { viewport: { width: 390, height: 844 }, isMobile: true, hasTouch: true, deviceScaleFactor: 2 }],
     ['small-phone', webkit, { viewport: { width: 375, height: 667 }, isMobile: true, hasTouch: true }],
   ]) {
-    const browser = await type.launch({ headless: true });
+    const browser = await type.launch({ headless: true, ...(type === chromium && process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
     try {
       const page = await browser.newPage(options);
       const errors = []; page.on('pageerror', error => errors.push(error.message));
@@ -74,4 +74,15 @@ try {
       console.log(`${name}: paste, sample, playback, settings, sections, draft retention, About and layout passed`);
     } finally { await browser.close(); }
   }
+  // Plain http: on a real host withholds Web Crypto, as on many pages the extensions read.
+  const browser = await chromium.launch({ headless: true, ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : {}) });
+  try {
+    const page = await browser.newPage();
+    const local = `http://127.0.0.1:${server.address().port}`;
+    await page.route('http://flickleaf.test/**', async route => route.fulfill({ response: await route.fetch({ url: route.request().url().replace('http://flickleaf.test', local) }) }));
+    await page.goto('http://flickleaf.test/flickleaf/');
+    assert.deepEqual(await page.evaluate(() => [isSecureContext, Boolean(crypto.subtle)]), [false, false]);
+    await checkReadingPosition(page);
+    console.log('insecure http: saved places passed without Web Crypto');
+  } finally { await browser.close(); }
 } finally { server.close(); }

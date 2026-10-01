@@ -15,9 +15,16 @@ export function setupParagraphView(article, pane, seek, signal) {
   const spans = new Map();
   previous.addEventListener('click', () => seek(Math.max(0, bounds.start - 1)), { signal });
   next.addEventListener('click', () => seek(Math.min(article.tokens.length - 1, bounds.end)), { signal });
+  // Selecting text must not move the place. Engines differ in whether document
+  // selection sees shadow content, so also ignore clicks that end a drag.
+  let press = null;
+  content.addEventListener('pointerdown', event => { press = { x: event.clientX, y: event.clientY }; }, { signal });
   content.addEventListener('click', event => {
     const target = event.target.closest('[data-token]');
-    if (target && !pane.ownerDocument.getSelection()?.toString()) { seek(Number(target.dataset.token)); pane.focus({ preventScroll: true }); }
+    const dragged = press && Math.hypot(event.clientX - press.x, event.clientY - press.y) > 4; press = null;
+    const root = pane.getRootNode();
+    const selected = (root.getSelection?.() ?? pane.ownerDocument.getSelection())?.toString();
+    if (target && !dragged && !selected) { seek(Number(target.dataset.token)); pane.focus({ preventScroll: true }); }
   }, { signal });
   function render(index, center = false) {
     if (index < bounds.start || index >= bounds.end) {

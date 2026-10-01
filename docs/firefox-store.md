@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status checked 1 October 2026: **0.6.0 Approved and publicly listed**. Preparing 0.7.0 with explicit PNG manifest icons and the existing leaf listing icon. Submission status below will be updated after confirmation.
+Status 1 October 2026: **0.6.0 Approved and publicly listed**. 0.7.0, with explicit PNG manifest icons and saved places, has been submitted and is awaiting review. 0.7.1 is prepared as the next submission.
 
 [Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
 
@@ -105,3 +105,13 @@ Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentati
 ## 0.7.0 submission preparation
 
 0.6.0 is approved. 0.7.0 includes explicit PNG icons for the Firefox manifest and the optional local bookmark described above. Use matching source from the icon-fix commit, rather than the earlier v0.7.0 tag. Validation: 42 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.
+
+## 0.7.1 submission preparation
+
+0.7.1 is a fix release on top of the submitted 0.7.0. Permissions, stored data, and listing copy are unchanged. Reviewer-relevant changes:
+
+- `src/reading-position.js` adds a built-in SHA-256 fallback for pages without Web Crypto (plain `http:`). It produces the same fingerprint as Web Crypto and stores the same fingerprint, index, and version fields.
+- Paragraph-view clicks that end a drag no longer move the reading place.
+- PDF cleanup also suggests lowercase roman page numbers in margins and repeated headers in two-page PDFs; suggestions still require preview and explicit apply.
+
+Check 0.7.0's review status in the Developer Hub before uploading. Build the package and source archive from the `v0.7.1` tag, and record their hashes here after submission.
