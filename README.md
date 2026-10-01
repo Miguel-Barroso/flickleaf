@@ -109,7 +109,7 @@ npm run lint:extension
 npm run package
 ```
 
-Browser tests use `/Applications/Chromium.app/Contents/MacOS/Chromium` by default; set `CHROMIUM_PATH` for another Chromium executable. They exercise the built content script, playback, scroll reversal, themes, context, focus restoration, narrow layout, repeated injection, and extraction errors.
+`npm run test:browser` uses `/Applications/Chromium.app/Contents/MacOS/Chromium` by default; the Chrome and web tests use Playwright's Chromium. Set `CHROMIUM_PATH` to use another Chromium executable for all three. They exercise the built content script, playback, scroll reversal, themes, context, focus restoration, narrow layout, repeated injection, and extraction errors.
 
 ## Structure
 
@@ -176,7 +176,7 @@ Flickleaf is [MIT licensed](LICENSE). Bundled dependencies retain their own lice
 
 ## PDF cleanup preview
 
-After opening a PDF, choose **Preview cleanup**. Flickleaf suggests removing short headers or footers repeated in the same margin on at least three pages and 60% of readable pages, and numeric page labels in the margins. Body numbers are kept. The preview leaves your draft unchanged; **Apply cleanup** uses the suggested text, and **Undo cleanup** restores the original extraction.
+After opening a PDF, choose **Preview cleanup**. Flickleaf suggests removing short headers or footers repeated in the same margin on at least three pages and 60% of readable pages (every page in two- or three-page PDFs), and page labels in the margins: numbers such as `12` or `Page 3 of 9`, and lowercase roman numerals such as `iv`. Capital numerals are kept because they are often chapter titles. Body numbers are kept. The preview leaves your draft unchanged; **Apply cleanup** uses the suggested text, and **Undo cleanup** restores the original extraction.
 
 Joining words split by a line-end hyphen is off by default because genuine compound words can be changed. If enabled, it joins nearby lowercase text lines within the same page. Review the result. Cleanup does not fix columns, tables, OCR, or arbitrary PDF reading order. Page navigation markers stay in place. Manually editing the draft discards cleanup suggestions and undo state; reopen the PDF to create new suggestions. Original and proposed text exist only in the current tab and are never uploaded or persisted.
 
@@ -190,6 +190,6 @@ The reader shows up to 600 tokens around your place; **Earlier passage** and **L
 
 Choose **Save place** to store your current position on this device. This is opt-in: reading alone never saves a bookmark. There is one bookmark per web origin or extension installation; saving replaces the previous one. Reopen the same article, paste the same text, or reimport the same PDF, then choose **Resume saved place**. Resume pauses at the saved word; it never moves you automatically. Save again to update your place.
 
-Only a SHA-256 fingerprint of the tokenized text, the token index, and a format version are stored locally. No document text, title, filename, URL, timestamp, or PDF bytes are saved. A fingerprint can identify a known matching text; it is not encryption or an anonymous record. Changed text or extraction may not match. **Delete saved place** removes the bookmark without changing preferences. **Clear saved preferences** does not delete the bookmark. There is no sync. Private extension sessions neither read nor write bookmarks; web private-mode storage follows the browser’s own isolation and lifetime. If storage or hashing is unavailable, reading continues without bookmarking.
+Only a SHA-256 fingerprint of the tokenized text, the token index, and a format version are stored locally. No document text, title, filename, URL, timestamp, or PDF bytes are saved. A fingerprint can identify a known matching text; it is not encryption or an anonymous record. Changed text or extraction may not match. **Delete saved place** removes the bookmark without changing preferences. **Clear saved preferences** does not delete the bookmark. There is no sync. Private extension sessions neither read nor write bookmarks; web private-mode storage follows the browser’s own isolation and lifetime. Bookmarks also work on plain `http:` pages, where browsers withhold Web Crypto; Flickleaf computes the same SHA-256 fingerprint itself. If storage is unavailable, reading continues without bookmarking.
 
 The submitted Firefox 0.6.0 package does not include this feature; its review remains separate from the 0.7.0 development packages.

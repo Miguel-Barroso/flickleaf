@@ -9,7 +9,8 @@ import assert from 'node:assert/strict';
 import { checkHeadingFocus } from './heading-focus.mjs';
 const extensionPath = resolve('dist-chrome');
 const context = await chromium.launchPersistentContext('', {
-  channel: 'chromium', headless: true,
+  // Full Chromium is needed for extensions; CHROMIUM_PATH overrides Playwright's bundled copy.
+  ...(process.env.CHROMIUM_PATH ? { executablePath: process.env.CHROMIUM_PATH } : { channel: 'chromium' }), headless: true,
   args: [`--disable-extensions-except=${extensionPath}`, `--load-extension=${extensionPath}`],
 });
 try {

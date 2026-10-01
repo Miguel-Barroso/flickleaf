@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Fix Save place on plain `http:` pages in the extensions: the fingerprint no longer depends on Web Crypto, and produces the same value, so existing bookmarks still match.
+- Ignore paragraph-view clicks that end a drag, so selecting text never moves your place.
+- PDF cleanup recognizes lowercase roman page numbers in margins and repeated headers in two-page PDFs.
+- Chrome-extension and web browser tests honor `CHROMIUM_PATH`.
+
 ## 0.7.0
 
 - Add explicit Save place, Resume saved place, and Delete saved place across the shared reader. One local fingerprint/position bookmark; no document storage, automatic saving, or sync. Private extension sessions cannot access bookmarks.

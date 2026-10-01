@@ -40,3 +40,5 @@ See README for `CHROMIUM_PATH` when the default executable is unavailable. Firef
 ## Send a focused contribution
 
 Describe the problem, the resulting behavior, and what you tested. Include screenshots for visible changes, using non-sensitive sample text. Do not attach private PDFs, credentials, or personal browsing data. Retain dependency license notices. Release tags, store submissions, signing, and production deployment are maintainer tasks; see [releasing](docs/releasing.md).
+
+Planned clean-up work, such as formatting and splitting the reader module, is described in [the maintainability plan](docs/maintainability.md).

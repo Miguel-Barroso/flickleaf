@@ -24,7 +24,10 @@ test('hyphen joining is opt-in, stays within nearby lines and never crosses page
 test('cleanup protects body numbers, nonrepeating headings, short documents, and text-only margin pages', () => {
   const repeatedBody = pages.map(page => ({...page,lines:[line('Field notes',.4),line('2026',.5)]}));
   assert.equal(cleanupPDFPages(repeatedBody).changed,false);
-  assert.equal(cleanupPDFPages(pages.slice(0,2),{numbers:false}).changes.headers,0);
+  assert.equal(cleanupPDFPages(pages.slice(0,1),{numbers:false}).changes.headers,0);
+  assert.equal(cleanupPDFPages(pages.slice(0,2),{numbers:false}).changes.headers,2,'two-page documents repeat on both pages');
+  const mixed = [pages[0],{...pages[1],lines:pages[1].lines.slice(1)},pages[2]];
+  assert.equal(cleanupPDFPages(mixed,{numbers:false}).changes.headers,0,'three-page documents still need every page');
   const unique = pages.map(page => ({...page,lines:[line(`Chapter ${page.number}`, .06),line('Body.',.4)]}));
   assert.equal(cleanupPDFPages(unique).changed,false);
   const onlyMargins = pages.map(page => ({...page,lines:[line('Only text',.06),line('42',.95)]}));
@@ -40,4 +43,13 @@ test('PDF extraction uses viewport coordinates and retains EOL boundaries', () =
   const content={items:[{str:'Hello',transform:[1,0,0,1,10,740]},{str:'world',transform:[1,0,0,1,50,740],hasEOL:true},{str:'Body',transform:[1,0,0,1,10,400],hasEOL:true}]};
   const lines=pdfLines(content,{height:800,convertToViewportPoint:(x,y)=>[x,800-y]});
   assert.deepEqual(lines,[line('Hello world',.075),line('Body',.5)]);
+});
+test('lowercase roman page numbers are removed only in margins; capitals stay', () => {
+  const front = ['iv','Page xii','xl','I','IV','Mix'].map((number,i) => ({number:i+1,lines:[line('Body text.',.4),line(number,.95)]}));
+  const result = cleanupPDFPages(front,{headers:false});
+  assert.equal(result.changes.numbers,3);
+  const lines = result.text.split('\n');
+  for (const kept of ['I','IV','Mix']) assert.ok(lines.includes(kept),kept);
+  for (const removed of ['iv','Page xii','xl']) assert.ok(!lines.includes(removed),removed);
+  assert.equal(cleanupPDFPages([{number:1,lines:[line('iv',.5),line('Body.',.4)]}]).changes.numbers,0);
 });
