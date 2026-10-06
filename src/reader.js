@@ -230,7 +230,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     else if (event.key === 'PageDown' || event.key === '-' || event.key === '−') { event.preventDefault(); speed(engine.speed - 25); }
     else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); seek(engine.index - 1); }
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); seek(engine.index + 1); }
-    else if (event.key.toLowerCase() === 'c' && !event.repeat && view !== 'paragraphs') { event.preventDefault(); toggleContext(); }
+    // Swallow repeats and Paragraphs-view presses too: an unhandled keydown
+    // reaches the browser, where Firefox find-as-you-type captures the typing.
+    else if (event.key.toLowerCase() === 'c') { event.preventDefault(); if (!event.repeat && view !== 'paragraphs') toggleContext(); }
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
   listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#save-place,#resume-place,#clear-place,#paste,#clear-preferences,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });

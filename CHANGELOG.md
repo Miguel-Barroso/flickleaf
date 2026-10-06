@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Swallow held or repeated C keys and C in Paragraphs view so the context shortcut never reaches the browser's find-as-you-type (Firefox).
+
 ## 0.8.0
 
 - Add a Stepped scroll mode that moves exactly one word per wheel notch, accumulates fine trackpad and drag input, and never glides.

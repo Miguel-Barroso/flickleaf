@@ -63,6 +63,10 @@ try {
   await page.getByRole('button', { name: 'Context', exact: true }).click(); assert.ok(await page.locator('.context').isVisible());
   await page.keyboard.press('c'); assert.equal(await page.locator('.context').isVisible(), false);
   await page.keyboard.press('c'); assert.ok(await page.locator('.context').isVisible());
+  // A held key toggles once; repeats stay swallowed instead of reaching the browser.
+  await page.keyboard.down('c'); await page.keyboard.down('c'); await page.keyboard.up('c');
+  assert.equal(await page.locator('.context').isVisible(), false);
+  await page.keyboard.press('c'); assert.ok(await page.locator('.context').isVisible());
   await page.getByRole('button', { name: 'Switch to dark theme' }).click(); assert.ok(await page.locator('dialog.dark').isVisible());
   await page.getByRole('button', { name: 'Switch to light theme' }).click();
   await page.locator('.stage').hover(); await page.mouse.wheel(0, 220); await page.waitForTimeout(400);
