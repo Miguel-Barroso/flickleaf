@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status checked 1 October 2026: **0.6.0 Approved and publicly listed**. Preparing 0.7.0 with explicit PNG manifest icons and the existing leaf listing icon. Submission status below will be updated after confirmation.
+Status checked 6 October 2026: **0.8.0 Approved and publicly listed**, minutes after the first scripted submission; 0.7.0 was approved and listed before it. Listing description and release notes on the Developer Hub still need updating for 0.8.0 (the public description predates the Stepped mode and Glide relabel).
 
 [Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
 
@@ -104,4 +104,6 @@ Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentati
 
 ## 0.8.0 submission preparation
 
-0.6.0 is approved. 0.8.0 supersedes the planned 0.7.0 submission and includes its explicit PNG manifest icons and optional local bookmark, plus the Stepped scroll mode, the C context shortcut, the section-menu reset, and the Direct-to-Glide relabel. Submission now runs as one deliberate local step, `npm run submit:firefox`, which uploads the package and matching source from the tagged release commit through Mozilla's submission API (see [releasing](releasing.md)). Validation: 44 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.
+Status, 6 October 2026: 0.8.0 was submitted for listed review with matching source via `npm run submit:firefox` — the first scripted submission ([version page](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions/6546766)) — and was approved and publicly listed within minutes. Release notes and the listing description are handled on the Developer Hub.
+
+0.8.0 includes the explicit PNG manifest icons and optional local bookmark shipped in 0.7.0, plus the Stepped scroll mode, the C context shortcut, the section-menu reset, and the Direct-to-Glide relabel. Submission now runs as one deliberate local step, `npm run submit:firefox`, which uploads the package and matching source from the tagged release commit through Mozilla's submission API (see [releasing](releasing.md)). Validation: 44 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.

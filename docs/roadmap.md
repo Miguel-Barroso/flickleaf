@@ -20,10 +20,11 @@ Agreed 25 September 2026; updated 29 September 2026.
 
 ## Next, in recommended order
 
-1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
+1. Finish Firefox store follow-through: 0.8.0 is approved and publicly listed (submitted 6 October via the scripted `npm run submit:firefox`). Verify the signed installation, refresh the listing description, release notes, and screenshots for 0.8.0, and address any later reviewer requests; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
 2. Validate bookmarks on physical devices and gather feedback before expanding to multiple saved places. Saving document text remains a separate, unimplemented feature requiring explicit choice.
 3. Recapture the quick-start screenshots, which still show 0.6.0, once the 0.8.0 web reader is published. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
+5. Optional hold at sections: a toggle so arriving on a heading card pauses indefinitely until the reader scrolls, steps, or presses Play, replacing the timed section pause. Off by default; remembered with the other preferences. Suggested label **Hold at sections**, a quiet aria-pressed button beside the Section picker, since both appear only when headings exist. Implementation notes: stop in the engine when forward playback or momentum lands on a heading token, without re-triggering at the same index on resume; keep the quiet reading state while holding — a heading must not reveal the surrounding controls by pausing (today the dimmed `reading` state drops whenever the engine pauses, so holding needs its own state or an explicit exception); suggested status line "Holding at section · scroll to continue".
 
 ## Guardrails
 

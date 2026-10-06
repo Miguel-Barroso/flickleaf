@@ -12,7 +12,7 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ## Availability — 5 October 2026
 
-The web reader is live at version 0.8.0. Firefox 0.6.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/); a newer Firefox package is being prepared for submission.
+The web reader is live at version 0.8.0. Firefox 0.8.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/).
 
 Chrome remains a manual developer install. Safari remains an unsigned Xcode project; there is no Chrome Web Store or App Store release. GitHub release packages are currently drafts, so public users should build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
@@ -25,7 +25,7 @@ Requires desktop Firefox 142 or newer. Clone this repository, run `npm ci` and `
 3. Open an article, then click **Flickleaf** in Firefox's extensions menu.
 4. If extraction misses the text you want, select a passage and click the extension again.
 
-Temporary add-ons are removed when Firefox restarts. The submitted 0.6.0 release is awaiting Mozilla review and signing. Internal browser pages, the add-on store, and other protected pages cannot be read; Flickleaf opens the paste view when Firefox rejects access.
+Temporary add-ons are removed when Firefox restarts. The signed release is on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/). Internal browser pages, the add-on store, and other protected pages cannot be read; Flickleaf opens the paste view when Firefox rejects access.
 
 ## Paste your own text
 
@@ -193,4 +193,4 @@ Choose **Save place** to store your current position on this device. This is opt
 
 Only a SHA-256 fingerprint of the tokenized text, the token index, and a format version are stored locally. No document text, title, filename, URL, timestamp, or PDF bytes are saved. A fingerprint can identify a known matching text; it is not encryption or an anonymous record. Changed text or extraction may not match. **Delete saved place** removes the bookmark without changing preferences. **Clear saved preferences** does not delete the bookmark. There is no sync. Private extension sessions neither read nor write bookmarks; web private-mode storage follows the browser’s own isolation and lifetime. If storage or hashing is unavailable, reading continues without bookmarking.
 
-The submitted Firefox 0.6.0 package does not include this feature; its review remains separate from the 0.7.0 development packages.
+The listed Firefox release includes this feature since 0.7.0.

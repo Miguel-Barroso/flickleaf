@@ -23,4 +23,4 @@ Pace, limits, theme, and scroll mode are remembered locally. Document text is no
 
 ## Browser extensions
 
-See the [README](../README.md) for current availability and developer installation. Firefox 0.6.0 is awaiting Mozilla review. Chrome is a developer build; Safari requires Xcode and signing. On a phone, the web reader is the simplest starting point.
+See the [README](../README.md) for current availability and developer installation. Firefox is publicly available on the [official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/). Chrome is a developer build; Safari requires Xcode and signing. On a phone, the web reader is the simplest starting point.
