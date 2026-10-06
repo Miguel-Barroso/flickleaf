@@ -13,7 +13,7 @@
 
 ![Paragraph view with the current word highlighted](images/paragraphs.png)
 
-These are unretouched captures of the shared web reader, version 0.6.0, using Flickleaf’s built-in sample. They demonstrate the UI, not a signed extension installation.
+These are unretouched captures of the shared web reader, version 0.8.0, using Flickleaf’s built-in sample. They demonstrate the UI, not a signed extension installation.
 
 ## Bring your own text
 
