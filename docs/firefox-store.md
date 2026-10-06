@@ -38,7 +38,9 @@ Flickleaf is an alternative way to present text, not a promise of faster compreh
 
 **Source:** https://github.com/Miguel-Barroso/flickleaf
 
-Suggested category: Productivity. Do not claim Firefox for Android support until the packaged extension has been checked there. Screenshots should show an ordinary article, section navigation, pace controls, and local PDF import with non-sensitive sample text.
+### Listing guidance — instructions for the author, never pasted into AMO
+
+Everything from the **Description** paragraphs through the Source link above is the public listing copy; nothing below this line belongs in any Developer Hub field. Suggested category: Productivity. Do not claim Firefox for Android support until the packaged extension has been checked there. Screenshots should show an ordinary article, section navigation, pace controls, and local PDF import with non-sensitive sample text.
 
 ## Privacy statement for the extension
 
