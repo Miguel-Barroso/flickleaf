@@ -1,5 +1,12 @@
 # Changelog
 
+## 0.8.0
+
+- Add a Stepped scroll mode that moves exactly one word per wheel notch, accumulates fine trackpad and drag input, and never glides.
+- Toggle the context line with the C key.
+- Choosing the current section in the Section menu returns to the start of that section.
+- Rename the Direct scroll mode to Glide. Saved preferences keep working unchanged.
+
 ## 0.7.0
 
 - Add explicit Save place, Resume saved place, and Delete saved place across the shared reader. One local fingerprint/position bookmark; no document storage, automatic saving, or sync. Private extension sessions cannot access bookmarks.

@@ -10,9 +10,9 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ![Flickleaf word reader](docs/images/words.png)
 
-## Availability — 29 September 2026
+## Availability — 5 October 2026
 
-The web reader is live at version 0.7.0. Firefox 0.6.0 and its matching source have been submitted to Mozilla; the Developer Hub reports **Awaiting Review**. The [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) is currently visible to the signed-in author, but may show “page not found” publicly until publication. It is not yet an approved store release.
+The web reader is live at version 0.8.0. Firefox 0.6.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/); a newer Firefox package is being prepared for submission.
 
 Chrome remains a manual developer install. Safari remains an unsigned Xcode project; there is no Chrome Web Store or App Store release. GitHub release packages are currently drafts, so public users should build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
@@ -35,7 +35,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.7.0.zip`.
+Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.8.0.zip`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -45,24 +45,25 @@ The Chrome version shares all reading controls and the paste-text view with Fire
 
 ## Section navigation
 
-The progress bar shows a tick at each heading: taller marks for main sections, shorter marks for subsections. Hover over the bar to preview the section at that position. Use the **Section** picker underneath to jump precisely to a heading, including on touch screens or pages with closely packed headings. Jumping pauses playback at the heading card; Play resumes from there. The picker follows the current section as you read or scrub. Pages without headings keep a simple slider.
+The progress bar shows a tick at each heading: taller marks for main sections, shorter marks for subsections. Hover over the bar to preview the section at that position. Use the **Section** picker underneath to jump precisely to a heading, including on touch screens or pages with closely packed headings. Jumping pauses playback at the heading card; Play resumes from there. The picker follows the current section as you read or scrub. While you are inside a section, choosing that same section again returns you to its start. Pages without headings keep a simple slider.
 
 ## Reading speed limits
 
-The **Min / Max** fields default to **300 / 900 WPM**. They cap the base reading pace in Direct, Freewheel, reverse scrolling, and hands-off playback. You can choose limits between 50 and 1,500 WPM. Changing either limit takes effect immediately; if you move one past the other, the other follows so the range stays valid. Blank or invalid entries restore the previous value.
+The **Min / Max** fields default to **300 / 900 WPM**. They cap the base reading pace in Glide, Freewheel, reverse scrolling, and hands-off playback; Stepped scrolling moves by whole words and is not paced by them. You can choose limits between 50 and 1,500 WPM. Changing either limit takes effect immediately; if you move one past the other, the other follows so the range stays valid. Blank or invalid entries restore the previous value.
 
 Wheel momentum still decays naturally. When it would produce a pace below the minimum, reading holds at your minimum until the wheel settles, then pauses. Pause remains immediate. Punctuation and heading pauses still apply, so the average number of words shown per minute can be below your minimum base pace. Limits start at 300–900 and are remembered locally when storage is available.
 
-## Two scroll modes
+## Three scroll modes
 
-Choose **Direct** or **Freewheel** below the playback controls.
+Choose **Stepped**, **Glide**, or **Freewheel** below the playback controls.
 
-- **Direct** keeps the original short glide and close control.
+- **Stepped** moves exactly one word per wheel notch, with no glide. A larger flick moves a few words at once, and fine trackpad or drag input accumulates until it adds up to a whole word. Reading stops the moment your hand does.
+- **Glide** keeps the original short glide and close control. It was previously labeled Direct and is still stored as `direct`, so saved preferences keep working.
 - **Freewheel** adds more momentum per flick and coasts much longer. Repeated flicks accelerate; opposite scrolling brakes first, then reverses. Space, Enter, Pause, seeking, or switching modes stops momentum immediately. Leaving the tab/window also stops it.
 
-Freewheel is a software approximation of a freely spinning wheel, not a hardware-specific Logitech simulation. A moderate flick can coast for roughly 20 seconds; input from different wheels and trackpads varies. Both modes respect your minimum and maximum pace and retain heading timing. Hands-off Play still runs at the configured WPM. Your selected mode is remembered locally when storage is available.
+Freewheel is a software approximation of a freely spinning wheel, not a hardware-specific Logitech simulation. A moderate flick can coast for roughly 20 seconds; input from different wheels and trackpads varies. Glide and Freewheel respect your minimum and maximum pace and retain heading timing. Stepped moves by position rather than pace, so the speed limits do not apply to it; headings pass as single cards. Hands-off Play still runs at the configured WPM in every mode. Your selected mode is remembered locally when storage is available.
 
-For tuning: Direct uses gain 4 and a 420 ms exponential decay constant; Freewheel uses gain 6 and a 6,000 ms decay constant, with stronger opposing-input braking and a 20 WPM stop threshold. These constants live in `src/core.js`.
+For tuning: Stepped treats a single input of 40 px or more as a wheel notch (one word per 120 px, at least one), accumulates finer input at 90 px per word, and drops a partial step when you reverse; Glide uses gain 4 and a 420 ms exponential decay constant; Freewheel uses gain 6 and a 6,000 ms decay constant, with stronger opposing-input braking and a 20 WPM stop threshold. These constants live in `src/core.js`.
 
 ## Headings and section rhythm
 
@@ -76,13 +77,13 @@ Extraction filters navigation landmarks, forms, hidden elements, recognizable in
 
 | Control | Action |
 | --- | --- |
-| Scroll down / up | Accelerate forward / reverse; momentum decays |
+| Scroll down / up | Accelerate forward / reverse; momentum decays (Stepped: one word per notch, no glide) |
 | Drag upward / downward in the reading area | Move forward / reverse |
 | Play, Space, or Enter | Toggle hands-off continuous playback |
 | Left / right or up / down arrows | Pause and step one word |
 | Progress slider | Pause and seek |
 | Page Up / Page Down, + / − keys or buttons, or WPM input | Set continuous playback speed within your chosen limits |
-| Context button | Pause and show surrounding words |
+| Context button or C | Pause and toggle surrounding words |
 | Hold Shift | Pause and temporarily show surrounding words |
 | Escape or Close | Return to the original page |
 
@@ -156,7 +157,7 @@ Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is 
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.7.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.8.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 

@@ -1,6 +1,6 @@
 {
   "name": "flickleaf",
-  "version": "0.7.0",
+  "version": "0.8.0",
   "private": true,
   "type": "module",
   "description": "A browser reader where your hand controls the pace.",
@@ -19,6 +19,7 @@
     "test:chrome": "node tests/chrome.mjs",
     "build:safari": "node build.mjs --safari",
     "package:safari": "npm run build:safari && node package-safari.mjs",
+    "submit:firefox": "node scripts/submit-firefox.mjs",
     "test:safari": "node tests/safari.mjs"
   },
   "dependencies": {

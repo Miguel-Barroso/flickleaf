@@ -20,7 +20,7 @@ Submission completion was verified in the signed-in Developer Hub on 29 Septembe
 
 **Description:**
 
-Flickleaf puts the words in one place and lets your hand control the pace. Open an article and click the leaf to read it, or select a passage first. Scroll forward or backward, choose a gentle glide or longer freewheel motion, or press Play for hands-off reading.
+Flickleaf puts the words in one place and lets your hand control the pace. Open an article and click the leaf to read it, or select a passage first. Scroll forward or backward, choose stepped word-by-word scrolling, a gentle glide, or longer freewheel motion, or press Play for hands-off reading.
 
 Set a comfortable pace and minimum/maximum speed. Headings stay centered, with section pauses and navigation markers so you can find your place. Pause to see surrounding text whenever you need context. Switch to Paragraphs for a normal passage view with your current word highlighted, then return to Words without losing your place.
 
@@ -102,6 +102,6 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 
 Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentation/publish/submitting-an-add-on/) and [add-on policies](https://extensionworkshop.com/documentation/publish/add-on-policies/) at submission time; requirements can change. Any new developer agreement must be reviewed by the owner. Submission is complete; approval and public availability must be verified separately.
 
-## 0.7.0 submission preparation
+## 0.8.0 submission preparation
 
-0.6.0 is approved. 0.7.0 includes explicit PNG icons for the Firefox manifest and the optional local bookmark described above. Use matching source from the icon-fix commit, rather than the earlier v0.7.0 tag. Validation: 42 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.
+0.6.0 is approved. 0.8.0 supersedes the planned 0.7.0 submission and includes its explicit PNG manifest icons and optional local bookmark, plus the Stepped scroll mode, the C context shortcut, the section-menu reset, and the Direct-to-Glide relabel. Submission now runs as one deliberate local step, `npm run submit:firefox`, which uploads the package and matching source from the tagged release commit through Mozilla's submission API (see [releasing](releasing.md)). Validation: 44 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.

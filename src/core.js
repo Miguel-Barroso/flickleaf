@@ -2,6 +2,7 @@ export const clamp = (value, min, max) => Math.max(min, Math.min(max, value));
 
 // Software wheel feel, not a model of any particular mouse's hardware.
 const SCROLL_MODES = {
+  stepped: { notch: 40, swipe: 120, drag: 90, holdMs: 900 },
   direct: { gain: 4, coastMs: 420, stopSpeed: 12, brake: 1 },
   freewheel: { gain: 6, coastMs: 6000, stopSpeed: 20, brake: 1.5 },
 };
@@ -49,9 +50,10 @@ export class Playback {
     this.tokens = tokens; this.index = 0; this.speed = 300;
     this.velocity = 0; this.mode = 'paused'; this.elapsed = 0;
     this.scrollMode = 'direct';
+    this.stepCharge = 0; this.stepHold = 0;
     this.minSpeed = 300; this.maxSpeed = 900;
   }
-  pause() { this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; }
+  pause() { this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
   play() {
     if (!this.tokens.length) return;
     if (this.index === this.tokens.length - 1) this.index = 0;
@@ -81,6 +83,7 @@ export class Playback {
   }
   impulse(pixels) {
     if (!Number.isFinite(pixels) || !pixels || !this.tokens.length) return;
+    if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240));
     if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; }
     const before = Math.sign(this.velocity);
     this.mode = 'scrub';
@@ -88,6 +91,25 @@ export class Playback {
     const braking = before && before !== Math.sign(pixels);
     this.velocity = clamp(this.velocity + clamp(pixels, -240, 240) * feel.gain * (braking ? feel.brake : 1), -this.maxSpeed, this.maxSpeed);
     if (before !== Math.sign(this.velocity)) this.elapsed = 0;
+  }
+  // No glide: a wheel notch moves one word immediately, a larger swipe a few,
+  // and fine trackpad or drag input accumulates toward whole words. Nothing
+  // continues once the hand stops; scrub only lingers for the reading chrome.
+  step(pixels) {
+    const feel = SCROLL_MODES.stepped;
+    if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
+    this.mode = 'scrub'; this.stepHold = feel.holdMs;
+    let steps;
+    if (Math.abs(pixels) >= feel.notch) {
+      steps = Math.sign(pixels) * Math.max(1, Math.trunc(Math.abs(pixels) / feel.swipe));
+      this.stepCharge = 0;
+    } else {
+      if (Math.sign(pixels) !== Math.sign(this.stepCharge)) this.stepCharge = 0;
+      this.stepCharge += pixels;
+      steps = Math.trunc(this.stepCharge / feel.drag);
+      this.stepCharge -= steps * feel.drag;
+    }
+    this.index = clamp(this.index + steps, 0, this.tokens.length - 1);
   }
   tick(milliseconds) {
     if (this.mode === 'paused' || !this.tokens.length) return;
@@ -100,9 +122,14 @@ export class Playback {
       // floor, continue at minSpeed until friction stops the wheel completely.
       this.elapsed += Math.abs(this.readingVelocity) * step / 60000;
       if (this.mode === 'scrub') {
-        const feel = SCROLL_MODES[this.scrollMode];
-        this.velocity *= Math.exp(-step / feel.coastMs);
-        if (Math.abs(this.velocity) < feel.stopSpeed) { this.pause(); break; }
+        if (this.scrollMode === 'stepped') {
+          this.stepHold -= step;
+          if (this.stepHold <= 0) { this.pause(); break; }
+        } else {
+          const feel = SCROLL_MODES[this.scrollMode];
+          this.velocity *= Math.exp(-step / feel.coastMs);
+          if (Math.abs(this.velocity) < feel.stopSpeed) { this.pause(); break; }
+        }
       }
       while (this.elapsed >= this.tokens[this.index].weight) {
         this.elapsed -= this.tokens[this.index].weight;

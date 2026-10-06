@@ -67,6 +67,30 @@ test('switching scroll modes clears momentum and leaves the original feel intact
   run(engine, 2500); assert.equal(engine.mode, 'paused');
   engine.setScrollMode('unknown'); assert.equal(engine.scrollMode, 'direct');
 });
+test('stepped mode moves one word per notch, bounds hard flicks, and never glides', () => {
+  const engine = new Playback(plain()); engine.seek(50); engine.setScrollMode('stepped');
+  engine.impulse(100); assert.equal(engine.index, 51);   // a pixel-mode wheel notch
+  assert.equal(engine.mode, 'scrub');
+  engine.impulse(48); assert.equal(engine.index, 52);    // a line-mode wheel notch
+  run(engine, 5000);
+  assert.equal(engine.index, 52, 'no glide once the hand stops');
+  assert.equal(engine.mode, 'paused');
+  engine.impulse(-100); assert.equal(engine.index, 51);
+  engine.impulse(500); assert.equal(engine.index, 53, 'a hard flick stays bounded');
+});
+test('stepped mode accumulates fine trackpad input and drops it on reversal', () => {
+  const engine = new Playback(plain()); engine.seek(50); engine.setScrollMode('stepped');
+  for (let i = 0; i < 8; i++) engine.impulse(10);
+  assert.equal(engine.index, 50, 'input below one step does not move');
+  engine.impulse(10); assert.equal(engine.index, 51);
+  for (let i = 0; i < 8; i++) engine.impulse(10);
+  engine.impulse(-10); engine.impulse(30); engine.impulse(30);
+  assert.equal(engine.index, 51, 'reversal clears the partial step');
+  engine.impulse(30); assert.equal(engine.index, 52);
+  engine.seek(99); engine.impulse(240); assert.equal(engine.index, 99);
+  engine.seek(0); engine.impulse(-240); assert.equal(engine.index, 0);
+  engine.play(); run(engine, 450); assert.equal(engine.index, 2, 'hands-off playback still paces by WPM');
+});
 test('constant playback is independent of frame rate', () => {
   for (const step of [5, 10, 20, 40]) { const engine = new Playback(plain()); engine.play(); run(engine, 2000, step); assert.equal(engine.index, 10); }
 });

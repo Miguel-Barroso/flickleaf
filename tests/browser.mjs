@@ -61,6 +61,8 @@ try {
   const paused = await page.locator('#count').textContent(); await page.waitForTimeout(300); assert.equal(await page.locator('#count').textContent(), paused);
   await page.getByRole('button', { name: 'Next word', exact: true }).click(); assert.notEqual(await page.locator('#count').textContent(), paused);
   await page.getByRole('button', { name: 'Context', exact: true }).click(); assert.ok(await page.locator('.context').isVisible());
+  await page.keyboard.press('c'); assert.equal(await page.locator('.context').isVisible(), false);
+  await page.keyboard.press('c'); assert.ok(await page.locator('.context').isVisible());
   await page.getByRole('button', { name: 'Switch to dark theme' }).click(); assert.ok(await page.locator('dialog.dark').isVisible());
   await page.getByRole('button', { name: 'Switch to light theme' }).click();
   await page.locator('.stage').hover(); await page.mouse.wheel(0, 220); await page.waitForTimeout(400);
@@ -72,7 +74,7 @@ try {
   await page.keyboard.press('Escape'); assert.equal(await page.locator('dialog').count(), 0); assert.equal(await page.locator('article').innerHTML(), original);
   assert.equal(await page.evaluate(() => document.activeElement.id), 'open');
   await page.getByRole('button', { name: 'Start reading' }).click();
-  assert.equal(await page.getByRole('button', { name: 'Direct', exact: true }).getAttribute('aria-pressed'), 'true');
+  assert.equal(await page.getByRole('button', { name: 'Glide', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.getByRole('button', { name: 'Freewheel', exact: true }).click();
   assert.equal(await page.getByRole('button', { name: 'Freewheel', exact: true }).getAttribute('aria-pressed'), 'true');
   await page.locator('.stage').hover(); await page.mouse.wheel(0, 100);
@@ -92,8 +94,21 @@ try {
   await page.keyboard.press('Space'); assert.match(await page.locator('#state').textContent(), /Paused/);
   const coastStop = await page.locator('#count').textContent();
   await page.waitForTimeout(300); assert.equal(await page.locator('#count').textContent(), coastStop);
-  await page.mouse.wheel(0, 100); await page.getByRole('button', { name: 'Direct', exact: true }).click();
+  await page.mouse.wheel(0, 100); await page.getByRole('button', { name: 'Glide', exact: true }).click();
   assert.match(await page.locator('#state').textContent(), /Paused/);
+  await page.getByRole('button', { name: 'Stepped', exact: true }).click();
+  assert.equal(await page.getByRole('button', { name: 'Stepped', exact: true }).getAttribute('aria-pressed'), 'true');
+  const beforeStep = Number((await page.locator('#count').textContent()).split(' / ')[0]);
+  await page.locator('.stage').hover(); await page.mouse.wheel(0, 100); await page.waitForTimeout(150);
+  assert.match(await page.locator('#state').textContent(), /Stepping/);
+  const afterStep = Number((await page.locator('#count').textContent()).split(' / ')[0]);
+  assert.ok(afterStep > beforeStep, 'one notch moves forward');
+  await page.waitForTimeout(1500);
+  assert.equal(Number((await page.locator('#count').textContent()).split(' / ')[0]), afterStep, 'a notch never glides onward');
+  assert.match(await page.locator('#state').textContent(), /Paused/);
+  await page.mouse.wheel(0, -100); await page.waitForTimeout(150);
+  assert.equal(Number((await page.locator('#count').textContent()).split(' / ')[0]), beforeStep, 'a reverse notch steps back');
+  await page.getByRole('button', { name: 'Glide', exact: true }).click();
   await page.keyboard.press('Escape');
   // Exercise the actual injected extension bundle, including repeated activation.
   await page.addScriptTag({ url: '/content.js' }); assert.ok(await word.isVisible());
@@ -111,6 +126,14 @@ try {
   await page.getByLabel('Jump to section').selectOption(String(headingIndex));
   assert.equal(await word.textContent(), 'A pace of your own');
   assert.match(await page.locator('#state').textContent(), /Paused/);
+  // Mid-section, the select shows the section via a hidden placeholder, so
+  // choosing the same section is a real change that resets to its start.
+  await page.getByRole('button', { name: 'Next word', exact: true }).click();
+  assert.equal(await page.locator('#sections').inputValue(), '');
+  assert.equal(await page.locator('#sections').evaluate(el => el.selectedOptions[0]?.textContent), 'A pace of your own');
+  await page.getByLabel('Jump to section').selectOption(String(headingIndex));
+  assert.equal(await word.textContent(), 'A pace of your own');
+  assert.equal(await page.locator('#sections').inputValue(), String(headingIndex));
   const progressBox = await page.locator('.progress').boundingBox();
   const headingX = progressBox.x + 8 + headingIndex / (tokens.length - 1) * (progressBox.width - 16);
   await page.mouse.move(headingX + 1, progressBox.y + progressBox.height / 2);

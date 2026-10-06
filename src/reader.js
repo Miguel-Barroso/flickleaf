@@ -26,7 +26,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     <div class="view-switch chrome mode-switch" role="group" aria-label="Reading view"><button id="word-view" aria-pressed="true">Words</button><button id="paragraph-view" aria-pressed="false">Paragraphs</button></div>
     <main class="stage" aria-label="Reading area. Scroll or drag to control the pace."><div class="focus-line" aria-hidden="true"></div><div class="word-frame"><span class="heading-label eyebrow" hidden>Section</span><div class="word" aria-live="off"></div><div class="context" hidden></div></div><div class="focus-line lower" aria-hidden="true"></div></main>
     <section class="paragraph-pane" hidden tabindex="0" aria-label="Paragraph reading view" aria-describedby="paragraph-help"><p id="paragraph-help">Your current word is highlighted. Select a word to move your place; use ← and → to step. Play returns to Words.</p><button id="earlier-passage">Earlier passage</button><div class="paragraph-content"></div><button id="later-passage">Later passage</button></section>
-    <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="direct" aria-pressed="true">Direct</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><div class="preferences chrome"><span id="preferences-status" role="status">Loading preferences…</span><button class="quiet" id="clear-preferences">Clear saved preferences</button></div><div class="reading-position chrome"><p id="place-status" role="status"></p><button id="save-place" disabled>Save place</button><button id="resume-place" hidden>Resume saved place</button><button class="quiet" id="clear-place">Delete saved place</button></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>Esc</kbd> to leave</p></div>
+    <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false" title="Show nearby words (C)">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="stepped" aria-pressed="false">Stepped</button><button id="direct" aria-pressed="true">Glide</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><div class="preferences chrome"><span id="preferences-status" role="status">Loading preferences…</span><button class="quiet" id="clear-preferences">Clear saved preferences</button></div><div class="reading-position chrome"><p id="place-status" role="status"></p><button id="save-place" disabled>Save place</button><button id="resume-place" hidden>Resume saved place</button><button class="quiet" id="clear-place">Delete saved place</button></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>C</kbd> for context · <kbd>Esc</kbd> to leave</p></div>
     <footer class="chrome"><span>FLICK. READ. FIND YOUR PACE.</span><span>One word. Right here.</span></footer>
   </div>`;
   root.append(dialog); document.documentElement.append(host);
@@ -75,6 +75,10 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const headings = article.tokens.flatMap((token, index) => token.heading ? [{ ...token, index }] : []);
   const sectionAt = index => headings.findLast(heading => heading.index <= index);
   const sections = $('#sections');
+  // Mirrors the current section while reading inside it, so choosing that
+  // section in the menu is a real change and returns to its start.
+  const readingAt = document.createElement('option');
+  readingAt.hidden = true; readingAt.disabled = true; readingAt.value = '';
   if (headings.length) {
     $('.section-nav').hidden = false;
     if (headings[0].index > 0) {
@@ -105,8 +109,14 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       progress.value = String(engine.index);
       progress.style.setProperty('--progress', `${engine.index / Math.max(1, article.tokens.length - 1) * 100}%`);
       const section = sectionAt(engine.index);
-      sections.value = String(section?.index ?? 0);
+      const sectionStart = section?.index ?? 0;
       sections.title = section?.text || 'Beginning';
+      if (engine.index === sectionStart) { readingAt.remove(); sections.value = String(sectionStart); }
+      else if (headings.length) {
+        readingAt.textContent = section?.text || 'Beginning';
+        sections.querySelector(`option[value="${sectionStart}"]`)?.after(readingAt);
+        sections.value = '';
+      }
       const startWord = (wordEnds[engine.index - 1] || 0) + 1;
       $('#count').textContent = `${token.heading && token.wordCount > 1 ? `${startWord}–${wordEnds[engine.index]}` : startWord} / ${totalWords} words`;
       progress.setAttribute('aria-valuetext', token.heading ? `Heading: ${token.text}` : `Word ${startWord} of ${totalWords}`);
@@ -118,7 +128,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     }
     if (view === 'paragraphs') paragraphView.render(engine.index);
     text('#play', view === 'paragraphs' ? 'Play words' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
-    text('#state', engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
+    text('#state', engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : engine.scrollMode === 'stepped' ? 'Stepping · word by word' : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
     dialog.classList.toggle('reading', engine.mode !== 'paused' && performance.now() - awake > 1600 && !context);
   };
   const setView = mode => {
@@ -133,11 +143,14 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const seek = index => { engine.seek(index); awake = performance.now(); render(); };
   const speed = value => { if (Number.isFinite(value)) engine.setSpeed(value); $('#speed').value = String(engine.speed); savePreferences(); render(); };
   const showContext = () => { $('.context').hidden = !context; $('#context').setAttribute('aria-pressed', String(context)); };
-  for (const mode of ['direct', 'freewheel']) listen($('#' + mode), 'click', () => {
-    engine.setScrollMode(mode);
-    $('#direct').setAttribute('aria-pressed', String(mode === 'direct'));
-    $('#freewheel').setAttribute('aria-pressed', String(mode === 'freewheel'));
-    text('#scroll-help', mode === 'direct' ? 'Short glide, close control.' : 'Flick to coast. Reverse to brake. Space to stop.');
+  const toggleContext = () => { engine.pause(); context = !context; showContext(); render(); };
+  const scrollHelp = { stepped: 'One word per notch. No glide.', direct: 'Short glide, close control.', freewheel: 'Flick to coast. Reverse to brake. Space to stop.' };
+  const showScrollMode = () => {
+    for (const mode of Object.keys(scrollHelp)) $('#' + mode).setAttribute('aria-pressed', String(mode === engine.scrollMode));
+    text('#scroll-help', scrollHelp[engine.scrollMode]);
+  };
+  for (const mode of Object.keys(scrollHelp)) listen($('#' + mode), 'click', () => {
+    engine.setScrollMode(mode); showScrollMode();
     savePreferences(); awake = performance.now(); render();
   });
   listen($('#play'), 'click', toggle);
@@ -145,7 +158,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen($('#forward'), 'click', () => seek(engine.index + 1));
   listen(progress, 'input', () => seek(Number(progress.value)));
   listen(sections, 'focus', () => { engine.pause(); awake = performance.now(); render(); });
-  listen(sections, 'change', () => { seek(Number(sections.value)); sections.blur(); progress.focus(); });
+  listen(sections, 'change', () => { if (sections.value === '') return; seek(Number(sections.value)); sections.blur(); progress.focus(); });
   listen(progress, 'pointermove', event => {
     if (!headings.length || event.pointerType !== 'mouse') return;
     const rect = progress.getBoundingClientRect();
@@ -169,7 +182,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   });
   listen($('#slower'), 'click', () => speed(engine.speed - 25));
   listen($('#faster'), 'click', () => speed(engine.speed + 25));
-  listen($('#context'), 'click', () => { engine.pause(); context = !context; showContext(); render(); });
+  listen($('#context'), 'click', toggleContext);
   let mouseSample = null;
   listen(dialog, 'pointermove', event => {
     if (event.pointerType !== 'mouse' || event.buttons) return;
@@ -217,6 +230,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     else if (event.key === 'PageDown' || event.key === '-' || event.key === '−') { event.preventDefault(); speed(engine.speed - 25); }
     else if (event.key === 'ArrowLeft' || event.key === 'ArrowUp') { event.preventDefault(); seek(engine.index - 1); }
     else if (event.key === 'ArrowRight' || event.key === 'ArrowDown') { event.preventDefault(); seek(engine.index + 1); }
+    else if (event.key.toLowerCase() === 'c' && !event.repeat && view !== 'paragraphs') { event.preventDefault(); toggleContext(); }
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
   listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#save-place,#resume-place,#clear-place,#paste,#clear-preferences,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
@@ -261,8 +275,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     $('#max-speed').value = String(engine.maxSpeed);
     $('#speed').min = String(engine.minSpeed); $('#speed').max = String(engine.maxSpeed);
     $('#speed').value = String(engine.speed);
-    for (const mode of ['direct', 'freewheel']) $('#' + mode).setAttribute('aria-pressed', String(mode === engine.scrollMode));
-    text('#scroll-help', engine.scrollMode === 'direct' ? 'Short glide, close control.' : 'Flick to coast. Reverse to brake. Space to stop.');
+    showScrollMode();
     dialog.classList.toggle('dark', values.theme === 'dark');
     $('#theme').setAttribute('aria-label', `Switch to ${values.theme === 'dark' ? 'light' : 'dark'} theme`);
     render();

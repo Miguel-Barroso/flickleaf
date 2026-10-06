@@ -41,7 +41,7 @@ try {
       assert.equal(await page.locator('.word').textContent(), 'A pace of your own');
       assert.equal(await page.locator('#sections option').count(), 3);
       assert.equal(await page.locator('dialog').evaluate(el => el.scrollWidth > el.clientWidth), false);
-      for (const control of ['#direct', '#freewheel', '#min-speed', '#max-speed']) assert.ok(await page.locator(control).isVisible());
+      for (const control of ['#stepped', '#direct', '#freewheel', '#min-speed', '#max-speed']) assert.ok(await page.locator(control).isVisible());
       const playBox = await page.locator('#play').boundingBox();
       assert.ok(playBox.y + playBox.height <= options.viewport.height, 'Play fits the initial viewport');
       await page.locator('#play').click();

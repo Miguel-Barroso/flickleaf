@@ -4,7 +4,7 @@
 
 1. Choose **Play**, or press Space or Enter, to start. Press again to pause.
 2. Set a comfortable pace with the WPM field. Min and Max default to 300–900; slower limits are available.
-3. In Words, scroll or swipe to move through the text. Direct gives a short glide; Freewheel keeps moving longer. Pause stops it.
+3. In Words, scroll or swipe to move through the text. Stepped moves one word per notch with no glide; Glide eases off over a short distance; Freewheel keeps moving longer. Pause stops it.
 4. Choose **Paragraphs** when you want context. Scroll normally, select a word to change your place, then choose **Play words** to continue.
 5. Use the Section picker or the marks above the progress bar to revisit a heading.
 6. Close the reader to edit your text. Closing or reloading the tab may discard the document.

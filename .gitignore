@@ -9,3 +9,6 @@ dist-chrome/
 
 dist-safari/
 safari-build/
+
+.claude/
+.serena/

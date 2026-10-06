@@ -6,6 +6,8 @@ test('preferences whitelist and normalize damaged input without storing document
   assert.deepEqual(normalizePreferences(null), DEFAULT_PREFERENCES);
   assert.deepEqual(normalizePreferences({ minSpeed: 600, maxSpeed: 100, speed: Infinity, scrollMode: 'bogus', theme: 'dark', text: 'private', position: 17 }),
     { minSpeed: 600, maxSpeed: 600, speed: 600, scrollMode: 'direct', theme: 'dark' });
+  assert.equal(normalizePreferences({ scrollMode: 'stepped' }).scrollMode, 'stepped');
+  assert.equal(normalizePreferences({ scrollMode: 'freewheel' }).scrollMode, 'freewheel');
 });
 test('web storage persists settings and clears only its own key', async () => {
   const values = new Map([['unrelated', 'keep']]);

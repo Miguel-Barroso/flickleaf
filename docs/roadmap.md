@@ -16,11 +16,13 @@ Agreed 25 September 2026; updated 29 September 2026.
 
 - 0.7.0: Opt-in single local bookmark, exact-text matching, explicit resume, and independent deletion. No document storage.
 
+- 0.8.0: Stepped scroll mode (one word per notch, no glide), a C shortcut for context, section-menu reset to the current section's start, and the Direct mode relabeled Glide.
+
 ## Next, in recommended order
 
 1. Finish Firefox store readiness: real Firefox installation checks, final screenshots, and exact source/package review. The 0.6.0 package and matching source were successfully submitted; confirmation and the author listing were verified on 29 September. Status: Awaiting Review. Add listing screenshots, address any reviewer requests, then verify signed installation and update public install links; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
 2. Validate bookmarks on physical devices and gather feedback before expanding to multiple saved places. Saving document text remains a separate, unimplemented feature requiring explicit choice.
-3. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots.
+3. Recapture the quick-start screenshots, which still show 0.6.0, once the 0.8.0 web reader is published. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
 
 ## Guardrails

@@ -8,7 +8,7 @@ export function normalizePreferences(value) {
   const minSpeed = number('minSpeed', 300);
   const maxSpeed = Math.max(minSpeed, number('maxSpeed', 900));
   return { speed: Math.max(minSpeed, Math.min(maxSpeed, number('speed', 300))), minSpeed, maxSpeed,
-    scrollMode: source.scrollMode === 'freewheel' ? 'freewheel' : 'direct', theme: source.theme === 'dark' ? 'dark' : 'light' };
+    scrollMode: source.scrollMode === 'freewheel' || source.scrollMode === 'stepped' ? source.scrollMode : 'direct', theme: source.theme === 'dark' ? 'dark' : 'light' };
 }
 
 export function createPreferencesStore(scope = globalThis) {
