@@ -1,5 +1,5 @@
 export const PREFERENCES_KEY = 'flickleaf.preferences.v1';
-export const DEFAULT_PREFERENCES = Object.freeze({ speed: 300, minSpeed: 300, maxSpeed: 900, scrollMode: 'direct', theme: 'light' });
+export const DEFAULT_PREFERENCES = Object.freeze({ speed: 300, minSpeed: 300, maxSpeed: 900, scrollMode: 'direct', theme: 'light', holdAtSections: false });
 
 // Whitelist settings: never serialize articles, filenames, or reading positions.
 export function normalizePreferences(value) {
@@ -8,7 +8,8 @@ export function normalizePreferences(value) {
   const minSpeed = number('minSpeed', 300);
   const maxSpeed = Math.max(minSpeed, number('maxSpeed', 900));
   return { speed: Math.max(minSpeed, Math.min(maxSpeed, number('speed', 300))), minSpeed, maxSpeed,
-    scrollMode: source.scrollMode === 'freewheel' || source.scrollMode === 'stepped' ? source.scrollMode : 'direct', theme: source.theme === 'dark' ? 'dark' : 'light' };
+    scrollMode: source.scrollMode === 'freewheel' || source.scrollMode === 'stepped' ? source.scrollMode : 'direct', theme: source.theme === 'dark' ? 'dark' : 'light',
+    holdAtSections: source.holdAtSections === true };
 }
 
 export function createPreferencesStore(scope = globalThis) {

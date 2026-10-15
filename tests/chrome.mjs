@@ -1,3 +1,4 @@
+import { checkSectionHold } from './section-hold-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -23,6 +24,7 @@ try {
   const errors = []; page.on('pageerror', e => errors.push(e.message));
   await page.goto(`chrome-extension://${id}/paste.html`);
   await checkHeadingFocus(page);
+  await checkSectionHold(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);

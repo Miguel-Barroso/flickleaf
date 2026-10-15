@@ -1,6 +1,10 @@
 # Changelog
 
-## Unreleased
+## 0.9.0
+
+- Add opt-in Hold at sections across web, Firefox, Chrome, and Safari. Forward playback and scrolling wait at each heading until Play, a scroll, or a step; held headings keep controls dim and stay at the reading focal point.
+- Remember the section-hold preference locally, off by default; clearing preferences restores timed headings.
+- Leave room for a two-line heading and its Section label on short phone screens.
 
 - Swallow held or repeated C keys and C in Paragraphs view so the context shortcut never reaches the browser's find-as-you-type (Firefox).
 

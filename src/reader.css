@@ -51,6 +51,8 @@ header{display:flex;align-items:center;justify-content:space-between;gap:20px}.b
 .section-nav{display:flex;align-items:center;gap:12px;margin:0 0 15px;color:var(--muted);font-size:11px}
 .section-nav[hidden],.section-preview[hidden]{display:none}
 .section-nav select{min-width:0;flex:1;min-height:36px;font:inherit;font-size:12px;color:var(--ink);background:var(--paper);border:1px solid var(--line);border-radius:8px;padding:7px 10px;text-overflow:ellipsis}
+.section-nav #hold-sections{flex-shrink:0;min-height:44px;padding:6px 10px;font-size:11px;color:var(--ink)}
+.section-nav #hold-sections[aria-pressed="true"]{border-color:var(--accent);background:color-mix(in srgb,var(--accent) 12%,transparent)}
 .section-nav select:focus-visible{outline:2px solid var(--accent);outline-offset:3px}
 .section-preview{position:absolute;bottom:calc(100% + 10px);left:0;max-width:100%;padding:8px 12px;background:var(--ink);color:var(--paper);border-radius:8px;font-size:12px;line-height:1.5;pointer-events:none;z-index:1;overflow-wrap:anywhere}
 .reading .section-nav:has(select:focus){opacity:1}

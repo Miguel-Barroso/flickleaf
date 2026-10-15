@@ -1,3 +1,4 @@
+import { checkSectionHold } from './section-hold-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -43,6 +44,7 @@ try {
   assert.deepEqual(await page.evaluate(() => calls), [{ url: `${base}/paste.html` }, 'close']);
   await page.goto(`${base}/paste.html`);
   await checkHeadingFocus(page);
+  await checkSectionHold(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);
   await checkPreferences(page);

@@ -15,6 +15,7 @@ Record device, OS/browser version, package version/commit, date, and result for 
 ## Reading and privacy
 
 - [ ] Heading cards stay centered and do not reveal the background during playback.
+- [ ] Hold at sections waits indefinitely in Play, Glide, Freewheel, and Stepped; Play, scroll/swipe, and arrows continue. Check real trackpad momentum, preference persistence/reset, and wake-lock release while held.
 - [ ] Swipes move the reader without scrolling the underlying page; closing restores the original page position.
 - [ ] Pace and scroll-mode controls remain visible; small screens can reach every control and reset.
 - [ ] Saved preferences survive reopening/reload. Reset clears only Flickleaf preferences; extension private sessions do not save changes.
