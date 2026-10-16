@@ -1,57 +1,78 @@
-// Capture AMO/Chrome listing screenshots from the live shared web reader,
-// unretouched, at 1440x900 then scaled to 1280x800 (16:10). The PDF shot uses
-// a generated non-sensitive three-page sample with repeated headers and page numbers.
-// Run after a web release: node scripts/capture-store-screenshots.mjs [url]
+// Capture Chrome Web Store and AMO listing screenshots from the packaged Chrome
+// build reading Dario Amodei's "The Adolescence of Technology" live from its own
+// site, unretouched, at 1440x900 then scaled to 1280x800 (16:10), plus the
+// 440x280 Chrome promo tile. The essay is never copied into the repository; the
+// PDF shot prints the live page locally. Only for capture, a temporary copy of
+// dist-chrome adds host access so the reader can be injected without a toolbar
+// click. Run after npm run build:chrome: node scripts/capture-store-screenshots.mjs
 import { chromium } from 'playwright';
 import { execFileSync } from 'node:child_process';
-import { mkdir } from 'node:fs/promises';
+import { cp, mkdir, readFile, rm, writeFile } from 'node:fs/promises';
+import { resolve } from 'node:path';
 
-const url = process.argv[2] || 'https://miguelbarroso.com/flickleaf/';
-const out = 'artifacts/store-screenshots';
-await mkdir(out, { recursive: true });
-const browser = await chromium.launch({ executablePath: process.env.CHROMIUM_PATH || '/Applications/Chromium.app/Contents/MacOS/Chromium', headless: true });
+const essay = 'https://www.darioamodei.com/essay/the-adolescence-of-technology';
+const out = 'artifacts/store-screenshots', ext = resolve('artifacts/.capture-extension');
+await rm(out, { recursive: true, force: true }); await mkdir(out, { recursive: true });
+await rm(ext, { recursive: true, force: true }); await cp('dist-chrome', ext, { recursive: true });
+const manifest = JSON.parse(await readFile(`${ext}/manifest.json`, 'utf8'));
+await writeFile(`${ext}/manifest.json`, JSON.stringify({ ...manifest, host_permissions: ['<all_urls>'] }));
+const context = await chromium.launchPersistentContext('', { channel: 'chromium', headless: true, viewport: { width: 1440, height: 900 },
+  args: [`--disable-extensions-except=${ext}`, `--load-extension=${ext}`] });
 const shots = [];
 try {
-  const page = await browser.newPage({ viewport: { width: 1440, height: 900 } });
+  const worker = context.serviceWorkers()[0] || await context.waitForEvent('serviceworker');
+  const id = new URL(worker.url()).host;
+  const page = await context.newPage();
   const shot = async name => { await page.waitForTimeout(500); await page.screenshot({ path: `${out}/${name}.png` }); shots.push(name); };
   const next = async n => { for (let i = 0; i < n; i++) await page.getByRole('button', { name: 'Next word', exact: true }).click(); };
-  await page.goto(url);
-  await page.getByRole('button', { name: 'Try a sample' }).click();
-  await page.getByRole('button', { name: 'Start reading' }).click();
+  const section = async pattern => page.locator('#sections').selectOption(
+    await page.locator('#sections option').evaluateAll((options, source) => options.find(o => new RegExp(source).test(o.textContent)).value, pattern.source));
+  await page.goto(essay, { waitUntil: 'networkidle' });
+  await worker.evaluate(() => chrome.tabs.query({ url: '*://*.darioamodei.com/*' })
+    .then(([tab]) => chrome.scripting.executeScript({ target: { tabId: tab.id }, files: ['content.js'] })));
   await page.locator('.word').waitFor();
-  await next(26); // "linger." in the sample's first paragraph
+  await section(/sorry, Dave/);
+  await next(5); // "geniuses" in "A country of geniuses in a datacenter"
   await shot('1-words');
   await page.getByRole('button', { name: 'Paragraphs', exact: true }).click();
   await page.locator('.paragraph-content .current-word').waitFor();
   await shot('2-paragraphs');
   await page.getByRole('button', { name: 'Words', exact: true }).click();
   await page.getByRole('button', { name: 'Hold at sections' }).click();
-  await page.locator('#sections').selectOption({ label: 'Leave room for the thought' });
+  await section(/Player piano/);
   await shot('3-hold-at-sections');
   await page.getByRole('button', { name: 'Hold at sections' }).click();
   await page.getByRole('button', { name: 'Stepped', exact: true }).click();
-  await page.locator('#sections').selectOption({ label: 'Find your place' });
-  await next(9);
-  await page.locator('#theme').click();
+  await section(/Humanity/);
+  await next(38); // "beautiful" in the closing section
+  await page.locator("#theme").click();
   await shot('4-dark-stepped');
   await page.getByRole('button', { name: 'Clear saved preferences' }).click();
 
-  const pdfPage = await browser.newPage();
-  const header = `<header>Field Notes · The Garden in Spring</header>`, footer = n => `<footer>${n}</footer>`;
-  await pdfPage.setContent(`<style>body{font:13pt Georgia;margin:0}section{height:10.9in;display:flex;flex-direction:column;padding:.4in 1in;box-sizing:border-box;break-after:page}header,footer{font-size:9pt;color:#666}header{margin-bottom:.4in}footer{margin-top:auto}h1{font-size:20pt}</style>
-    <section>${header}<h1>Notes from the garden</h1><p>The first warm week arrives without ceremony. Overnight the beds turn from brown to a faint green, and the birds begin their arguments before sunrise.</p><p>Peas go in first, along the old fence, where the soil drains well and the morning light lingers. Beans can wait until the nights stop biting.</p><p>A garden rewards patience more than effort. Most of the work is watching: noticing which corner stays damp, where the slugs gather, and what the bees prefer.</p>${footer(1)}</section>
-    <section>${header}<h1>What the season teaches</h1><p>By May the tomatoes need stakes and the lettuce needs shade. Each plant keeps its own schedule, and none of them can be hurried.</p><p>Write down what worked.</p>${footer(2)}</section>
-    <section>${header}<h1>Keeping notes</h1><p>A small notebook by the door is enough. Record the first frost, the first harvest, and anything that surprised you.</p><p>Next spring will arrive just as quietly, and the notes will be waiting.</p>${footer(3)}</section>`);
-  const pdf = `${out}/sample-garden-notes.pdf`;
-  await pdfPage.pdf({ path: pdf, width: '8.5in', height: '11in' });
-  await page.getByRole('button', { name: 'Close' }).click();
-  await page.locator('#source').fill(''); await page.locator('#title').fill('');
+  // Chrome's print header and footer repeat the title and page numbers on every page, as real PDFs do.
+  const print = await context.newPage();
+  await print.goto(essay, { waitUntil: 'networkidle' });
+  const pdf = `${out}/the-adolescence-of-technology.pdf`;
+  await print.pdf({ path: pdf, format: 'Letter', displayHeaderFooter: true, margin: { top: '0.8in', bottom: '0.8in' },
+    headerTemplate: '<div style="font:9px Georgia;width:100%;text-align:center;color:#666">The Adolescence of Technology · Dario Amodei</div>',
+    footerTemplate: '<div style="font:9px Georgia;width:100%;text-align:center;color:#666"><span class="pageNumber"></span></div>' });
+  await print.close();
+  await page.goto(`chrome-extension://${id}/paste.html`);
   await page.locator('#pdf-file').setInputFiles(pdf);
-  await page.getByRole('button', { name: 'Preview cleanup' }).waitFor();
+  await page.getByRole('button', { name: 'Preview cleanup' }).waitFor({ timeout: 120000 });
   await page.getByRole('button', { name: 'Preview cleanup' }).click();
-  await page.locator("#pdf-removed-details").evaluate(d => { d.open = true; });
-  await page.locator(".pdf-cleanup").evaluate(p => window.scrollTo(0, p.getBoundingClientRect().top + scrollY - 120));
+  await page.locator('#pdf-removed-details').evaluate(d => { d.open = true; });
+  await page.locator('.pdf-cleanup').evaluate(p => window.scrollTo(0, p.getBoundingClientRect().top + scrollY - 120));
   await shot('5-local-pdf-cleanup');
-} finally { await browser.close(); }
+
+  const tile = await context.newPage({ viewport: { width: 440, height: 280 } });
+  const icon = await readFile('public/icon.svg', 'utf8');
+  await tile.setViewportSize({ width: 440, height: 280 });
+  await tile.setContent(`<body style="margin:0;width:440px;height:280px;display:flex;flex-direction:column;justify-content:center;padding:0 40px;box-sizing:border-box;background:#f6f3ec;color:#263b33;font-family:Georgia,serif">
+    <div style="display:flex;align-items:center;gap:12px"><div style="width:44px;height:44px">${icon.replace('<svg', '<svg width="44" height="44"')}</div><span style="font:600 26px system-ui">Flickleaf</span></div>
+    <p style="font-size:30px;line-height:1.15;margin:22px 0 10px">A little space<br>for every word.</p>
+    <p style="font:13px system-ui;color:#5c6b62;margin:0">Read one word at a time, at your own pace.</p></body>`);
+  await tile.screenshot({ path: `${out}/promo-tile-440x280.png` });
+} finally { await context.close(); await rm(ext, { recursive: true, force: true }); }
 for (const name of shots) execFileSync('sips', ['-z', '800', '1280', `${out}/${name}.png`], { stdio: 'ignore' });
-console.log(`Captured ${shots.length} 1280x800 screenshots in ${out} from ${url}`);
+console.log(`Captured ${shots.length} 1280x800 screenshots and the 440x280 promo tile in ${out} from the Chrome build`);

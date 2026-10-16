@@ -1,6 +1,6 @@
 # Chrome Web Store preparation
 
-Prepared 29 September 2026; updated for 0.7.0. No Chrome developer account, uploaded item, payment, or store approval has been verified. This document is submission material, not a claim of publication.
+Prepared 29 September 2026; updated for 0.9.0 on 16 October 2026. The owner registered the Chrome Web Store developer account on 16 October 2026 (registration paid, contact email verified, EEA trader status declared by the owner). No item has been uploaded, submitted, or approved yet; this document is submission material, not a claim of publication.
 
 ## Listing
 
@@ -10,7 +10,25 @@ Summary: Read articles and local PDFs one word at a time, with scrolling or hand
 
 Single purpose: Present user-selected articles, pasted text, and local PDF text in a reader with adjustable pace and paragraph context.
 
-For 0.7.0, disclose the optional bookmark described in README (including deletion and fingerprint privacy); the older preference-only privacy statement must be updated. Use the feature description in [Firefox store materials](firefox-store.md), replacing the Firefox minimum/protected-page wording with desktop Chrome 120 or newer. Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/.
+Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/. Suggested category: Productivity (Tools). Leave the store's own Support tab off; support goes to GitHub issues.
+
+**Description:**
+
+Flickleaf puts the words in one place and lets your hand control the pace. Open an article and click the leaf to read it, or select a passage first. Scroll forward or backward, choose stepped word-by-word scrolling, a gentle glide, or longer freewheel motion, or press Play for hands-off reading.
+
+Set a comfortable pace and minimum/maximum speed. Headings stay centered, with brief section pauses and navigation markers so you can find your place. Turn on Hold at sections to wait at each heading until you press Play, scroll, or step forward. Pause to see surrounding text whenever you need context. Switch to Paragraphs for a normal passage view with your current word highlighted, then return to Words without losing your place.
+
+Paste your own text or open a text-based PDF. PDF processing happens on your device: the file, filename, and extracted text are not uploaded. Review and edit extracted text before reading. PDFs are limited to 25 MB and 300 pages; scanned documents need OCR elsewhere, password-protected documents need an unlocked copy, and complex column layouts may require cleanup.
+
+Preview optional cleanup for repeated PDF headers, footers, and page numbers before applying changes. Hyphen joining is optional and should be reviewed. Cleanup and undo stay local.
+
+Reading preferences are saved locally on this browser. Save place optionally stores one local bookmark: a text fingerprint and word position. Reopen the same text and choose Resume saved place to return while paused. Delete saved place removes it independently of preferences. No document text, PDF files, titles, filenames, URLs, or reading history are stored; bookmarks are not synced. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
+
+Flickleaf is an alternative way to present text, not a promise of faster comprehension. It requires desktop Chrome 120 or newer. Chrome-protected pages, such as chrome:// pages and the Chrome Web Store, cannot be read directly; paste text instead.
+
+### Listing guidance — instructions for the author, never pasted into the store
+
+Everything from the **Description** paragraphs above is public listing copy; nothing in this section belongs in a dashboard field. Keep the description in step with [Firefox store materials](firefox-store.md), changing only the browser requirement and protected-page wording.
 
 ## Permission justifications
 
@@ -23,14 +41,14 @@ No blanket host access, remotely hosted executable code, accounts, analytics, or
 
 ## Package and review
 
-Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.7.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
+Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.9.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
 
-Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Prepare an extension icon, a 440×280 promotional tile, and at least one 1280×800 (or supported 640×400) screenshot of the actual Chrome build. The captures in `docs/images/` are web-reader documentation images, not Chrome store evidence; capture the packaged extension before upload.
+Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Store images come from `node scripts/capture-store-screenshots.mjs` after `npm run build:chrome`: five 1280×800 screenshots of the actual Chrome build reading Dario Amodei's essay "The Adolescence of Technology" live from its own site (the essay text is never committed), plus the 440×280 promo tile, all in `artifacts/store-screenshots/`. The 128×128 store icon is `public/icons/icon-128.png`. The captures in `docs/images/` are web-reader documentation images, not store evidence.
 
 ## Remaining checklist
 
-- [ ] Verify account access and registration.
-- [ ] Capture Chrome extension screenshots and prepare the promotional tile.
+- [x] Verify account access and registration.
+- [x] Capture Chrome extension screenshots and prepare the promotional tile.
 - [ ] Recheck listing, privacy disclosures, permissions, and package against the final version.
 - [ ] Upload, submit, and record the review result.
 - [ ] Test the signed installation and publish the real installation link.
