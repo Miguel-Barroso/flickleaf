@@ -10,7 +10,7 @@ Summary: Read articles and local PDFs one word at a time, with scrolling or hand
 
 Single purpose: Present user-selected articles, pasted text, and local PDF text in a reader with adjustable pace and paragraph context.
 
-Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/. Suggested category: Productivity (Tools). Leave the store's own Support tab off; support goes to GitHub issues.
+Support: https://github.com/Miguel-Barroso/flickleaf/issues. Homepage and privacy details: https://miguelbarroso.com/flickleaf/about/. Category: Productivity › Tools; language: English (United States). Leave the store's own Support tab off; support goes to GitHub issues.
 
 **Description:**
 
@@ -43,7 +43,7 @@ No blanket host access, remotely hosted executable code, accounts, analytics, or
 
 Run `npm ci`, `npm run package:chrome`, and `npm run test:chrome`. Upload `artifacts/flickleaf-chrome-0.9.0.zip`, not the Firefox package. Test article extraction, selected text, protected-page paste fallback, PDF import, paragraph switching, private-session preferences, and reset.
 
-Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Store images come from `node scripts/capture-store-screenshots.mjs` after `npm run build:chrome`: five 1280×800 screenshots of the actual Chrome build reading Dario Amodei's essay "The Adolescence of Technology" live from its own site (the essay text is never committed), plus the 440×280 promo tile, all in `artifacts/store-screenshots/`. The 128×128 store icon is `public/icons/icon-128.png`. The captures in `docs/images/` are web-reader documentation images, not store evidence.
+Before submission, confirm the developer account and required account security setup. The owner handles any registration payment or new legal agreement. Store images come from `node scripts/capture-store-screenshots.mjs` after `npm run build:chrome`: five 1280×800 screenshots of the actual Chrome build reading Dario Amodei's essay "The Adolescence of Technology" live from its own site (the essay text is never committed), plus the 440×280 promo tile and an optional 1400×560 marquee, all in `artifacts/store-screenshots/`. The 128×128 store icon is `public/icons/icon-128.png`. The captures in `docs/images/` are web-reader documentation images, not store evidence.
 
 ## Remaining checklist
 

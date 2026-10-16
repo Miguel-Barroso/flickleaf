@@ -73,6 +73,14 @@ try {
     <p style="font-size:30px;line-height:1.15;margin:22px 0 10px">A little space<br>for every word.</p>
     <p style="font:13px system-ui;color:#5c6b62;margin:0">Read one word at a time, at your own pace.</p></body>`);
   await tile.screenshot({ path: `${out}/promo-tile-440x280.png` });
+  // Optional marquee tile, used only if Chrome features the listing: the shared tagline beside a real reader capture.
+  const reader = (await readFile(`${out}/1-words.png`)).toString("base64");
+  await tile.setViewportSize({ width: 1400, height: 560 });
+  await tile.setContent(`<body style="margin:0;width:1400px;height:560px;display:flex;align-items:center;gap:60px;padding:0 80px;box-sizing:border-box;background:#f6f3ec;color:#263b33;font-family:Georgia,serif;overflow:hidden">
+    <div style="flex:0 0 470px"><div style="display:flex;align-items:center;gap:16px"><div style="width:60px;height:60px">${icon.replace("<svg", "<svg width=\"60\" height=\"60\"")}</div><span style="font:600 36px system-ui">Flickleaf</span></div>
+    <p style="font-size:54px;line-height:1.1;margin:30px 0 16px">A little space<br>for every word.</p><p style="font:20px system-ui;color:#5c6b62;margin:0">Read one word at a time, at your own pace.</p></div>
+    <img src="data:image/png;base64,${reader}" style="width:720px;border-radius:14px;box-shadow:0 20px 50px rgba(38,59,51,.18)"></body>`);
+  await tile.screenshot({ path: `${out}/marquee-1400x560.png` });
 } finally { await context.close(); await rm(ext, { recursive: true, force: true }); }
 for (const name of shots) execFileSync('sips', ['-z', '800', '1280', `${out}/${name}.png`], { stdio: 'ignore' });
-console.log(`Captured ${shots.length} 1280x800 screenshots and the 440x280 promo tile in ${out} from the Chrome build`);
+console.log(`Captured ${shots.length} 1280x800 screenshots, the promo tile, and the marquee in ${out} from the Chrome build`);
