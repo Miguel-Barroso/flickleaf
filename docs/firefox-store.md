@@ -1,6 +1,6 @@
 # Firefox store preparation
 
-Status, 16 October 2026: **0.9.0 submitted; awaiting Mozilla approval.** The owner confirmed completing the upload from their own terminal. The public AMO API still lists **0.8.0** as the current public version, checked on 16 October 2026. Submission does not yet establish approval or public availability of 0.9.0.
+Status checked 16 October 2026: **0.9.0 Approved and publicly listed**; the public AMO API reports 0.9.0 as the current version. 0.8.0 was approved and listed before it. Version notes were added on the Developer Hub, and the owner installed the signed 0.9.0 from the AMO listing and confirmed it works.
 
 [Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
 
@@ -114,8 +114,8 @@ Status, 6 October 2026: 0.8.0 was submitted for listed review with matching sour
 
 ## 0.9.0 submission
 
-Submitted on 16 October 2026 via the existing local `npm run submit:firefox` workflow, as confirmed by the owner. Status: **awaiting Mozilla approval**. Release revision: `590c64127d2674bfee74a29b24c88c3c9b8ab558` (`v0.9.0`). The preceding dry run passed from the clean, tagged checkout and generated the matching source archive; credentials remained in the owner's environment.
+Submitted on 16 October 2026 via the existing local `npm run submit:firefox` workflow, as confirmed by the owner. Status: **approved and publicly listed** the same day ([version page](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions/6583648)). Release revision: `590c64127d2674bfee74a29b24c88c3c9b8ab558` (`v0.9.0`). The preceding dry run passed from the clean, tagged checkout and generated the matching source archive; credentials remained in the owner's environment.
 
 0.9.0 adds opt-in Hold at sections, remembers that preference locally, gives two-line headings more room on short phone screens, and prevents repeated C-key context shortcuts from reaching Firefox's find-as-you-type feature. Validation passed: 56 unit tests, all four browser suites, all target builds, unsigned macOS/iOS compilation, and Firefox lint with 0 errors and 13 existing dependency warnings.
 
-The public AMO API still reported 0.8.0 on 16 October 2026 after the upload confirmation. Approval, public availability of 0.9.0, and signed-installation testing remain pending. Review the public listing description and release notes for this version on the Developer Hub; this record does not establish that those fields were updated.
+Unlike 0.8.0, approval was not instant: the file sat in Awaiting Review for a while before listing. The public AMO API confirmed 0.9.0 as current on 16 October 2026 (an earlier cached response still showed 0.8.0). Version notes were entered on the Developer Hub before approval. The owner then installed the signed build from the AMO listing and confirmed it works.
