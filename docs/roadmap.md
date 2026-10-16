@@ -22,7 +22,7 @@ Agreed 25 September 2026; updated 15 October 2026.
 
 ## Next, in recommended order
 
-1. Submit the 0.9.0 update after release review, then finish Firefox store follow-through: 0.8.0 is approved and publicly listed (submitted 6 October via the scripted `npm run submit:firefox`). Verify the signed installation, refresh the listing description, release notes, and screenshots for the new version, and address any later reviewer requests; follow with [Chrome submission](chrome-store.md). Safari signing and physical Apple-device testing remain pending.
+1. [Chrome submission](chrome-store.md). Firefox follow-through for 0.9.0 is complete: approved and publicly listed 16 October 2026, signed installation verified, and the listing description, version notes, and five screenshots (`scripts/capture-store-screenshots.mjs`) refreshed. Address any later Mozilla reviewer requests. Safari signing and physical Apple-device testing remain pending.
 2. Validate bookmarks on physical devices and gather feedback before expanding to multiple saved places. Saving document text remains a separate, unimplemented feature requiring explicit choice.
 3. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots. The quick-start captures were refreshed from the live 0.8.0 web reader via `scripts/capture-quick-start.mjs`.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.

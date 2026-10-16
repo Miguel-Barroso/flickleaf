@@ -24,13 +24,13 @@ Submission completion was verified in the signed-in Developer Hub on 29 Septembe
 
 Flickleaf puts the words in one place and lets your hand control the pace. Open an article and click the leaf to read it, or select a passage first. Scroll forward or backward, choose stepped word-by-word scrolling, a gentle glide, or longer freewheel motion, or press Play for hands-off reading.
 
-Set a comfortable pace and minimum/maximum speed. Headings stay centered, with section pauses and navigation markers so you can find your place. Pause to see surrounding text whenever you need context. Switch to Paragraphs for a normal passage view with your current word highlighted, then return to Words without losing your place.
+Set a comfortable pace and minimum/maximum speed. Headings stay centered, with brief section pauses and navigation markers so you can find your place. Turn on Hold at sections to wait at each heading until you press Play, scroll, or step forward. Pause to see surrounding text whenever you need context. Switch to Paragraphs for a normal passage view with your current word highlighted, then return to Words without losing your place.
 
 Paste your own text or open a text-based PDF. PDF processing happens on your device: the file, filename, and extracted text are not uploaded. Review and edit extracted text before reading. PDFs are limited to 25 MB and 300 pages; scanned documents need OCR elsewhere, password-protected documents need an unlocked copy, and complex column layouts may require cleanup.
 
 Preview optional cleanup for repeated PDF headers, footers, and page numbers before applying changes. Hyphen joining is optional and should be reviewed. Cleanup and undo stay local.
 
-Reading preferences are saved locally on this browser. In 0.7.0, Save place optionally stores one local bookmark: a text fingerprint and word position. Reopen the same text and choose Resume saved place to return while paused. Delete saved place removes it independently of preferences. No document text, PDF files, titles, filenames, URLs, or reading history are stored; bookmarks are not synced. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
+Reading preferences are saved locally on this browser. Save place optionally stores one local bookmark: a text fingerprint and word position. Reopen the same text and choose Resume saved place to return while paused. Delete saved place removes it independently of preferences. No document text, PDF files, titles, filenames, URLs, or reading history are stored; bookmarks are not synced. There are no accounts, analytics, or remote executable code. You can reset saved preferences from the reader.
 
 Flickleaf is an alternative way to present text, not a promise of faster comprehension. It requires Firefox 142 or newer. Firefox-protected pages cannot be read directly; paste text instead.
 
@@ -100,7 +100,7 @@ Test walkthrough: invoke on an article, select a passage and invoke again, chang
 - [x] Run automated checks and a real Firefox smoke test of the packaged add-on, including the PDF worker. Chromium/WebKit checks do not replace Firefox testing.
 - [x] Create clean reproducible source/package archives from the same release revision; record build environment and checksums.
 - [ ] Review every linter warning and include dependency/reviewer notes above; resolve any reviewer request before calling the release approved.
-- [ ] Capture accurate screenshots and finalize listing/privacy wording against actual shipped behavior.
+- [x] Capture accurate screenshots and finalize listing/privacy wording against actual shipped behavior.
 - [x] Upload the Firefox package and matching source, complete AMO validation, and verify submission confirmation and the author listing.
 - [ ] After Mozilla signs/approves it, test the signed installation and replace temporary-install guidance with the actual AMO link.
 
@@ -119,3 +119,5 @@ Submitted on 16 October 2026 via the existing local `npm run submit:firefox` wor
 0.9.0 adds opt-in Hold at sections, remembers that preference locally, gives two-line headings more room on short phone screens, and prevents repeated C-key context shortcuts from reaching Firefox's find-as-you-type feature. Validation passed: 56 unit tests, all four browser suites, all target builds, unsigned macOS/iOS compilation, and Firefox lint with 0 errors and 13 existing dependency warnings.
 
 Unlike 0.8.0, approval was not instant: the file sat in Awaiting Review for a while before listing. The public AMO API confirmed 0.9.0 as current on 16 October 2026 (an earlier cached response still showed 0.8.0). Version notes were entered on the Developer Hub before approval. The owner then installed the signed build from the AMO listing and confirmed it works.
+
+Listing refreshed on 16 October 2026: the description above (Hold at sections added, version reference removed) and five 1280x800 captioned screenshots, all verified through the public AMO API. Screenshots come unretouched from the live web reader via `node scripts/capture-store-screenshots.mjs` (output in `artifacts/store-screenshots/`, with a generated non-sensitive sample PDF); recapture after reader UI changes.
