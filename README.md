@@ -14,7 +14,7 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 Version 0.9.0 adds optional Hold at sections. Firefox 0.9.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/), and the web reader runs 0.9.0.
 
-Chrome 0.9.0 has been submitted to the Chrome Web Store and is awaiting review; until it is listed, Chrome is a manual developer install. Safari remains an unsigned Xcode project with no App Store release. The latest published GitHub release is 0.8.0 (unsigned packages); 0.9.0 is still a draft, so build from source using the instructions below for a developer install. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
+Chrome 0.9.0 has been submitted to the Chrome Web Store and is awaiting review; until it is listed, Chrome is a manual developer install. Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.9.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.9.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
 ## Try it in Firefox
 
