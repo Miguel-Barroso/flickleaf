@@ -19,10 +19,10 @@ These are unretouched captures of the shared web reader, version 0.8.0, using Fl
 
 Paste a passage or choose **Open PDF**. PDFs are processed locally and must contain selectable text; the limit is 25 MB and 300 pages. Review extraction before reading. Optional cleanup previews repeated headers, footers, and page numbers. Hyphen joining can alter genuine compound words, so it stays optional.
 
-Pace, limits, theme, and scroll mode are remembered locally. Document text is not saved. In 0.7.0, Save place optionally stores one text fingerprint and position locally; Delete saved place removes it. Reopen the same text to resume. You can clear saved preferences in the reader.
+Pace, limits, theme, and scroll mode are remembered locally. Document text is not saved. Save place optionally stores one text fingerprint and position locally; Delete saved place removes it. Reopen the same text to resume. You can clear saved preferences in the reader.
 
 ## Browser extensions
 
-See the [README](../README.md) for current availability and developer installation. Firefox is publicly available on the [official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/). Chrome is a developer build; Safari requires Xcode and signing. On a phone, the web reader is the simplest starting point.
+See the [README](../README.md) for current availability and developer installation. Firefox is publicly available on the [official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/). Chrome is a developer build while its Chrome Web Store review is pending; Safari requires Xcode and signing. On a phone, the web reader is the simplest starting point.
 
 Since 0.9.0, **Hold at sections** beside the Section picker lets you wait at headings until you scroll, step, or press Play. It is off by default and remembered on this device. The captures above show the earlier 0.8.0 layout.
