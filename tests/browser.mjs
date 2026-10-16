@@ -1,3 +1,4 @@
+import { checkSectionHold } from './section-hold-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -191,6 +192,7 @@ try {
   await page.setViewportSize({ width: 1440, height: 1000 });
   await page.screenshot({ path: '.test-results/paste-desktop.png' });
   await checkHeadingFocus(page);
+  await checkSectionHold(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);

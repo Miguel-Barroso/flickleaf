@@ -5,7 +5,9 @@ import { createPreferencesStore, normalizePreferences, DEFAULT_PREFERENCES, PREF
 test('preferences whitelist and normalize damaged input without storing document data', () => {
   assert.deepEqual(normalizePreferences(null), DEFAULT_PREFERENCES);
   assert.deepEqual(normalizePreferences({ minSpeed: 600, maxSpeed: 100, speed: Infinity, scrollMode: 'bogus', theme: 'dark', text: 'private', position: 17 }),
-    { minSpeed: 600, maxSpeed: 600, speed: 600, scrollMode: 'direct', theme: 'dark' });
+    { minSpeed: 600, maxSpeed: 600, speed: 600, scrollMode: 'direct', theme: 'dark', holdAtSections: false });
+  assert.equal(normalizePreferences({ holdAtSections: true }).holdAtSections, true);
+  for (const invalid of ['true', 1, null, {}, false]) assert.equal(normalizePreferences({ holdAtSections: invalid }).holdAtSections, false);
   assert.equal(normalizePreferences({ scrollMode: 'stepped' }).scrollMode, 'stepped');
   assert.equal(normalizePreferences({ scrollMode: 'freewheel' }).scrollMode, 'freewheel');
 });
@@ -13,8 +15,9 @@ test('web storage persists settings and clears only its own key', async () => {
   const values = new Map([['unrelated', 'keep']]);
   const scope = { localStorage: { getItem: key => values.get(key), setItem: (key, value) => values.set(key, value), removeItem: key => values.delete(key) } };
   const store = createPreferencesStore(scope);
-  await store.save({ ...DEFAULT_PREFERENCES, speed: 550, text: 'secret' });
+  await store.save({ ...DEFAULT_PREFERENCES, speed: 550, holdAtSections: true, text: 'secret' });
   assert.equal((await createPreferencesStore(scope).load()).value.speed, 550);
+  assert.equal((await createPreferencesStore(scope).load()).value.holdAtSections, true);
   assert.ok(!values.get(PREFERENCES_KEY).includes('secret'));
   await store.clear();
   assert.equal(values.size, 1);

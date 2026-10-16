@@ -1,3 +1,4 @@
+import { checkSectionHold } from './section-hold-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -57,6 +58,7 @@ try {
       await page.locator('#close').click();
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
+  await checkSectionHold(page, `.test-results/section-hold-${name}.png`);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);

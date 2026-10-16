@@ -52,11 +52,16 @@ export class Playback {
     this.scrollMode = 'direct';
     this.stepCharge = 0; this.stepHold = 0;
     this.minSpeed = 300; this.maxSpeed = 900;
+    this.holdAtSections = false; this.holding = false;
   }
-  pause() { this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
+  pause() { this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; this.stepHold = 0; this.holding = false; }
   play() {
     if (!this.tokens.length) return;
+    const wasHolding = this.holding;
+    this.pause();
     if (this.index === this.tokens.length - 1) this.index = 0;
+    else if (wasHolding) this.advance(1);
+    if (this.holding) return; // Adjacent headings each get their own hold.
     this.elapsed = 0; this.mode = 'play'; this.velocity = this.speed;
   }
   toggle() { this.mode === 'paused' ? this.play() : this.pause(); }
@@ -81,9 +86,29 @@ export class Playback {
     this.pause();
     this.scrollMode = mode;
   }
+  setHoldAtSections(enabled) {
+    this.holdAtSections = enabled === true;
+    if (!this.holdAtSections && this.holding) this.pause();
+  }
+  // Only forward arrivals hold. Seeking is deliberate navigation, and resuming
+  // starts beyond the current heading so it cannot hold again at the same place.
+  advance(steps) {
+    const target = clamp(this.index + steps, 0, this.tokens.length - 1);
+    if (this.holdAtSections && steps > 0) {
+      for (let next = this.index + 1; next <= target; next++) {
+        if (this.tokens[next].heading) {
+          this.index = next; this.pause(); this.holding = true;
+          return;
+        }
+      }
+    }
+    this.index = target;
+  }
   impulse(pixels) {
     if (!Number.isFinite(pixels) || !pixels || !this.tokens.length) return;
     if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240));
+    const wasHolding = this.holding;
+    this.holding = false;
     if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; }
     const before = Math.sign(this.velocity);
     this.mode = 'scrub';
@@ -91,14 +116,14 @@ export class Playback {
     const braking = before && before !== Math.sign(pixels);
     this.velocity = clamp(this.velocity + clamp(pixels, -240, 240) * feel.gain * (braking ? feel.brake : 1), -this.maxSpeed, this.maxSpeed);
     if (before !== Math.sign(this.velocity)) this.elapsed = 0;
+    if (wasHolding) this.advance(Math.sign(pixels));
   }
   // No glide: a wheel notch moves one word immediately, a larger swipe a few,
   // and fine trackpad or drag input accumulates toward whole words. Nothing
   // continues once the hand stops; scrub only lingers for the reading chrome.
   step(pixels) {
     const feel = SCROLL_MODES.stepped;
-    if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
-    this.mode = 'scrub'; this.stepHold = feel.holdMs;
+    if (this.mode !== 'scrub' && !this.holding) { this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
     let steps;
     if (Math.abs(pixels) >= feel.notch) {
       steps = Math.sign(pixels) * Math.max(1, Math.trunc(Math.abs(pixels) / feel.swipe));
@@ -109,7 +134,9 @@ export class Playback {
       steps = Math.trunc(this.stepCharge / feel.drag);
       this.stepCharge -= steps * feel.drag;
     }
-    this.index = clamp(this.index + steps, 0, this.tokens.length - 1);
+    if (this.holding && !steps) return; // Fine input still needs a full step.
+    this.holding = false; this.mode = 'scrub'; this.stepHold = feel.holdMs;
+    this.advance(steps);
   }
   tick(milliseconds) {
     if (this.mode === 'paused' || !this.tokens.length) return;
@@ -135,7 +162,8 @@ export class Playback {
         this.elapsed -= this.tokens[this.index].weight;
         const next = this.index + direction;
         if (next < 0 || next >= this.tokens.length) { this.pause(); break; }
-        this.index = next;
+        this.advance(direction);
+        if (this.holding) break;
       }
     }
   }

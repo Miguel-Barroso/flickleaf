@@ -10,9 +10,9 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ![Flickleaf word reader](docs/images/words.png)
 
-## Availability — 5 October 2026
+## Availability — 15 October 2026
 
-The web reader is live at version 0.8.0. Firefox 0.8.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/).
+Version 0.9.0 adds optional Hold at sections to the web reader and development packages. Firefox 0.8.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/).
 
 Chrome remains a manual developer install. Safari remains an unsigned Xcode project; there is no Chrome Web Store or App Store release. GitHub release packages are currently drafts, so public users should build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
@@ -35,7 +35,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.8.0.zip`.
+Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.9.0.zip`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -69,7 +69,7 @@ For tuning: Stepped treats a single input of 40 px or more as a wheel notch (one
 
 Headings appear as complete cards labeled Section or Subsection, centered at the same focal point as body words. They keep the surrounding controls dim during reading; a heading never reveals the background on its own. Body paragraphs remain one word at a time. Cards receive at least five base-word intervals, or their word count plus two, whichever is longer. The preceding body word receives another 1.5 intervals before the section change. At 300 WPM, a five-word heading stays for about 1.4 seconds, and the added section pause is 0.3 seconds. These are tunable starting values, not scientifically validated optimal timings.
 
-Arrow keys step over a heading as one card; the word counter still includes every word in it. Scroll, reverse, seek, and hands-off controls continue to work on cards. There is no forced manual confirmation at each section.
+Arrow keys step over a heading as one card; the word counter still includes every word in it. Scroll, reverse, seek, and hands-off controls continue to work on cards. By default, headings keep their timed pause. Enable **Hold at sections** beside the Section picker to wait indefinitely at each heading reached while moving forward, including in Stepped mode. Play leaves the held heading immediately; a new scroll or swipe continues in its direction, and the arrows step as usual. Reverse arrivals and explicit section/slider jumps do not start a hold. Held headings keep the controls dim and release autoplay screen wake protection. Turning the option off leaves the reader paused. It is off by default and remembered locally; pages without headings do not show the option.
 
 Extraction filters navigation landmarks, forms, hidden elements, recognizable in-page contents lists, and standalone links styled as action buttons. It preserves ordinary linked prose and nested list/card text. Filtering is conservative and depends on page markup; unusual sites can still need text selection. Captions and substantive lists are retained.
 
@@ -82,6 +82,7 @@ Extraction filters navigation landmarks, forms, hidden elements, recognizable in
 | Play, Space, or Enter | Toggle hands-off continuous playback |
 | Left / right or up / down arrows | Pause and step one word |
 | Progress slider | Pause and seek |
+| Hold at sections | Wait at forward heading arrivals until you continue (off by default) |
 | Page Up / Page Down, + / − keys or buttons, or WPM input | Set continuous playback speed within your chosen limits |
 | Context button or C | Pause and toggle surrounding words |
 | Hold Shift | Pause and temporarily show surrounding words |
@@ -157,7 +158,7 @@ Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is 
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.8.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.9.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. Open the project and choose the macOS or iOS scheme. Select your Apple development team in Signing & Capabilities for both the app and its extension, then build and run on your chosen device. A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 
@@ -165,11 +166,11 @@ The Safari target requests `activeTab`, `scripting`, and `storage`; its touch-fr
 
 ## Local preferences
 
-Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, and theme on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Preferences save only these settings—never document text, PDFs, filenames, or page URLs. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
+Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, theme, and Hold at sections on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Preferences save only these settings—never document text, PDFs, filenames, or page URLs. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
 
 ## Roadmap and releases
 
-See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). Local preferences, automated release checks, PDF cleanup, and paragraph view have shipped. Next are Mozilla review and signed-install verification, Chrome store submission, and physical-device checks. Optional position bookmarks and contributor onboarding are now implemented. Development packages remain unsigned until the separate store/signing process is completed.
+See the [agreed roadmap](docs/roadmap.md), [release process](docs/releasing.md), and [Firefox store preparation](docs/firefox-store.md). Local preferences, automated release checks, PDF cleanup, and paragraph view have shipped. Next are Firefox update submission and signed-install verification, Chrome store submission, and physical-device checks. Optional position bookmarks and contributor onboarding are now implemented. Development packages remain unsigned until the separate store/signing process is completed.
 
 ## License
 
