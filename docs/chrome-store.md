@@ -1,6 +1,6 @@
 # Chrome Web Store preparation
 
-Prepared 29 September 2026; updated for 0.9.0 on 16 October 2026. The owner registered the Chrome Web Store developer account on 16 October 2026 (registration paid, contact email verified, EEA trader status declared by the owner). No item has been uploaded, submitted, or approved yet; this document is submission material, not a claim of publication.
+Prepared 29 September 2026; updated for 0.9.0 on 16 October 2026. The owner registered the Chrome Web Store developer account on 16 October 2026 (registration paid, contact email verified, EEA trader status declared by the owner). 0.9.0 was uploaded and submitted for review through the developer dashboard on 16 October 2026 (category Productivity › Tools, English (United States), five screenshots, promo tile and marquee, About-page privacy policy, no data-use categories, no remote code; Free, Public). Review is pending; this is not a claim of publication.
 
 ## Listing
 
@@ -49,8 +49,8 @@ Before submission, confirm the developer account and required account security s
 
 - [x] Verify account access and registration.
 - [x] Capture Chrome extension screenshots and prepare the promotional tile.
-- [ ] Recheck listing, privacy disclosures, permissions, and package against the final version.
-- [ ] Upload, submit, and record the review result.
-- [ ] Test the signed installation and publish the real installation link.
+- [x] Recheck listing, privacy disclosures, permissions, and package against the final version.
+- [ ] Upload, submit, and record the review result. Submitted 16 October 2026; review result pending.
+- [ ] Test the signed installation and publish the real installation link (README, web About availability line, which still says Firefox 0.8.0 and no Chrome release).
 
 Official references checked 29 September 2026: [listing fields](https://developer.chrome.com/docs/webstore/cws-dashboard-listing), [images](https://developer.chrome.com/docs/webstore/images), [privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy), and [program policies](https://developer.chrome.com/docs/webstore/program-policies/policies).
