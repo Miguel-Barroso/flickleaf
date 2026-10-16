@@ -1,10 +1,12 @@
 # Firefox store preparation
 
-Status checked 6 October 2026: **0.8.0 Approved and publicly listed**, minutes after the first scripted submission; 0.7.0 was approved and listed before it. Listing description and release notes on the Developer Hub still need updating for 0.8.0 (the public description predates the Stepped mode and Glide relabel).
+Status, 16 October 2026: **0.9.0 submitted; awaiting Mozilla approval.** The owner confirmed completing the upload from their own terminal. The public AMO API still lists **0.8.0** as the current public version, checked on 16 October 2026. Submission does not yet establish approval or public availability of 0.9.0.
 
 [Official listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) · [Developer status](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions)
 
 Mozilla says signing/publication can take up to 24 hours, or longer for manual review; it gives no firm manual-review deadline in its [distribution guidance](https://www.extensionworkshop.com/documentation/publish/signing-and-distribution-overview/). Watch for reviewer questions and the publication email.
+
+## 0.6.0 submission record
 
 Release revision: `cb716ac` (`v0.6.0`). Local build: Node v26.10.0, npm 11.19.1, macOS arm64. A clean `npm ci && npm run build` from the submitted source archive matched every unpacked file in `dist/`. Firefox smoke checks passed for paste fallback, paragraph view, keyboard return to autoplay, and local two-page PDF extraction. All automated suites and GitHub release validation passed, including unsigned Safari macOS/iOS compilation.
 
@@ -109,3 +111,11 @@ Use Mozilla's [submission walkthrough](https://extensionworkshop.com/documentati
 Status, 6 October 2026: 0.8.0 was submitted for listed review with matching source via `npm run submit:firefox` — the first scripted submission ([version page](https://addons.mozilla.org/en-US/developers/addon/flickleaf/versions/6546766)) — and was approved and publicly listed within minutes. Release notes and the listing description are handled on the Developer Hub.
 
 0.8.0 includes the explicit PNG manifest icons and optional local bookmark shipped in 0.7.0, plus the Stepped scroll mode, the C context shortcut, the section-menu reset, and the Direct-to-Glide relabel. Submission now runs as one deliberate local step, `npm run submit:firefox`, which uploads the package and matching source from the tagged release commit through Mozilla's submission API (see [releasing](releasing.md)). Validation: 44 unit tests pass; Firefox lint has 0 errors and 13 existing dependency warnings.
+
+## 0.9.0 submission
+
+Submitted on 16 October 2026 via the existing local `npm run submit:firefox` workflow, as confirmed by the owner. Status: **awaiting Mozilla approval**. Release revision: `590c64127d2674bfee74a29b24c88c3c9b8ab558` (`v0.9.0`). The preceding dry run passed from the clean, tagged checkout and generated the matching source archive; credentials remained in the owner's environment.
+
+0.9.0 adds opt-in Hold at sections, remembers that preference locally, gives two-line headings more room on short phone screens, and prevents repeated C-key context shortcuts from reaching Firefox's find-as-you-type feature. Validation passed: 56 unit tests, all four browser suites, all target builds, unsigned macOS/iOS compilation, and Firefox lint with 0 errors and 13 existing dependency warnings.
+
+The public AMO API still reported 0.8.0 on 16 October 2026 after the upload confirmation. Approval, public availability of 0.9.0, and signed-installation testing remain pending. Review the public listing description and release notes for this version on the Developer Hub; this record does not establish that those fields were updated.
