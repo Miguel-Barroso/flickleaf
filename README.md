@@ -12,9 +12,9 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ## Availability — 16 October 2026
 
-Version 0.9.0 adds optional Hold at sections. Firefox 0.9.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/), and the web reader runs 0.9.0.
+Version 0.9.0 adds optional Hold at sections. Firefox 0.9.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/), Chrome 0.9.0 is published on the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl), and the web reader runs 0.9.0.
 
-Chrome 0.9.0 has been submitted to the Chrome Web Store and is awaiting review; until it is listed, Chrome is a manual developer install. Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.9.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.9.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
+Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.9.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.9.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
 ## Try it in Firefox
 
@@ -41,7 +41,7 @@ Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to c
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
 3. Pin Flickleaf, open an article, and click its leaf icon.
 
-The Chrome version shares all reading controls and the paste-text view with Firefox. Right-click the icon for **Paste text into Flickleaf**. Browser-protected pages open the paste view instead. This is a manual-install build; the Chrome Web Store release is awaiting review. Keep the unzipped folder in place. For updates, replace its contents and press Reload on the extension card.
+The Chrome version shares all reading controls and the paste-text view with Firefox. Right-click the icon for **Paste text into Flickleaf**. Browser-protected pages open the paste view instead. This is a manual-install build; the published release is on the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl). Keep the unzipped folder in place. For updates, replace its contents and press Reload on the extension card.
 
 ## Section navigation
 

@@ -12,7 +12,7 @@ Agreed 25 September 2026; updated 15 October 2026.
 
 - 0.6.0: Paragraph view with exact position switching, native scrolling, and bounded passages.
 
-- Contributor onboarding: one-minute illustrated guide and CONTRIBUTING instructions. Chrome listing and permission materials prepared; account and submission remain pending.
+- Contributor onboarding: one-minute illustrated guide and CONTRIBUTING instructions. Chrome listing and permission materials prepared; 0.9.0 published on the Chrome Web Store in October 2026.
 
 - 0.7.0: Opt-in single local bookmark, exact-text matching, explicit resume, and independent deletion. No document storage.
 
@@ -22,7 +22,7 @@ Agreed 25 September 2026; updated 15 October 2026.
 
 ## Next, in recommended order
 
-1. Chrome review follow-through: 0.9.0 submitted to the Chrome Web Store on 16 October 2026 ([details](chrome-store.md)); on approval, test the store install and publish the link. Firefox follow-through for 0.9.0 is complete: approved and publicly listed 16 October 2026, signed installation verified, and the listing description, version notes, and five screenshots (`scripts/capture-store-screenshots.mjs`) refreshed. Address any later Mozilla reviewer requests. Safari signing and physical Apple-device testing remain pending.
+1. Chrome follow-through: 0.9.0 submitted 16 October 2026 and confirmed published on the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl) 17 October 2026 ([details](chrome-store.md)); test the store install. Firefox follow-through for 0.9.0 is complete: approved and publicly listed 16 October 2026, signed installation verified, and the listing description, version notes, and five screenshots (`scripts/capture-store-screenshots.mjs`) refreshed. Address any later Mozilla reviewer requests. Safari signing and physical Apple-device testing remain pending.
 2. Validate bookmarks on physical devices and gather feedback before expanding to multiple saved places. Saving document text remains a separate, unimplemented feature requiring explicit choice.
 3. Expand the illustrated contributor guide with a short recorded demo and actual extension screenshots. The quick-start captures were refreshed from the live 0.8.0 web reader via `scripts/capture-quick-start.mjs`.
 4. Expand PDF cleanup only from representative documents and feedback; column/table reordering and OCR remain outside the current cleanup.
