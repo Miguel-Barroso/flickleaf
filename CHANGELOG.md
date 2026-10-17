@@ -1,5 +1,9 @@
 # Changelog
 
+## Unreleased
+
+- Hold the current word for about 300 ms when scrolling reverses moving text, in every scroll mode and during autoplay, so the eye can re-anchor before the text runs back. Reversed input waits and still lands; a quick back-and-forth nets out in place. Text at rest reverses immediately.
+
 ## 0.9.0
 
 - Add opt-in Hold at sections across web, Firefox, Chrome, and Safari. Forward playback and scrolling wait at each heading until Play, a scroll, or a step; held headings keep controls dim and stay at the reading focal point.

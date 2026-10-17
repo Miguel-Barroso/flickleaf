@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Playback, tokenize } from '../src/core.js';
+import { Playback, REVERSAL_GRACE_MS, tokenize } from '../src/core.js';
 import { extract, cleanNavigation, collectBlocks } from '../src/extract.js';
 import { JSDOM } from 'jsdom';
 
@@ -76,7 +76,35 @@ test('stepped mode moves one word per notch, bounds hard flicks, and never glide
   assert.equal(engine.index, 52, 'no glide once the hand stops');
   assert.equal(engine.mode, 'paused');
   engine.impulse(-100); assert.equal(engine.index, 51);
-  engine.impulse(500); assert.equal(engine.index, 53, 'a hard flick stays bounded');
+  engine.impulse(500); assert.equal(engine.index, 51, 'reversal waits out the grace');
+  run(engine, REVERSAL_GRACE_MS + 10); assert.equal(engine.index, 53, 'a hard flick stays bounded');
+});
+test('reversing moving text holds the current word before motion continues', () => {
+  for (const mode of ['direct', 'freewheel']) {
+    const engine = new Playback(plain()); engine.seek(50); engine.setScrollMode(mode);
+    engine.impulse(200); run(engine, 400); const turned = engine.index; assert.ok(turned > 50);
+    engine.impulse(-240); engine.impulse(-240); assert.ok(engine.velocity < 0);
+    run(engine, REVERSAL_GRACE_MS - 20); assert.equal(engine.index, turned, `${mode} holds the word`);
+    run(engine, 600); assert.ok(engine.index < turned, `${mode} reversed input still lands`);
+  }
+  const reading = new Playback(plain()); reading.seek(50); reading.play(); run(reading, 1000);
+  const at = reading.index; reading.impulse(-100);
+  run(reading, REVERSAL_GRACE_MS - 20); assert.equal(reading.index, at, 'autoplay reversal also holds');
+});
+test('a short reverse nudge settles on the earlier word and a quick correction stays put', () => {
+  const engine = new Playback(plain()); engine.seek(50); engine.setScrollMode('stepped');
+  engine.impulse(100); engine.impulse(100); assert.equal(engine.index, 52);
+  engine.impulse(-100); assert.equal(engine.index, 52, 'the first reversed step waits');
+  run(engine, REVERSAL_GRACE_MS + 10); assert.equal(engine.index, 51, 'then lands');
+  engine.impulse(-100); assert.equal(engine.index, 50, 'further steps the same way are immediate');
+  engine.impulse(100); engine.impulse(-100); run(engine, REVERSAL_GRACE_MS + 10);
+  assert.equal(engine.index, 50, 'back-and-forth inside the grace nets out');
+  const glide = new Playback(plain()); glide.seek(50); glide.impulse(200); run(glide, 400);
+  const turned = glide.index; glide.impulse(-240); glide.impulse(240);
+  assert.equal(glide.grace, 0, 'turning back cancels the grace'); run(glide, 100); assert.ok(glide.index >= turned);
+  const settled = new Playback(plain()); settled.seek(50); settled.impulse(100); run(settled, 3000);
+  const stopped = settled.index; settled.impulse(-100); assert.equal(settled.grace, 0, 'text at rest needs no re-anchoring');
+  assert.ok(stopped > 50);
 });
 test('stepped mode accumulates fine trackpad input and drops it on reversal', () => {
   const engine = new Playback(plain()); engine.seek(50); engine.setScrollMode('stepped');

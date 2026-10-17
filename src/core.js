@@ -6,6 +6,9 @@ const SCROLL_MODES = {
   direct: { gain: 4, coastMs: 420, stopSpeed: 12, brake: 1 },
   freewheel: { gain: 6, coastMs: 6000, stopSpeed: 20, brake: 1.5 },
 };
+// Reversing moving text keeps the current word in view briefly so the eye can
+// re-anchor. Reversed input is held, not discarded, and lands afterwards.
+export const REVERSAL_GRACE_MS = 300;
 
 export function tokenize(blocks, language = 'en') {
   let segmenter;
@@ -53,8 +56,12 @@ export class Playback {
     this.stepCharge = 0; this.stepHold = 0;
     this.minSpeed = 300; this.maxSpeed = 900;
     this.holdAtSections = false; this.holding = false;
+    this.moved = 0; this.grace = 0; this.graceSteps = 0;
   }
-  pause() { this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; this.stepHold = 0; this.holding = false; }
+  pause() {
+    this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; this.stepHold = 0; this.holding = false;
+    this.moved = 0; this.grace = 0; this.graceSteps = 0;
+  }
   play() {
     if (!this.tokens.length) return;
     const wasHolding = this.holding;
@@ -115,7 +122,12 @@ export class Playback {
     const feel = SCROLL_MODES[this.scrollMode];
     const braking = before && before !== Math.sign(pixels);
     this.velocity = clamp(this.velocity + clamp(pixels, -240, 240) * feel.gain * (braking ? feel.brake : 1), -this.maxSpeed, this.maxSpeed);
-    if (before !== Math.sign(this.velocity)) this.elapsed = 0;
+    const direction = Math.sign(this.velocity);
+    if (before !== direction) this.elapsed = 0;
+    // Grace starts when momentum turns against the text's last movement; turning
+    // back before it elapses cancels it, since the word has not moved.
+    if (direction !== -this.moved) this.grace = 0;
+    else if (before !== direction) this.grace = REVERSAL_GRACE_MS;
     if (wasHolding) this.advance(Math.sign(pixels));
   }
   // No glide: a wheel notch moves one word immediately, a larger swipe a few,
@@ -136,6 +148,14 @@ export class Playback {
     }
     if (this.holding && !steps) return; // Fine input still needs a full step.
     this.holding = false; this.mode = 'scrub'; this.stepHold = feel.holdMs;
+    if (this.grace > 0 || Math.sign(steps) === -this.moved) {
+      // Steps during grace net out, so a quick back-and-forth stays in place.
+      if (!this.grace) this.grace = REVERSAL_GRACE_MS;
+      this.graceSteps += steps;
+      if (Math.sign(this.graceSteps) === -this.moved) return;
+      steps = this.graceSteps; this.grace = 0; this.graceSteps = 0;
+    }
+    if (steps) this.moved = Math.sign(steps);
     this.advance(steps);
   }
   tick(milliseconds) {
@@ -145,6 +165,16 @@ export class Playback {
     while (remaining > 0 && this.mode !== 'paused') {
       const step = Math.min(remaining, 8); remaining -= step;
       const direction = Math.sign(this.velocity);
+      if (this.grace > 0) {
+        // Momentum and step timeouts wait too, so held input is not lost.
+        this.grace -= step;
+        if (this.grace <= 0 && this.graceSteps) {
+          const steps = this.graceSteps; this.graceSteps = 0;
+          this.stepHold = SCROLL_MODES.stepped.holdMs; this.moved = Math.sign(steps);
+          this.advance(steps);
+        }
+        continue;
+      }
       // Keep invisible wheel momentum separate from the readable pace. At the
       // floor, continue at minSpeed until friction stops the wheel completely.
       this.elapsed += Math.abs(this.readingVelocity) * step / 60000;
@@ -162,6 +192,7 @@ export class Playback {
         this.elapsed -= this.tokens[this.index].weight;
         const next = this.index + direction;
         if (next < 0 || next >= this.tokens.length) { this.pause(); break; }
+        this.moved = direction;
         this.advance(direction);
         if (this.holding) break;
       }
