@@ -69,6 +69,18 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   await swipe(false, '.article');
   assert.ok(Number(await page.locator('.progress').inputValue()) > rewound, 'a swipe on the title area advances words');
   assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'title-area swipes do not pan the overlay');
+  // While reading, the dimmed controls under the thumb read as well, and a tap
+  // on a dimmed control still works as that control.
+  const quiet = () => page.waitForFunction(() => document.querySelector('[data-rsvp-reader]').shadowRoot.querySelector('dialog').classList.contains('reading'), null, { timeout: 4000 });
+  const settled = () => page.waitForFunction(() => document.querySelector('[data-rsvp-reader]').shadowRoot.querySelector('#play').textContent === 'Play', null, { timeout: 4000 });
+  await settled(); await page.locator('#play').click(); await quiet();
+  const reading = Number(await page.locator('.progress').inputValue());
+  await swipe(false, '.controls');
+  assert.ok(Number(await page.locator('.progress').inputValue()) > reading, 'a swipe over dimmed controls reads');
+  assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'and does not pan the overlay');
+  await settled(); await page.locator('#play').click(); await quiet();
+  await page.locator('#play').tap();
+  assert.equal(await page.locator('#play').textContent(), 'Play', 'a tap on dimmed Pause pauses');
   assert.deepEqual(await page.evaluate(() => ({ x: scrollX, y: scrollY, top: document.body.getBoundingClientRect().top })), locked, 'background remains fixed');
   await page.locator('#max-speed').scrollIntoViewIfNeeded();
   assert.ok(await page.locator('#max-speed').isVisible(), 'settings remain reachable');

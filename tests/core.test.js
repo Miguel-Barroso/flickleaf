@@ -1,6 +1,6 @@
 import { test } from 'node:test';
 import assert from 'node:assert/strict';
-import { Playback, REVERSAL_GRACE_MS, tokenize } from '../src/core.js';
+import { Playback, REVERSAL_GRACE_MS, isSafariWheelNotch, tokenize } from '../src/core.js';
 import { extract, cleanNavigation, collectBlocks } from '../src/extract.js';
 import { JSDOM } from 'jsdom';
 
@@ -78,6 +78,20 @@ test('stepped mode moves one word per notch, bounds hard flicks, and never glide
   engine.impulse(-100); assert.equal(engine.index, 51);
   engine.impulse(500); assert.equal(engine.index, 51, 'reversal waits out the grace');
   run(engine, REVERSAL_GRACE_MS + 10); assert.equal(engine.index, 53, 'a hard flick stays bounded');
+});
+test('Safari mouse notches step exactly one word each; trackpad streams still accumulate', () => {
+  // Recorded in Safari 26.6 on macOS: Logitech G309 notches (slow, then at reading pace) and a trackpad drag and flick.
+  const mouse = [4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 4.000244140625, 27.8643798828125, 4.000244140625, 37.07275390625, 137.109375, 4.000244140625, 36.1395263671875, 143.704833984375, 4.000244140625, 4.000244140625];
+  const trackpad = [[1, 0], [1, 0], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [1, 1], [0, 1], [1, 0], [1, 0], [1, 0], [3, 0], [3, 1], [4, 1], [5, 1], [6, 1], [7, 1], [7, 1], [7, 1], [7, 0], [7, 0], [7, 0], [6, 0], [6, 0], [6, 0], [4, -1], [5, 0], [4, -1], [4, -1], [4, -1], [4, -1], [3, -1], [4, -1], [3, 0], [2, 0], [2, 0], [1, 0], [1, 0], [1, 0]];
+  assert.ok(mouse.every(deltaY => isSafariWheelNotch({ deltaX: 0, deltaY, deltaMode: 0 })));
+  assert.ok(trackpad.every(([deltaY, deltaX]) => !isSafariWheelNotch({ deltaX, deltaY, deltaMode: 0 })));
+  assert.ok(!isSafariWheelNotch({ deltaX: 0, deltaY: 3, deltaMode: 1 }), 'Firefox line-mode input keeps its own handling');
+  const engine = new Playback(plain()); engine.setScrollMode('stepped');
+  for (const deltaY of mouse) engine.impulse(deltaY, true);
+  assert.equal(engine.index, mouse.length, 'one word per notch, whatever the acceleration');
+  const pad = new Playback(plain()); pad.setScrollMode('stepped');
+  for (const [deltaY] of trackpad) pad.impulse(deltaY);
+  assert.ok(pad.index > 0 && pad.index < 5, 'fine trackpad input adds up gradually');
 });
 test('reversing moving text holds the current word before motion continues', () => {
   for (const mode of ['direct', 'freewheel']) {

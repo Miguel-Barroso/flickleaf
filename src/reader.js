@@ -2,7 +2,7 @@ import { setupReadingPosition } from './reading-position.js';
 import { setupParagraphView } from './paragraph-view.js';
 import { createPreferencesStore, DEFAULT_PREFERENCES } from './preferences.js';
 import { AutoplayWakeLock } from './wake-lock.js';
-import { Playback } from './core.js';
+import { Playback, isSafariWheelNotch } from './core.js';
 import { lockPageScroll } from './scroll-lock.js';
 import css from './reader.css';
 
@@ -220,11 +220,15 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen(dialog, 'pointerdown', event => {
     if (event.target.closest('button,input,select')) awake = performance.now();
   });
+  const safariWheel = navigator.vendor === 'Apple Computer, Inc.';
   listen(dialog, 'wheel', event => {
     if (view === 'paragraphs' || event.ctrlKey || event.target.closest('input,select')) return;
     event.preventDefault();
     context = false; showContext();
-    engine.impulse(event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1));
+    const pixels = event.deltaY * (event.deltaMode === 1 ? 16 : event.deltaMode === 2 ? innerHeight : 1);
+    const notch = safariWheel && isSafariWheelNotch(event);
+    // A notch matches a Firefox line-mode notch (3 lines) in the gliding modes.
+    engine.impulse(notch ? Math.sign(pixels) * Math.max(Math.abs(pixels), 48) : pixels, notch);
   }, { passive: false });
   listen(dialog, 'keydown', event => {
     if (event.key === 'Escape') return;
@@ -271,26 +275,38 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   // into native page panning. Touch is handled only here, not twice via pointers.
   // On a phone the word area is a small band, so everything above the controls
   // reads; the controls panel itself still scrolls to reach its lower rows.
-  let touch = null, touchY = 0;
-  listen($('.frame'), 'touchstart', event => {
-    if (view === 'paragraphs' || event.target.closest('.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
-    if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
-    touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
+  // While reading, the dimmed controls sit under the thumb, so a swipe there
+  // reads too; a tap on a dimmed control still acts as that control.
+  const touchGain = 1.5, controlSlop = 8;
+  let touch = null, touchY = 0, touchOnControl = false;
+  const beginReadingTouch = () => {
     if (!engine.holding) engine.pause();
     context = false; showContext();
     $('#play').blur(); dialog.focus({ preventScroll: true });
+  };
+  listen($('.frame'), 'touchstart', event => {
+    const quiet = dialog.classList.contains('reading');
+    if (view === 'paragraphs' || event.target.closest(quiet ? 'input,select,textarea' : '.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
+    if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
+    touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
+    touchOnControl = Boolean(event.target.closest('button,a'));
+    if (!touchOnControl) beginReadingTouch();
   }, { passive: true });
   listen($('.frame'), 'touchmove', event => {
     if (touch === null || event.touches.length !== 1) return;
     const current = [...event.touches].find(item => item.identifier === touch);
     if (!current) return;
-    if (event.cancelable) event.preventDefault();
-    engine.impulse((touchY - current.clientY) * 2); touchY = current.clientY;
+    if (event.cancelable) event.preventDefault(); // Before iOS commits to panning.
+    if (touchOnControl) {
+      if (Math.abs(current.clientY - touchY) < controlSlop) return;
+      touchOnControl = false; beginReadingTouch(); touchY = current.clientY;
+    }
+    engine.impulse((touchY - current.clientY) * touchGain); touchY = current.clientY;
   }, { passive: false });
   listen($('.frame'), 'touchend', event => {
     if ([...event.changedTouches].some(item => item.identifier === touch)) touch = null;
   });
-  listen($('.frame'), 'touchcancel', () => { if (touch !== null) engine.pause(); touch = null; });
+  listen($('.frame'), 'touchcancel', () => { if (touch !== null && !touchOnControl) engine.pause(); touch = null; });
   listen(document, 'visibilitychange', () => { if (document.hidden) { engine.pause(); render(); } last = performance.now(); });
   listen(window, 'blur', () => { engine.pause(); context = false; showContext(); render(); });
   const applyPreferences = values => {

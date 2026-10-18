@@ -10,6 +10,13 @@ const SCROLL_MODES = {
 // re-anchor. Reversed input is held, not discarded, and lands afterwards.
 export const REVERSAL_GRACE_MS = 300;
 
+// Safari on macOS reports each mouse-wheel notch with a fractional pixel delta
+// (4.000244 px when slow, accelerated beyond that) and no sideways motion.
+// Trackpads send whole-pixel streams, so they keep accumulating.
+export function isSafariWheelNotch({ deltaX, deltaY, deltaMode }) {
+  return deltaMode === 0 && !deltaX && Number.isFinite(deltaY) && !Number.isInteger(deltaY);
+}
+
 export function tokenize(blocks, language = 'en') {
   let segmenter;
   try { segmenter = new Intl.Segmenter(language || 'en', { granularity: 'word' }); }
@@ -111,9 +118,10 @@ export class Playback {
     }
     this.index = target;
   }
-  impulse(pixels) {
+  // `notch` marks input known to be one discrete wheel notch, whatever its size.
+  impulse(pixels, notch = false) {
     if (!Number.isFinite(pixels) || !pixels || !this.tokens.length) return;
-    if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240));
+    if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240), notch);
     const wasHolding = this.holding;
     this.holding = false;
     if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; }
@@ -133,11 +141,12 @@ export class Playback {
   // No glide: a wheel notch moves one word immediately, a larger swipe a few,
   // and fine trackpad or drag input accumulates toward whole words. Nothing
   // continues once the hand stops; scrub only lingers for the reading chrome.
-  step(pixels) {
+  step(pixels, notch = false) {
     const feel = SCROLL_MODES.stepped;
     if (this.mode !== 'scrub' && !this.holding) { this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; }
     let steps;
-    if (Math.abs(pixels) >= feel.notch) {
+    if (notch) { steps = Math.sign(pixels); this.stepCharge = 0; }
+    else if (Math.abs(pixels) >= feel.notch) {
       steps = Math.sign(pixels) * Math.max(1, Math.trunc(Math.abs(pixels) / feel.swipe));
       this.stepCharge = 0;
     } else {
