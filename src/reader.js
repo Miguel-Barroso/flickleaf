@@ -161,7 +161,21 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen($('#play'), 'click', toggle);
   listen($('#back'), 'click', () => seek(engine.index - 1));
   listen($('#forward'), 'click', () => seek(engine.index + 1));
-  listen(progress, 'input', () => seek(Number(progress.value)));
+  // A fingertip cannot pick one word out of thousands, so touch lands on the
+  // nearest section start. Mouse, pen, and keyboard keep word precision.
+  let touchTimeline = false;
+  const sectionStarts = [0, ...headings.map(heading => heading.index)];
+  const nearestSection = index => sectionStarts.reduce((best, start) => Math.abs(start - index) < Math.abs(best - index) ? start : best);
+  listen(progress, 'pointerdown', event => { touchTimeline = event.pointerType === 'touch' && headings.length > 0; });
+  listen(progress, 'keydown', () => { touchTimeline = false; });
+  listen(progress, 'input', () => {
+    const index = Number(progress.value);
+    if (!touchTimeline) return seek(index);
+    seek(nearestSection(index));
+    text('.section-preview', sectionAt(engine.index)?.text || 'Beginning');
+    $('.section-preview').hidden = false;
+  });
+  for (const type of ['pointerup', 'pointercancel']) listen(progress, type, event => { if (event.pointerType === 'touch') $('.section-preview').hidden = true; });
   listen(sections, 'focus', () => { engine.pause(); awake = performance.now(); render(); });
   listen(sections, 'change', () => { if (sections.value === '') return; seek(Number(sections.value)); sections.blur(); progress.focus(); });
   listen(progress, 'pointermove', event => {
@@ -255,25 +269,28 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) listen($('.stage'), event, e => { if (e.pointerId === pointer) pointer = null; });
   // Use a non-passive touch listener so WebKit cannot turn a reading swipe
   // into native page panning. Touch is handled only here, not twice via pointers.
+  // On a phone the word area is a small band, so everything above the controls
+  // reads; the controls panel itself still scrolls to reach its lower rows.
   let touch = null, touchY = 0;
-  listen($('.stage'), 'touchstart', event => {
+  listen($('.frame'), 'touchstart', event => {
+    if (view === 'paragraphs' || event.target.closest('.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
     if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
     touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
     if (!engine.holding) engine.pause();
     context = false; showContext();
     $('#play').blur(); dialog.focus({ preventScroll: true });
   }, { passive: true });
-  listen($('.stage'), 'touchmove', event => {
+  listen($('.frame'), 'touchmove', event => {
     if (touch === null || event.touches.length !== 1) return;
     const current = [...event.touches].find(item => item.identifier === touch);
     if (!current) return;
     if (event.cancelable) event.preventDefault();
     engine.impulse((touchY - current.clientY) * 2); touchY = current.clientY;
   }, { passive: false });
-  listen($('.stage'), 'touchend', event => {
+  listen($('.frame'), 'touchend', event => {
     if ([...event.changedTouches].some(item => item.identifier === touch)) touch = null;
   });
-  listen($('.stage'), 'touchcancel', () => { touch = null; engine.pause(); });
+  listen($('.frame'), 'touchcancel', () => { if (touch !== null) engine.pause(); touch = null; });
   listen(document, 'visibilitychange', () => { if (document.hidden) { engine.pause(); render(); } last = performance.now(); });
   listen(window, 'blur', () => { engine.pause(); context = false; showContext(); render(); });
   const applyPreferences = values => {

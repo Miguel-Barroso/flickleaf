@@ -19,10 +19,11 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   assert.equal(await page.evaluate(() => document.body.style.top), `${-before.y}px`);
   const locked = await page.evaluate(() => ({ x: scrollX, y: scrollY, top: document.body.getBoundingClientRect().top }));
   const cdp = nativeTouch ? await page.context().newCDPSession(page) : null;
-  async function swipe(reverse = false) {
-    const box = await page.locator('.stage').boundingBox();
+  async function swipe(reverse = false, surface = '.stage') {
+    const box = await page.locator(surface).boundingBox();
     const x = box.x + box.width / 2;
-    const low = box.y + box.height * .8, high = box.y + box.height * .2;
+    // A short real swipe; the title area on small phones is only a line tall.
+    const low = box.y + box.height * .8, high = low - Math.max(box.height * .6, 80);
     const start = reverse ? high : low, end = reverse ? low : high;
     if (cdp) {
       await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [{ x, y: start }] });
@@ -34,12 +35,12 @@ export async function checkTouchScroll(page, nativeTouch = false) {
     } else {
       // WebKit's automation API has no native swipe. Check cancellable touch
       // events explicitly here; Chromium separately exercises real browser panning.
-      await page.locator('.stage').evaluate((stage, { x, start }) => {
+      await page.locator(surface).evaluate((stage, { x, start }) => {
         const point = { identifier: 7, target: stage, clientX: x, clientY: start };
         stage.dispatchEvent(Object.assign(new Event('touchstart', { bubbles: true, cancelable: true }), { touches: [point], changedTouches: [point] }));
       }, { x, start });
       for (let step = 1; step <= 12; step++) {
-        const canceled = await page.locator('.stage').evaluate((stage, { x, y }) => {
+        const canceled = await page.locator(surface).evaluate((stage, { x, y }) => {
           const point = { identifier: 7, target: stage, clientX: x, clientY: y };
           const event = Object.assign(new Event('touchmove', { bubbles: true, cancelable: true }), { touches: [point], changedTouches: [point] });
           stage.dispatchEvent(event); return event.defaultPrevented;
@@ -47,7 +48,7 @@ export async function checkTouchScroll(page, nativeTouch = false) {
         assert.ok(canceled, 'reading swipes cancel native panning');
         await page.waitForTimeout(20);
       }
-      await page.locator('.stage').evaluate(stage => {
+      await page.locator(surface).evaluate(stage => {
         const point = { identifier: 7, target: stage };
         stage.dispatchEvent(Object.assign(new Event('touchend', { bubbles: true }), { touches: [], changedTouches: [point] }));
       });
@@ -61,7 +62,13 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   assert.ok(forward > initial, 'swipe advances words');
   assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'reading swipe does not pan the overlay');
   await swipe(true);
-  assert.ok(Number(await page.locator('.progress').inputValue()) < forward, 'reverse swipe rewinds');
+  const rewound = Number(await page.locator('.progress').inputValue());
+  assert.ok(rewound < forward, 'reverse swipe rewinds');
+  // The word band is short on phones; the title area above it reads as well.
+  await page.waitForTimeout(1500); // Let the reverse glide settle: a fresh swipe, not a reversal.
+  await swipe(false, '.article');
+  assert.ok(Number(await page.locator('.progress').inputValue()) > rewound, 'a swipe on the title area advances words');
+  assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'title-area swipes do not pan the overlay');
   assert.deepEqual(await page.evaluate(() => ({ x: scrollX, y: scrollY, top: document.body.getBoundingClientRect().top })), locked, 'background remains fixed');
   await page.locator('#max-speed').scrollIntoViewIfNeeded();
   assert.ok(await page.locator('#max-speed').isVisible(), 'settings remain reachable');

@@ -4,6 +4,9 @@ import { tokenize } from './core.js';
 // Work only on a clone: navigation and forms on the original page stay intact.
 export function cleanNavigation(root, pageURL) {
   root.querySelectorAll('nav,[role="navigation"],[role="banner"],[role="contentinfo"],form,[role="form"],button,[role="button"],input,select,textarea,[hidden],[aria-hidden="true"],script,style,template').forEach(el => el.remove());
+  // Footnote markers would glue a number onto the word before them, and some
+  // sites nest the whole note inside the marker as a style-hidden tooltip.
+  root.querySelectorAll('[role="doc-noteref"],[role="doc-backlink"],a.footnote-ref,a.footnote-backref,sup a[href^="#"]').forEach(el => (el.closest('sup') || el).remove());
   for (const link of root.querySelectorAll('a[href]')) {
     const looksLikeButton = /(^|[\s_-])(cta|button|btn)(?=$|[\s_-])/i.test(link.className);
     const parent = link.parentElement;

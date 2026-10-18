@@ -191,6 +191,17 @@ test('navigation cleanup removes contents and forms but keeps linked prose and u
   assert.ok(text.includes('A useful reference'));
 });
 
+test('footnote markers, their hidden tooltips, and backlinks stay out of the reading text', () => {
+  const dom = new JSDOM(`<main><p>In a quasi-religious way.<sup id="fnref:1"><a href="#fn:1" class="footnote-ref">1</a><span class="footnote-tooltip"><sup>1</sup> Hidden note.</span></sup> Many people.<sup><a href="#cite-2">[2]</a></sup></p>
+    <ol><li id="fn:1"><p>Visible note. <a href="#fnref:1" role="doc-backlink">↩</a></p></li></ol><p>Water is H<sub>2</sub>O and E = mc<sup>2</sup>.</p></main>`);
+  const doc = dom.window.document; cleanNavigation(doc, 'https://example.com/');
+  const words = tokenize(collectBlocks(doc.querySelector('main'))).map(t => t.text);
+  assert.deepEqual(words.slice(0, 6), ['In', 'a', 'quasi-', 'religious', 'way.', 'Many']);
+  assert.ok(!words.some(w => /Hidden|↩|\[2\]/.test(w)));
+  assert.ok(words.includes('Visible'), 'the footnote list itself remains readable');
+  assert.ok(words.includes('mc2.'), 'superscripts without in-page links are ordinary text');
+});
+
 test('nested card and list content is preserved in order without duplication', () => {
   const dom = new JSDOM('<main><ul><li>Introduction <strong>with emphasis</strong><h3>Card heading</h3><p>Description.</p>Afterwards<ul><li>Nested item</li></ul>Closing words</li></ul></main>');
   const blocks = collectBlocks(dom.window.document.querySelector('main'));

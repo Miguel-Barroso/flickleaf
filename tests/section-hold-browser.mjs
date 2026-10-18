@@ -94,3 +94,21 @@ export async function checkSectionHold(page, screenshot = '') {
   assert.equal(await hold.isVisible(), false, 'hold control is absent without headings');
   await page.locator('#close').click();
 }
+
+// Touch on the timeline lands on the nearest section start; mouse stays exact.
+export async function checkTouchTimeline(page) {
+  await page.locator('#source').fill('Opening words come first. '.repeat(20) + '\n\n# Middle\n\n' + 'Middle words follow. '.repeat(20) + '\n\n# End\n\n' + 'Closing words. '.repeat(20));
+  await page.getByRole('button', { name: 'Start reading' }).click();
+  const scrub = (pointerType, value) => page.locator('.progress').evaluate((el, { pointerType, value }) => {
+    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType }));
+    el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true }));
+    return Number(el.value);
+  }, { pointerType, value });
+  const [middle, end] = await page.locator('.progress').evaluate(el => [...el.closest('.timeline').querySelectorAll('.section-ticks span')].map(tick => Math.round(parseFloat(tick.style.left) / 100 * Number(el.max))));
+  assert.equal(await scrub('touch', middle - 3), middle, 'a touch just before a tick lands on that section');
+  assert.equal(await page.locator('.section-preview').textContent(), 'Middle');
+  assert.equal(await scrub('touch', end + 5), end);
+  assert.equal(await scrub('touch', 4), 0, 'the beginning is a section start too');
+  assert.equal(await scrub('mouse', middle - 3), middle - 3, 'mouse keeps word precision');
+  await page.locator('#close').click();
+}
