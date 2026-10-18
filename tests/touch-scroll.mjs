@@ -69,6 +69,17 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   await swipe(false, '.article');
   assert.ok(Number(await page.locator('.progress').inputValue()) > rewound, 'a swipe on the title area advances words');
   assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'title-area swipes do not pan the overlay');
+  // A tap without movement catches a glide; a second swipe would add to it.
+  const caught = await page.locator('.stage').evaluate(stage => {
+    const fire = (type, y) => { const point = { identifier: 9, target: stage, clientX: 100, clientY: y };
+      stage.dispatchEvent(Object.assign(new Event(type, { bubbles: true, cancelable: true }), { touches: type === 'touchend' ? [] : [point], changedTouches: [point] })); };
+    fire('touchstart', 300); for (let y = 290; y >= 200; y -= 10) fire('touchmove', y); fire('touchend', 200);
+    const state = () => stage.getRootNode().querySelector('#state').textContent;
+    const gliding = state();
+    fire('touchstart', 250); fire('touchend', 250);
+    return [gliding, state()];
+  });
+  assert.ok(!caught[0].startsWith('Paused') && caught[1].startsWith('Paused'), `a tap stops a glide: ${caught}`);
   // While reading, the dimmed controls under the thumb read as well, and a tap
   // on a dimmed control still works as that control.
   const quiet = () => page.waitForFunction(() => document.querySelector('[data-rsvp-reader]').shadowRoot.querySelector('dialog').classList.contains('reading'), null, { timeout: 4000 });

@@ -9,6 +9,9 @@ const SCROLL_MODES = {
 // Reversing moving text keeps the current word in view briefly so the eye can
 // re-anchor. Reversed input is held, not discarded, and lands afterwards.
 export const REVERSAL_GRACE_MS = 300;
+// Hands-off playback gives a heading time to be read. When the hand moves the
+// text, a heading passes like a sentence ending instead of stalling the input.
+const SCRUB_HEADING_WEIGHT = 2;
 
 // Safari on macOS reports each mouse-wheel notch with a fractional pixel delta
 // (4.000244 px when slow, accelerated beyond that) and no sideways motion.
@@ -168,6 +171,10 @@ export class Playback {
     if (steps) this.moved = Math.sign(steps);
     this.advance(steps);
   }
+  weightAt(index) {
+    const token = this.tokens[index];
+    return this.mode === 'scrub' && token.heading ? Math.min(token.weight, SCRUB_HEADING_WEIGHT) : token.weight;
+  }
   tick(milliseconds) {
     if (this.mode === 'paused' || !this.tokens.length) return;
     // Never jump across unread text after a suspended or blocked browser frame.
@@ -198,8 +205,8 @@ export class Playback {
           if (Math.abs(this.velocity) < feel.stopSpeed) { this.pause(); break; }
         }
       }
-      while (this.elapsed >= this.tokens[this.index].weight) {
-        this.elapsed -= this.tokens[this.index].weight;
+      while (this.elapsed >= this.weightAt(this.index)) {
+        this.elapsed -= this.weightAt(this.index);
         const next = this.index + direction;
         if (next < 0 || next >= this.tokens.length) { this.pause(); break; }
         this.moved = direction;

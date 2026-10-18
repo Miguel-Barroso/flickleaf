@@ -196,6 +196,15 @@ test('headings stay intact with a section boundary and proportional reading time
   engine.seek(3); assert.equal(engine.tokens[engine.index].text, 'Next');
 });
 
+test('a heading passes like a sentence ending under the hand but keeps its time in autoplay', () => {
+  const tokens = tokenize([{ text: 'The Adolescence of Technology', heading: true, level: 1 }, { text: 'Confronting the risks of powerful AI. '.repeat(10) }]);
+  assert.ok(tokens[0].weight >= 5);
+  const scrub = new Playback(tokens);
+  for (let i = 0; i < 10; i++) { scrub.impulse(12); scrub.tick(16); }
+  run(scrub, 350); assert.ok(scrub.index > 0, 'one short swipe leaves the title card');
+  const play = new Playback(tokens); play.play(); run(play, 1000);
+  assert.equal(play.index, 0, 'autoplay still shows the title for its full time');
+});
 test('navigation cleanup removes contents and forms but keeps linked prose and useful lists', () => {
   const dom = new JSDOM(`<nav>Home Work About</nav><main>
     <div><strong>On this page</strong><ul><li><a href="#first">First section</a></li><li><a href="#second">Second section</a></li></ul></div>

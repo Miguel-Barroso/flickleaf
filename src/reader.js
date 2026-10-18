@@ -278,9 +278,11 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   // While reading, the dimmed controls sit under the thumb, so a swipe there
   // reads too; a tap on a dimmed control still acts as that control.
   const touchGain = 1.5, controlSlop = 8;
-  let touch = null, touchY = 0, touchOnControl = false;
+  // A new swipe adds to a glide in progress, like repeated wheel flicks; only
+  // autoplay stops on touch. A tap without movement still stops a glide.
+  let touch = null, touchY = 0, touchOnControl = false, touchMoved = false;
   const beginReadingTouch = () => {
-    if (!engine.holding) engine.pause();
+    if (engine.mode === 'play') engine.pause();
     context = false; showContext();
     $('#play').blur(); dialog.focus({ preventScroll: true });
   };
@@ -289,7 +291,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     if (view === 'paragraphs' || event.target.closest(quiet ? 'input,select,textarea' : '.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
     if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
     touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
-    touchOnControl = Boolean(event.target.closest('button,a'));
+    touchOnControl = Boolean(event.target.closest('button,a')); touchMoved = false;
     if (!touchOnControl) beginReadingTouch();
   }, { passive: true });
   listen($('.frame'), 'touchmove', event => {
@@ -301,10 +303,13 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       if (Math.abs(current.clientY - touchY) < controlSlop) return;
       touchOnControl = false; beginReadingTouch(); touchY = current.clientY;
     }
+    if (current.clientY !== touchY) touchMoved = true;
     engine.impulse((touchY - current.clientY) * touchGain); touchY = current.clientY;
   }, { passive: false });
   listen($('.frame'), 'touchend', event => {
-    if ([...event.changedTouches].some(item => item.identifier === touch)) touch = null;
+    if (![...event.changedTouches].some(item => item.identifier === touch)) return;
+    if (!touchMoved && !touchOnControl && engine.mode === 'scrub') { engine.pause(); render(); }
+    touch = null;
   });
   listen($('.frame'), 'touchcancel', () => { if (touch !== null && !touchOnControl) engine.pause(); touch = null; });
   listen(document, 'visibilitychange', () => { if (document.hidden) { engine.pause(); render(); } last = performance.now(); });
