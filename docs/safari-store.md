@@ -1,6 +1,6 @@
 # App Store preparation (Safari)
 
-Prepared 18 October 2026 for 0.10.1. One App Store Connect record covers iPhone, iPad, and Mac: the iOS and macOS apps share the bundle ID `com.miguelbarroso.flickleaf` (extension `com.miguelbarroso.flickleaf.Extension`), so it is a single free universal purchase. Development signing and device testing passed on a Mac and an iPhone 15 Pro (see [device checklist](device-checklist.md)). Not yet submitted.
+Prepared 18 October 2026 for 0.10.1. One App Store Connect record covers iPhone, iPad, and Mac: the iOS and macOS apps share the bundle ID `com.miguelbarroso.flickleaf` (extension `com.miguelbarroso.flickleaf.Extension`), so it is a single free universal purchase. Development signing and device testing passed on a Mac and an iPhone 15 Pro (see [device checklist](device-checklist.md)). App Store Connect record "Flickleaf" created on 18 October 2026 (iOS and macOS); 0.10.1 build 1001 uploaded for both platforms with `npm run submit:safari` the same day. Not yet submitted for review: the seller-name question was sent to Apple Developer Support on 18 October 2026 and awaits a reply.
 
 ## Listing copy
 
