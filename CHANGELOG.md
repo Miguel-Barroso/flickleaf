@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.0
 
 - Hold the current word for about 300 ms when scrolling reverses moving text, in every scroll mode and during autoplay, so the eye can re-anchor before the text runs back. Reversed input waits and still lands; a quick back-and-forth nets out in place. Text at rest reverses immediately.
 - Leave footnote markers, their hover tooltips, and footnote backlinks out of the reading text, so a reference number no longer joins the word before it and hidden notes are not read inline. The footnote list itself is still read where the article places it.

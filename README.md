@@ -10,11 +10,11 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ![Flickleaf word reader](docs/images/words.png)
 
-## Availability — 16 October 2026
+## Availability — 18 October 2026
 
-Version 0.9.0 adds optional Hold at sections. Firefox 0.9.0 is approved and publicly available on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/), Chrome 0.9.0 is published on the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl), and the web reader runs 0.9.0.
+Version 0.10.0 holds the current word briefly when you reverse, keeps footnote markers and numbers out of the way of words, steps exactly one word per mouse notch in Safari, and makes touch reading steadier. The web reader runs 0.10.0. Firefox and Chrome 0.10.0 have been submitted for review; until approved, the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/) and the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl) serve 0.9.0.
 
-Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.9.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.9.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
+Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.10.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.10.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 
 ## Try it in Firefox
 
@@ -35,7 +35,7 @@ Blank lines separate paragraphs; wrapped lines remain in one paragraph. Markdown
 
 ## Try it in Chrome
 
-Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.9.0.zip`.
+Use desktop Chrome 120 or newer. After `npm ci`, run `npm run build:chrome` to create `dist-chrome/`. If you have a development package, unzip `flickleaf-chrome-0.10.0.zip`.
 
 1. Open `chrome://extensions` and enable **Developer mode**.
 2. Choose **Load unpacked** and select the unzipped directory containing `manifest.json` (or `dist-chrome/`).
@@ -158,7 +158,7 @@ Choose **Open PDF** on the web reader or an extension’s paste page. PDF.js is 
 
 The Safari development package includes an Xcode project for macOS and iOS/iPadOS. It shares the reader, local PDF import, section navigation, and playback controls with the other versions. The native package targets macOS 15.4+ and iOS/iPadOS 18.4+. No App Store release is available yet.
 
-Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.9.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. To sign automatically, set your 10-character Team ID when packaging: `FLICKLEAF_APPLE_TEAM=XXXXXXXXXX npm run package:safari`. It is applied to the local project after the ZIP is created, so the shared package stays unsigned. Otherwise, select your Apple development team in Signing & Capabilities for both the app and its extension. Open the project, choose the macOS or iOS scheme, then build and run on your chosen device. If the Apple Development certificate shows as invalid, install Apple's [WWDR G3 intermediate](https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer). A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
+Run `npm run package:safari` to create `artifacts/flickleaf-safari-0.10.0-xcode.zip` on a Mac with full Xcode installed. This regenerates `safari-build/Flickleaf/Flickleaf.xcodeproj` from the current shared source, replacing any previous generated project; keep signing settings outside that generated directory. To sign automatically, set your 10-character Team ID when packaging: `FLICKLEAF_APPLE_TEAM=XXXXXXXXXX npm run package:safari`. It is applied to the local project after the ZIP is created, so the shared package stays unsigned. Otherwise, select your Apple development team in Signing & Capabilities for both the app and its extension. Open the project, choose the macOS or iOS scheme, then build and run on your chosen device. If the Apple Development certificate shows as invalid, install Apple's [WWDR G3 intermediate](https://www.apple.com/certificateauthority/AppleWWDRCAG3.cer). A physical iPhone requires signing and may require enabling Developer Mode. App Store/TestFlight distribution requires Apple Developer Program enrollment and a separate release process.
 
 On Mac, enable Flickleaf in Safari Settings → Extensions. For an unsigned development build, Safari’s developer settings must allow unsigned extensions. On iPhone/iPad, enable Flickleaf in Settings → Apps → Safari → Extensions after installing the signed app. In Safari, open the extensions menu, choose Flickleaf, then **Read this page** or **Paste text / Open PDF**. Grant access to the page when Safari asks. Safari extensions do not run inside Firefox or Chrome on iPhone.
 
