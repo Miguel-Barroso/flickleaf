@@ -12,7 +12,7 @@ A local-first web reader and Firefox/Chrome/Safari extension presenting article 
 
 ## Availability — 18 October 2026
 
-Version 0.10.0 holds the current word briefly when you reverse, keeps footnote markers and numbers out of the way of words, steps exactly one word per mouse notch in Safari, and makes touch reading steadier. The web reader runs 0.10.0, and Firefox 0.10.0 is approved on the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/). Chrome 0.10.0 is in review; until approved, the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl) serves 0.9.0.
+Version 0.10.0 holds the current word briefly when you reverse, keeps footnote markers and numbers out of the way of words, steps exactly one word per mouse notch in Safari, and makes touch reading steadier. The web reader, the [official Firefox listing](https://addons.mozilla.org/en-US/firefox/addon/flickleaf/), and the [Chrome Web Store](https://chromewebstore.google.com/detail/eifchlcmjmhbkhdecfbfiedjgenajmnl) all serve 0.10.0.
 
 Safari remains an unsigned Xcode project with no App Store release. Unsigned 0.10.0 packages are on the [GitHub release](https://github.com/Miguel-Barroso/flickleaf/releases/tag/v0.10.0); for a developer install, use them or build from source using the instructions below. On iPhone or Android, use the web reader now; physical-device extension testing remains pending.
 

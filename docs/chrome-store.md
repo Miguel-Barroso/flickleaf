@@ -57,4 +57,4 @@ Official references checked 29 September 2026: [listing fields](https://develope
 
 ## 0.10.0 submission
 
-Submitted on 18 October 2026 with `npm run submit:chrome` (Chrome Web Store API v2, service-account authentication) from the `v0.10.0` tag, the first scripted Chrome submission. Upload succeeded and the store reports the revision as PENDING_REVIEW; 0.9.0 stays published until approval. Check with `npm run submit:chrome -- --status`. Listing text and screenshots were not changed.
+Submitted on 18 October 2026 with `npm run submit:chrome` (Chrome Web Store API v2, service-account authentication) from the `v0.10.0` tag, the first scripted Chrome submission. Upload succeeded and the revision went to review; approved and published on 18 October 2026 (`--status` reports PUBLISHED 0.10.0). Check with `npm run submit:chrome -- --status`. Listing text and screenshots were not changed.
