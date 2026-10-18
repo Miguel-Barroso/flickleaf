@@ -20,6 +20,7 @@
     "build:safari": "node build.mjs --safari",
     "package:safari": "npm run build:safari && node package-safari.mjs",
     "submit:firefox": "node scripts/submit-firefox.mjs",
+    "submit:chrome": "node scripts/submit-chrome.mjs",
     "test:safari": "node tests/safari.mjs"
   },
   "dependencies": {
