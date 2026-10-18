@@ -1,6 +1,6 @@
 # App Store preparation (Safari)
 
-Prepared 18 October 2026 for 0.10.0. One App Store Connect record covers iPhone, iPad, and Mac: the iOS and macOS apps share the bundle ID `com.miguelbarroso.flickleaf` (extension `com.miguelbarroso.flickleaf.Extension`), so it is a single free universal purchase. Development signing and device testing passed on a Mac and an iPhone 15 Pro (see [device checklist](device-checklist.md)). Not yet submitted.
+Prepared 18 October 2026 for 0.10.1. One App Store Connect record covers iPhone, iPad, and Mac: the iOS and macOS apps share the bundle ID `com.miguelbarroso.flickleaf` (extension `com.miguelbarroso.flickleaf.Extension`), so it is a single free universal purchase. Development signing and device testing passed on a Mac and an iPhone 15 Pro (see [device checklist](device-checklist.md)). Not yet submitted.
 
 ## Listing copy
 
@@ -15,7 +15,7 @@ Prepared 18 October 2026 for 0.10.0. One App Store Connect record covers iPhone,
 Flickleaf puts the words in one place and lets your hand set the pace. Open an article in Safari and choose Flickleaf to read it one word at a time. Swipe or scroll forward and back, choose stepped word-by-word movement, a gentle glide, or longer freewheel motion, or press Play for hands-off reading.
 
 TURN IT ON IN SAFARI
-iPhone and iPad: open Settings → Apps → Safari → Extensions, tap Flickleaf and turn it on, and under Permissions allow Other Websites. Then, on an article in Safari, tap the page menu button beside the address, choose Flickleaf, and tap Read this page.
+iPhone and iPad: open Settings → Apps → Safari → Extensions, tap Flickleaf and turn it on, and under Permissions allow Other Websites. Then, on an article in Safari, tap the page menu button in the address bar (on iPad, the puzzle-piece icon to the right of the address), choose Flickleaf, and tap Read this page.
 Mac: open Safari → Settings → Extensions and tick Flickleaf, allowing it on the sites you read. Then click the Flickleaf leaf in the Safari toolbar and choose Read this page.
 The Flickleaf app shows these steps too.
 
