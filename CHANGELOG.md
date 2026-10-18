@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.1
 
 - Section ticks on the timeline are magnetic: tapping or dragging near one lands on that section's start, and anywhere else keeps word precision. Touch gets a wider pull than a mouse or pen; the keyboard always moves exactly. Replaces 0.10.0's snap-to-nearest-section on touch, which made positions between sections unreachable.
 - Centre the current word without a CSS transform, in a box spanning the reading width. iPad Safari could draw a word shifted right with its first letters cut off.
