@@ -5,6 +5,7 @@
 - Hold the current word for about 300 ms when scrolling reverses moving text, in every scroll mode and during autoplay, so the eye can re-anchor before the text runs back. Reversed input waits and still lands; a quick back-and-forth nets out in place. Text at rest reverses immediately.
 - Leave footnote markers, their hover tooltips, and footnote backlinks out of the reading text, so a reference number no longer joins the word before it and hidden notes are not read inline. The footnote list itself is still read where the article places it.
 - On touch screens, swipes anywhere above the controls read, not only on the word itself. While reading, swipes over the dimmed controls read too, and a tap on a dimmed control still works; when paused, the controls panel scrolls. Touch swipes are 25% less sensitive.
+- Keep numbers as their own words in Safari, whose word segmenter does not mark them as words: dates such as "January 2026" and reference numbers no longer join the previous word.
 - In Safari on macOS, Stepped mode moves exactly one word per mouse-wheel notch, however fast the wheel turns. Safari reports accelerated notches from 4 px, which previously stalled or skipped words; trackpad input still accumulates.
 - On touch screens, tapping or dragging the timeline lands on the nearest section start and names it. Mouse and keyboard keep word precision.
 

@@ -27,7 +27,8 @@ export function tokenize(blocks, language = 'en') {
     const local = [];
     let prefix = '', prefixStart = null;
     for (const part of segmenter.segment(text)) {
-      if (part.isWordLike) {
+      // Safari's segmenter does not mark numbers as word-like; other engines do.
+      if (part.isWordLike || /\p{N}/u.test(part.segment)) {
         local.push({ text: prefix + part.segment, paragraph, heading: block.heading, start: prefixStart ?? part.index, end: part.index + part.segment.length });
         prefix = ''; prefixStart = null;
       } else if (part.segment.trim()) {

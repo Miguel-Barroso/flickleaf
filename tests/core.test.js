@@ -155,6 +155,17 @@ test('punctuation and paragraph boundaries receive more time', () => {
   const tokens = tokenize([{ text: 'Hello, world. This is quiet.' }]);
   assert.equal(tokens[0].text, 'Hello,'); assert.ok(tokens[0].weight > tokens[2].weight); assert.ok(tokens.at(-1).weight > tokens[1].weight);
 });
+test('numbers stay separate words even where the segmenter calls them non-words (Safari)', () => {
+  const words = () => tokenize([{ text: 'January 2026. A quasi-religious way.1 Many in 2023–2024, 10x faster.' }]).map(t => t.text);
+  const expected = words();
+  const Original = Intl.Segmenter;
+  Intl.Segmenter = class extends Original {
+    segment(text) { return [...super.segment(text)].map(part => ({ ...part, isWordLike: part.isWordLike && !/^\p{N}+$/u.test(part.segment) })); }
+  };
+  try { assert.deepEqual(words(), expected); } finally { Intl.Segmenter = Original; }
+  assert.deepEqual(expected.slice(0, 2), ['January', '2026.']);
+  assert.ok(expected.includes('way.') && expected.includes('1'));
+});
 test('Unicode segmentation supports Japanese and invalid language fallback', () => {
   assert.ok(tokenize([{ text: '日本語を読みます。' }], 'ja').length > 1);
   assert.equal(tokenize([{ text: 'hello world' }], 'invalid_locale').length, 2);
