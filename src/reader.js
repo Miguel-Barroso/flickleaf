@@ -161,21 +161,24 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen($('#play'), 'click', toggle);
   listen($('#back'), 'click', () => seek(engine.index - 1));
   listen($('#forward'), 'click', () => seek(engine.index + 1));
-  // A fingertip cannot pick one word out of thousands, so touch lands on the
-  // nearest section start. Mouse, pen, and keyboard keep word precision.
-  let touchTimeline = false;
+  // Section ticks are magnetic: input near one lands on that section's start,
+  // anywhere else keeps word precision. A fingertip gets a wider pull than a
+  // mouse or pen; the keyboard always moves exactly.
+  const snapRadius = { touch: 28, mouse: 10, pen: 10 };
+  let timelineSnap = 0;
   const sectionStarts = [0, ...headings.map(heading => heading.index)];
   const nearestSection = index => sectionStarts.reduce((best, start) => Math.abs(start - index) < Math.abs(best - index) ? start : best);
-  listen(progress, 'pointerdown', event => { touchTimeline = event.pointerType === 'touch' && headings.length > 0; });
-  listen(progress, 'keydown', () => { touchTimeline = false; });
+  listen(progress, 'pointerdown', event => { timelineSnap = headings.length ? snapRadius[event.pointerType] || 0 : 0; });
+  listen(progress, 'keydown', () => { timelineSnap = 0; });
   listen(progress, 'input', () => {
-    const index = Number(progress.value);
-    if (!touchTimeline) return seek(index);
-    seek(nearestSection(index));
+    const index = Number(progress.value), section = nearestSection(index);
+    const pixelsPerToken = Math.max(1, progress.getBoundingClientRect().width - 16) / Math.max(1, article.tokens.length - 1);
+    if (!timelineSnap || Math.abs(section - index) * pixelsPerToken > timelineSnap) return seek(index);
+    seek(section); progress.value = String(section);
     text('.section-preview', sectionAt(engine.index)?.text || 'Beginning');
     $('.section-preview').hidden = false;
   });
-  for (const type of ['pointerup', 'pointercancel']) listen(progress, type, event => { if (event.pointerType === 'touch') $('.section-preview').hidden = true; });
+  for (const type of ['pointerup', 'pointercancel']) listen(progress, type, event => { if (event.pointerType !== 'mouse') $('.section-preview').hidden = true; });
   listen(sections, 'focus', () => { engine.pause(); awake = performance.now(); render(); });
   listen(sections, 'change', () => { if (sections.value === '') return; seek(Number(sections.value)); sections.blur(); progress.focus(); });
   listen(progress, 'pointermove', event => {

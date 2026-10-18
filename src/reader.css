@@ -19,7 +19,7 @@ header{display:flex;align-items:center;justify-content:space-between;gap:20px}.b
 @media(prefers-reduced-motion:reduce){.chrome{transition:none}button:active{transform:none}}
 
 .heading-label[hidden]{display:none}
-.word-frame{position:absolute;left:0;right:0;top:50%;transform:translateY(-50%);display:flex;justify-content:center;max-width:100%}
+.word-frame{position:absolute;inset:0;margin:auto 0;height:fit-content;display:flex;flex-direction:column;align-items:center;max-width:100%}
 .heading-label{position:absolute;bottom:calc(100% + 22px);left:0;right:0;text-align:center;color:var(--accent)}
 .heading-card .word{font-size:clamp(27px,3.7vw,52px);line-height:1.3;max-width:800px;text-wrap:balance;letter-spacing:-.025em}
 .heading-card .focus-line{visibility:hidden}

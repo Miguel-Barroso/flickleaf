@@ -1,5 +1,10 @@
 # Changelog
 
+## Unreleased
+
+- Section ticks on the timeline are magnetic: tapping or dragging near one lands on that section's start, and anywhere else keeps word precision. Touch gets a wider pull than a mouse or pen; the keyboard always moves exactly. Replaces 0.10.0's snap-to-nearest-section on touch, which made positions between sections unreachable.
+- Centre the current word without a CSS transform. iPad Safari could clip the word's left edge while the controls dimmed.
+
 ## 0.10.0
 
 - Hold the current word for about 300 ms when scrolling reverses moving text, in every scroll mode and during autoplay, so the eye can re-anchor before the text runs back. Reversed input waits and still lands; a quick back-and-forth nets out in place. Text at rest reverses immediately.

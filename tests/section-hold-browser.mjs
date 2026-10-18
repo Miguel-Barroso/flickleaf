@@ -95,7 +95,7 @@ export async function checkSectionHold(page, screenshot = '') {
   await page.locator('#close').click();
 }
 
-// Touch on the timeline lands on the nearest section start; mouse stays exact.
+// Section ticks on the timeline are magnetic, more so for touch than mouse.
 export async function checkTouchTimeline(page) {
   await page.locator('#source').fill('Opening words come first. '.repeat(20) + '\n\n# Middle\n\n' + 'Middle words follow. '.repeat(20) + '\n\n# End\n\n' + 'Closing words. '.repeat(20));
   await page.getByRole('button', { name: 'Start reading' }).click();
@@ -105,10 +105,15 @@ export async function checkTouchTimeline(page) {
     return Number(el.value);
   }, { pointerType, value });
   const [middle, end] = await page.locator('.progress').evaluate(el => [...el.closest('.timeline').querySelectorAll('.section-ticks span')].map(tick => Math.round(parseFloat(tick.style.left) / 100 * Number(el.max))));
-  assert.equal(await scrub('touch', middle - 3), middle, 'a touch just before a tick lands on that section');
+  const perToken = await page.locator('.progress').evaluate(el => (el.getBoundingClientRect().width - 16) / Number(el.max));
+  const near = px => Math.max(1, Math.floor(px / perToken)); // tokens within px pixels
+  assert.equal(await scrub('touch', middle - near(20)), middle, 'a touch near a tick lands on that section');
   assert.equal(await page.locator('.section-preview').textContent(), 'Middle');
-  assert.equal(await scrub('touch', end + 5), end);
-  assert.equal(await scrub('touch', 4), 0, 'the beginning is a section start too');
-  assert.equal(await scrub('mouse', middle - 3), middle - 3, 'mouse keeps word precision');
+  assert.equal(await scrub('touch', end + near(20)), end);
+  const between = Math.round((middle + end) / 2);
+  assert.ok((end - between) * perToken > 28, 'test text leaves room between ticks');
+  assert.equal(await scrub('touch', between), between, 'a touch away from ticks keeps word precision');
+  assert.equal(await scrub('mouse', middle - near(6)), middle, 'a mouse snaps only very close to a tick');
+  assert.equal(await scrub('mouse', middle - near(20)), middle - near(20), 'otherwise mouse keeps word precision');
   await page.locator('#close').click();
 }
