@@ -54,3 +54,7 @@ Before submission, confirm the developer account and required account security s
 - [ ] Test the signed installation and publish the real installation link (README, web About availability line, which still says Firefox 0.8.0 and no Chrome release).
 
 Official references checked 29 September 2026: [listing fields](https://developer.chrome.com/docs/webstore/cws-dashboard-listing), [images](https://developer.chrome.com/docs/webstore/images), [privacy fields](https://developer.chrome.com/docs/webstore/cws-dashboard-privacy), and [program policies](https://developer.chrome.com/docs/webstore/program-policies/policies).
+
+## 0.10.0 submission
+
+Submitted on 18 October 2026 with `npm run submit:chrome` (Chrome Web Store API v2, service-account authentication) from the `v0.10.0` tag, the first scripted Chrome submission. Upload succeeded and the store reports the revision as PENDING_REVIEW; 0.9.0 stays published until approval. Check with `npm run submit:chrome -- --status`. Listing text and screenshots were not changed.
