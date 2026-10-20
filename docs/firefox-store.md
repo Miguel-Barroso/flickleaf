@@ -128,4 +128,4 @@ Submitted on 18 October 2026 with `npm run submit:firefox` from the `v0.10.0` ta
 
 ## 0.10.1 submission
 
-Submitted on 18 October 2026 with `npm run submit:firefox` from the `v0.10.1` tag; release notes added by the owner. 0.10.1 makes timeline section ticks magnetic and fixes words clipped in iPad Safari.
+Submitted on 18 October 2026 with `npm run submit:firefox` from the `v0.10.1` tag; release notes added by the owner. 0.10.1 makes timeline section ticks magnetic and fixes words clipped in iPad Safari. Approved and published by 20 October 2026.
