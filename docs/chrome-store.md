@@ -61,4 +61,4 @@ Submitted on 18 October 2026 with `npm run submit:chrome` (Chrome Web Store API 
 
 ## 0.10.1 submission
 
-Submitted on 18 October 2026 with `npm run submit:chrome` from the `v0.10.1` tag.
+Submitted on 18 October 2026 with `npm run submit:chrome` from the `v0.10.1` tag. Approved and published by 20 October 2026.
