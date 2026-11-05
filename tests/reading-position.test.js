@@ -1,6 +1,7 @@
 import test from 'node:test';
 import assert from 'node:assert/strict';
-import { createPositionStore, textFingerprint, normalizePosition, POSITION_KEY } from '../src/reading-position.js';
+import { createHash, randomBytes } from 'node:crypto';
+import { createPositionStore, textFingerprint, normalizePosition, sha256, POSITION_KEY } from '../src/reading-position.js';
 test('fingerprints match identical text and distinguish edits and headings', async () => {
   const a = [{text:'hello'}];
   assert.equal(await textFingerprint(a),await textFingerprint([{text:'hello'}]));
@@ -30,4 +31,13 @@ test('extension bookmarks use extension storage and serialize save before deleti
   const data={};const area={get:async key=>({[key]:data[key]}),set:async value=>{await new Promise(r=>setTimeout(r,5));Object.assign(data,value);},remove:async key=>{delete data[key];}};
   const store=createPositionStore({chrome:{runtime:{id:'x'},storage:{local:area}},get localStorage(){throw Error('Must not use page storage');}});
   const saved=store.save({version:1,fingerprint:'a'.repeat(64),index:5});const cleared=store.clear();await Promise.all([saved,cleared]);assert.deepEqual(data,{});
+});
+
+test('fallback SHA-256 matches Web Crypto so http pages find the same bookmark',async()=>{
+  for (const size of [0,3,55,56,63,64,65,1000]) {
+    const bytes=randomBytes(size);
+    assert.equal(Buffer.from(sha256(new Uint8Array(bytes))).toString('hex'),createHash('sha256').update(bytes).digest('hex'));
+  }
+  const tokens=[{text:'“Quiet”'},{text:'Section',heading:true,level:2}];
+  assert.equal(await textFingerprint(tokens,{}),await textFingerprint(tokens));
 });

@@ -22,7 +22,9 @@ export function formatPDFPages(pages) {
     .map(page => `# Page ${page.number}\n\n${page.lines.map(line => line.text).join('\n')}`).join('\n\n');
 }
 const key = text => text.trim().replace(/\s+/g, ' ').toLocaleLowerCase();
-const pageNumber = text => /^(?:page\s+)?\d{1,4}(?:\s*(?:of|\/)\s*\d{1,4})?$/i.test(text.trim());
+// Roman numerals only in lowercase: front matter uses i, ii, iii, while capitals are often chapter titles.
+const pageNumber = text => /^(?:page\s+)?\d{1,4}(?:\s*(?:of|\/)\s*\d{1,4})?$/i.test(text.trim()) ||
+  /^(?:[Pp]age\s+)?(?=[ivxlc])c{0,3}(?:xc|xl|l?x{0,3})(?:ix|iv|v?i{0,3})$/.test(text.trim());
 function margin(line, index, lines) {
   if (line.y === null || !Number.isFinite(line.y)) return null;
   if (index < 2 && line.y <= .12) return 'top';
@@ -41,7 +43,8 @@ export function cleanupPDFPages(pages, { headers = true, numbers = true, hyphens
     });
     for (const value of seen) repetitions.set(value, (repetitions.get(value) || 0) + 1);
   }
-  const threshold = Math.max(3, Math.ceil(readablePages.length * .6));
+  // Short documents need the line on every page; a single page has nothing to compare.
+  const threshold = readablePages.length < 2 ? Infinity : Math.min(readablePages.length, Math.max(3, Math.ceil(readablePages.length * .6)));
   const changes = { headers: 0, numbers: 0, hyphens: 0, examples: [] };
   const example = value => { if (changes.examples.length < 8 && !changes.examples.includes(value)) changes.examples.push(value); };
   const cleaned = pages.map(page => {

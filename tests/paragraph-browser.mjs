@@ -23,6 +23,10 @@ export async function checkParagraphView(page) {
   assert.equal(await page.locator('.progress').inputValue(),paused,'switching to paragraphs pauses autoplay');
   await page.locator('[data-token="12"]').click();
   assert.equal(await page.locator('.progress').inputValue(),'12');
+  const dragged=await page.locator('[data-token="6"]').boundingBox();
+  await page.mouse.move(dragged.x+1,dragged.y+dragged.height/2);await page.mouse.down();
+  await page.mouse.move(dragged.x+dragged.width-1,dragged.y+dragged.height/2,{steps:4});await page.mouse.up();
+  assert.equal(await page.locator('.progress').inputValue(),'12','selecting a word by dragging keeps the place');
   await page.locator('.paragraph-pane').press('ArrowRight');
   assert.equal(await page.locator('.progress').inputValue(),'13');
   await page.locator('#later-passage').click();

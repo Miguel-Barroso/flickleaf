@@ -1,5 +1,12 @@
 # Changelog
 
+## Unreleased
+
+- Save place works on plain `http:` pages in the extensions. Browsers withhold Web Crypto there, so the fingerprint failed and saved places were reported unavailable; Flickleaf now computes the same SHA-256 itself, so existing bookmarks still match.
+- In Paragraphs view, a long paragraph next to a short one is shown in part instead of dropped: the passage no longer shrinks to a few sentences and needs **Later passage** for the rest.
+- In Paragraphs view, a click that ends a drag no longer moves your place, so selecting text is safe.
+- PDF cleanup removes lowercase roman page numbers (i, iv, xii) in the margins, keeping capitals, which are often chapter titles, and finds repeated headers and footers in two-page PDFs.
+
 ## 0.10.1
 
 - Section ticks on the timeline are magnetic: tapping or dragging near one lands on that section's start, and anywhere else keeps word precision. Touch gets a wider pull than a mouse or pen; the keyboard always moves exactly. Replaces 0.10.0's snap-to-nearest-section on touch, which made positions between sections unreachable.
