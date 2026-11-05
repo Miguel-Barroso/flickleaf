@@ -16,6 +16,8 @@ jobs:
         with:
           node-version: 24
           cache: npm
+      - name: Nothing private in a public repo
+        run: node scripts/check-public-content.mjs
       - run: npm ci
       - run: npx playwright install --with-deps chromium webkit
       - run: node scripts/check-release.mjs
