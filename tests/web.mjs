@@ -1,4 +1,5 @@
 import { checkSectionHold, checkTouchTimeline, checkTimelineTouchLayer } from './section-hold-browser.mjs';
+import { checkPlaybackGlide } from './playback-glide-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -59,6 +60,7 @@ try {
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
   await checkSectionHold(page, `.test-results/section-hold-${name}.png`);
+  await checkPlaybackGlide(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);

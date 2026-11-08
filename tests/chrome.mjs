@@ -1,4 +1,5 @@
 import { checkSectionHold } from './section-hold-browser.mjs';
+import { checkPlaybackGlide } from './playback-glide-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -26,6 +27,7 @@ try {
   await page.goto(`chrome-extension://${id}/paste.html`);
   await checkHeadingFocus(page);
   await checkSectionHold(page);
+  await checkPlaybackGlide(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);

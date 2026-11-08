@@ -12,6 +12,8 @@ export const REVERSAL_GRACE_MS = 300;
 // Hands-off playback gives a heading time to be read. When the hand moves the
 // text, a heading passes like a sentence ending instead of stalling the input.
 const SCRUB_HEADING_WEIGHT = 2;
+// The last word before a section waits this many extra word intervals (0.5 s at 300 WPM).
+const SECTION_PAUSE = 2.5;
 
 // Safari on macOS reports each mouse-wheel notch with a fractional pixel delta
 // (4.000244 px when slow, accelerated beyond that) and no sideways motion.
@@ -43,7 +45,7 @@ export function tokenize(blocks, language = 'en') {
     if (block.heading && local.length) {
       // Headings stay together; weights follow the user's chosen WPM.
       const previous = tokens.at(-1);
-      if (previous && !previous.heading) previous.weight += 1.5;
+      if (previous && !previous.heading) previous.weight += SECTION_PAUSE;
       tokens.push({ text, paragraph, heading: true, level: block.level || 2,
         start: 0, end: text.length, wordCount: local.length, weight: Math.max(5, local.length + 2) });
       return;
@@ -68,10 +70,13 @@ export class Playback {
     this.minSpeed = 300; this.maxSpeed = 900;
     this.holdAtSections = false; this.holding = false;
     this.moved = 0; this.grace = 0; this.graceSteps = 0;
+    // Set when a glide interrupts hands-off reading, which then carries on at
+    // the minimum pace instead of stopping. Stepped input still stops.
+    this.resume = false;
   }
   pause() {
     this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; this.stepHold = 0; this.holding = false;
-    this.moved = 0; this.grace = 0; this.graceSteps = 0;
+    this.moved = 0; this.grace = 0; this.graceSteps = 0; this.resume = false;
   }
   play() {
     if (!this.tokens.length) return;
@@ -115,7 +120,8 @@ export class Playback {
     if (this.holdAtSections && steps > 0) {
       for (let next = this.index + 1; next <= target; next++) {
         if (this.tokens[next].heading) {
-          this.index = next; this.pause(); this.holding = true;
+          const resume = this.mode === 'play' || this.resume;
+          this.index = next; this.pause(); this.holding = true; this.resume = resume;
           return;
         }
       }
@@ -123,9 +129,12 @@ export class Playback {
     this.index = target;
   }
   // `notch` marks input known to be one discrete wheel notch, whatever its size.
-  impulse(pixels, notch = false) {
+  // `resume` marks input that began during hands-off reading, for callers that
+  // stop playback as the hand lands, before the first movement arrives.
+  impulse(pixels, notch = false, resume = false) {
     if (!Number.isFinite(pixels) || !pixels || !this.tokens.length) return;
     if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240), notch);
+    if (this.mode === 'play' || resume) this.resume = true;
     const wasHolding = this.holding;
     this.holding = false;
     if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; }
@@ -202,7 +211,14 @@ export class Playback {
         } else {
           const feel = SCROLL_MODES[this.scrollMode];
           this.velocity *= Math.exp(-step / feel.coastMs);
-          if (Math.abs(this.velocity) < feel.stopSpeed) { this.pause(); break; }
+          if (Math.abs(this.velocity) < feel.stopSpeed) {
+            if (!this.resume) { this.pause(); break; }
+            // The glide already reads at the minimum pace, so forward text
+            // carries straight on; after a rewind the current word starts afresh.
+            this.resume = false; this.mode = 'play'; this.speed = this.minSpeed; this.velocity = this.speed;
+            if (direction < 0) this.elapsed = 0;
+            continue;
+          }
         }
       }
       while (this.elapsed >= this.weightAt(this.index)) {

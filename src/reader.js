@@ -127,6 +127,8 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       });
     }
     if (view === 'paragraphs') paragraphView.render(engine.index);
+    // A glide that interrupts hands-off reading hands back at the minimum pace.
+    if ($('#speed').value !== String(engine.speed) && root.activeElement !== $('#speed')) $('#speed').value = String(engine.speed);
     text('#play', view === 'paragraphs' ? 'Play words' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
     text('#state', engine.holding ? 'Holding at section · scroll to continue' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : engine.scrollMode === 'stepped' ? 'Stepping · word by word' : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
     dialog.classList.toggle('reading', (engine.mode !== 'paused' || engine.holding) && performance.now() - awake > 1600 && !context);
@@ -139,7 +141,12 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     awake = performance.now(); render();
     if (mode === 'paragraphs') { paragraphView.render(engine.index, true); $('.paragraph-pane').focus({ preventScroll: true }); }
   };
-  const toggle = () => { if (view === 'paragraphs') setView('words'); context = false; showContext(); engine.toggle(); render(); };
+  // Play quiets the controls at once; other input keeps them up for a moment.
+  const toggle = () => {
+    if (view === 'paragraphs') setView('words'); context = false; showContext(); engine.toggle();
+    if (engine.mode === 'play' || engine.holding) awake = -Infinity;
+    render();
+  };
   const seek = index => { engine.seek(index); awake = performance.now(); render(); };
   const speed = value => { if (Number.isFinite(value)) engine.setSpeed(value); $('#speed').value = String(engine.speed); savePreferences(); render(); };
   const showContext = () => { $('.context').hidden = !context; $('#context').setAttribute('aria-pressed', String(context)); };
@@ -161,22 +168,29 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen($('#play'), 'click', toggle);
   listen($('#back'), 'click', () => seek(engine.index - 1));
   listen($('#forward'), 'click', () => seek(engine.index + 1));
-  // Section ticks are magnetic: input near one lands on that section's start,
-  // anywhere else keeps word precision. A fingertip gets a wider pull than a
-  // mouse or pen; the keyboard always moves exactly.
-  const snapRadius = { touch: 28, mouse: 10, pen: 10 };
-  let timelineSnap = 0;
+  // Section ticks are magnetic: a tap or click near one lands on that section's
+  // start, anywhere else keeps word precision. A fingertip gets a wider pull
+  // than a mouse or pen. Once a press drags, the pull drops to a slight catch
+  // at each tick so the whole timeline stays reachable; the keyboard always
+  // moves exactly.
+  const snapRadius = { touch: 28, mouse: 10, pen: 10 }, dragSnap = 3, dragSlop = 6;
+  let timelineSnap = 0, timelineStart = null, timelineFinger = null;
   const sectionStarts = [0, ...headings.map(heading => heading.index)];
   const nearestSection = index => sectionStarts.reduce((best, start) => Math.abs(start - index) < Math.abs(best - index) ? start : best);
-  listen(progress, 'pointerdown', event => { timelineSnap = headings.length ? snapRadius[event.pointerType] || 0 : 0; });
+  const pressTimeline = (type, x) => { timelineSnap = headings.length ? snapRadius[type] || 0 : 0; timelineStart = x; };
+  const dragTimeline = x => { if (timelineStart !== null && Math.abs(x - timelineStart) > dragSlop) { timelineStart = null; timelineSnap = headings.length ? dragSnap : 0; } };
+  listen(progress, 'pointerdown', event => pressTimeline(event.pointerType, event.clientX));
+  listen(progress, 'pointermove', event => { if (event.buttons) dragTimeline(event.clientX); });
   listen(progress, 'keydown', () => { timelineSnap = 0; });
   const scrubTo = index => {
     const section = nearestSection(index);
     const pixelsPerToken = Math.max(1, progress.getBoundingClientRect().width - 16) / Math.max(1, article.tokens.length - 1);
-    if (!timelineSnap || Math.abs(section - index) * pixelsPerToken > timelineSnap) return seek(index);
-    seek(section); progress.value = String(section);
+    const snapped = timelineSnap && Math.abs(section - index) * pixelsPerToken <= timelineSnap;
+    seek(snapped ? section : index); if (snapped) progress.value = String(section);
+    // A finger covers the ticks, so a touch drag names the section it is in.
+    if (!snapped && !(timelineFinger !== null && timelineStart === null)) return;
     text('.section-preview', sectionAt(engine.index)?.text || 'Beginning');
-    $('.section-preview').hidden = false;
+    $('.section-preview').hidden = !headings.length;
   };
   listen(progress, 'input', () => scrubTo(Number(progress.value)));
   // On touch screens a layer over the range takes taps and drags, so the native
@@ -185,7 +199,6 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   // left it following, so every later tap moved the timeline instead of
   // pressing a button. Mouse, keyboard, and VoiceOver still use the range.
   const timelineTouch = $('.timeline-touch');
-  let timelineFinger = null;
   const touchIndex = point => {
     const rect = progress.getBoundingClientRect();
     const fraction = Math.max(0, Math.min(1, (point.clientX - rect.left - 8) / Math.max(1, rect.width - 16)));
@@ -195,13 +208,13 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   listen(timelineTouch, 'touchstart', event => {
     event.preventDefault();
     const point = event.changedTouches[0];
-    timelineFinger = point.identifier; timelineSnap = headings.length ? snapRadius.touch : 0;
+    timelineFinger = point.identifier; pressTimeline('touch', point.clientX);
     awake = performance.now(); scrubTo(touchIndex(point));
   }, { passive: false });
   listen(timelineTouch, 'touchmove', event => {
     const point = [...event.changedTouches].find(item => item.identifier === timelineFinger);
     if (!point) return;
-    event.preventDefault(); scrubTo(touchIndex(point));
+    event.preventDefault(); dragTimeline(point.clientX); scrubTo(touchIndex(point));
   }, { passive: false });
   for (const type of ['touchend', 'touchcancel']) listen(timelineTouch, type, event => {
     if ([...event.changedTouches].some(item => item.identifier === timelineFinger)) endTimelineTouch();
@@ -295,16 +308,19 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     else if (event.key === 'Shift' && !event.repeat) { engine.pause(); context = true; showContext(); render(); }
   });
   listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#save-place,#resume-place,#clear-place,#paste,#clear-preferences,#hold-sections,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
-  let pointer = null, y = 0;
+  // A hand that lands during hands-off reading stops the text at once; if it
+  // then moves, the glide hands back to reading at the minimum pace.
+  let pointer = null, y = 0, pointerResume = false;
   listen($('.stage'), 'pointerdown', event => {
     if (event.pointerType === 'touch' || pointer !== null || event.button !== 0) return;
     pointer = event.pointerId; y = event.clientY; $('.stage').setPointerCapture(pointer);
+    pointerResume = engine.mode === 'play' || engine.resume;
     if (!engine.holding) engine.pause();
     context = false; showContext(); $('#play').blur(); dialog.focus({ preventScroll: true });
   });
   listen($('.stage'), 'pointermove', event => {
     if (event.pointerId !== pointer) return;
-    engine.impulse((y - event.clientY) * 2); y = event.clientY;
+    engine.impulse((y - event.clientY) * 2, false, pointerResume); y = event.clientY;
   });
   for (const event of ['pointerup', 'pointercancel', 'lostpointercapture']) listen($('.stage'), event, e => { if (e.pointerId === pointer) pointer = null; });
   // Use a non-passive touch listener so WebKit cannot turn a reading swipe
@@ -316,8 +332,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const touchGain = 1.5, controlSlop = 8;
   // A new swipe adds to a glide in progress, like repeated wheel flicks; only
   // autoplay stops on touch. A tap without movement still stops a glide.
-  let touch = null, touchY = 0, touchOnControl = false, touchMoved = false;
+  let touch = null, touchY = 0, touchOnControl = false, touchMoved = false, touchResume = false;
   const beginReadingTouch = () => {
+    touchResume = engine.mode === 'play' || engine.resume;
     if (engine.mode === 'play') engine.pause();
     context = false; showContext();
     $('#play').blur(); dialog.focus({ preventScroll: true });
@@ -340,7 +357,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       touchOnControl = false; beginReadingTouch(); touchY = current.clientY;
     }
     if (current.clientY !== touchY) touchMoved = true;
-    engine.impulse((touchY - current.clientY) * touchGain); touchY = current.clientY;
+    engine.impulse((touchY - current.clientY) * touchGain, false, touchResume); touchY = current.clientY;
   }, { passive: false });
   listen($('.frame'), 'touchend', event => {
     if (![...event.changedTouches].some(item => item.identifier === touch)) return;
