@@ -117,3 +117,36 @@ export async function checkTouchTimeline(page) {
   assert.equal(await scrub('mouse', middle - near(20)), middle - near(20), 'otherwise mouse keeps word precision');
   await page.locator('#close').click();
 }
+
+// On touch screens the timeline takes taps itself, so the native slider never
+// tracks a finger, and still works when the host page stops touch events.
+export async function checkTimelineTouchLayer(page) {
+  await page.locator('#source').fill('Opening words come first. '.repeat(20) + '\n\n# Middle\n\n' + 'Middle words follow. '.repeat(20) + '\n\n# End\n\n' + 'Closing words. '.repeat(20));
+  const open = () => page.getByRole('button', { name: 'Start reading' }).click();
+  const tapAt = async index => {
+    const box = await page.locator('.progress').boundingBox();
+    const max = Number(await page.locator('.progress').getAttribute('max'));
+    await page.touchscreen.tap(box.x + 8 + index / max * (box.width - 16), box.y + box.height / 2);
+  };
+  await open();
+  assert.ok(await page.locator('.timeline-touch').isVisible(), 'touch screens get the timeline layer');
+  const middle = await page.locator('.progress').evaluate(el => Math.round(parseFloat(el.closest('.timeline').querySelector('.section-ticks span').style.left) / 100 * Number(el.max)));
+  await tapAt(middle - 2);
+  assert.equal(Number(await page.locator('.progress').inputValue()), middle, 'a tap near a tick lands on that section');
+  const between = Math.round(middle / 2);
+  await tapAt(between);
+  assert.ok(Math.abs(Number(await page.locator('.progress').inputValue()) - between) <= 1, 'a tap away from ticks keeps word precision');
+  await page.locator('#play').tap();
+  assert.equal(await page.locator('#play').textContent(), 'Pause', 'a later tap presses the button under the finger');
+  await page.locator('#play').tap();
+  await page.locator('#close').click();
+  // A host page that stops every touch event before it reaches the reader.
+  await page.evaluate(() => { for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) window.addEventListener(type, event => event.stopImmediatePropagation(), { capture: true }); });
+  await open();
+  await tapAt(middle + 2);
+  assert.equal(Number(await page.locator('.progress').inputValue()), middle, 'taps still seek when the page swallows touch events');
+  await page.locator('#play').tap();
+  assert.equal(await page.locator('#play').textContent(), 'Pause', 'buttons still work after a timeline tap on a hostile page');
+  await page.locator('#play').tap();
+  await page.locator('#close').click();
+}

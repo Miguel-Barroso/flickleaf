@@ -2,6 +2,7 @@
 
 ## Unreleased
 
+- On touch screens, the timeline handles taps and drags itself instead of the native slider. On some sites (darioamodei.com) one tap on the timeline in the iPhone extension made every later tap move the timeline instead of pressing the button under your finger; that can no longer happen, and timeline taps still work on pages that intercept touch events. Mouse, keyboard, and VoiceOver keep the native slider.
 - Save place works on plain `http:` pages in the extensions. Browsers withhold Web Crypto there, so the fingerprint failed and saved places were reported unavailable; Flickleaf now computes the same SHA-256 itself, so existing bookmarks still match.
 - In Paragraphs view, a long paragraph next to a short one is shown in part instead of dropped: the passage no longer shrinks to a few sentences and needs **Later passage** for the rest.
 - In Paragraphs view, a click that ends a drag no longer moves your place, so selecting text is safe.

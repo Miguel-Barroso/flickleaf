@@ -26,7 +26,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     <div class="view-switch chrome mode-switch" role="group" aria-label="Reading view"><button id="word-view" aria-pressed="true">Words</button><button id="paragraph-view" aria-pressed="false">Paragraphs</button></div>
     <main class="stage" aria-label="Reading area. Scroll or drag to control the pace."><div class="focus-line" aria-hidden="true"></div><div class="word-frame"><span class="heading-label eyebrow" hidden>Section</span><div class="word" aria-live="off"></div><div class="context" hidden></div></div><div class="focus-line lower" aria-hidden="true"></div></main>
     <section class="paragraph-pane" hidden tabindex="0" aria-label="Paragraph reading view" aria-describedby="paragraph-help"><p id="paragraph-help">Your current word is highlighted. Select a word to move your place; use ← and → to step. Play returns to Words.</p><button id="earlier-passage">Earlier passage</button><div class="paragraph-content"></div><button id="later-passage">Later passage</button></section>
-    <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select><button class="quiet" id="hold-sections" aria-pressed="false" title="Wait at each heading until you scroll, step, or press Play">Hold at sections</button></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false" title="Show nearby words (C)">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="stepped" aria-pressed="false">Stepped</button><button id="direct" aria-pressed="true">Glide</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><div class="preferences chrome"><span id="preferences-status" role="status">Loading preferences…</span><button class="quiet" id="clear-preferences">Clear saved preferences</button></div><div class="reading-position chrome"><p id="place-status" role="status"></p><button id="save-place" disabled>Save place</button><button id="resume-place" hidden>Resume saved place</button><button class="quiet" id="clear-place">Delete saved place</button></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>C</kbd> for context · <kbd>Esc</kbd> to leave</p></div>
+    <div class="bottom"><div class="status"><span class="state"><i class="dot"></i><span id="state">Ready when you are</span></span><span id="count"></span></div><div class="timeline"><div class="section-preview" hidden></div><div class="section-ticks" aria-hidden="true"></div><input class="progress" aria-label="Reading position" type="range" min="0" value="0" step="1"><div class="timeline-touch" aria-hidden="true"></div></div><div class="section-nav chrome" hidden><label for="sections">Section</label><select id="sections" aria-label="Jump to section"></select><button class="quiet" id="hold-sections" aria-pressed="false" title="Wait at each heading until you scroll, step, or press Play">Hold at sections</button></div><div class="controls chrome"><button class="step" id="back" aria-label="Previous word" title="Previous word (←)">←</button><button class="play" id="play">Play</button><button class="step" id="forward" aria-label="Next word" title="Next word (→)">→</button><div class="speed"><button id="slower" aria-label="Decrease speed">−</button><label><input id="speed" aria-label="Playback speed in words per minute" type="number" min="300" max="900" step="25" value="300"><span>WPM</span></label><button id="faster" aria-label="Increase speed">+</button></div><button class="quiet" id="context" aria-pressed="false" title="Show nearby words (C)">Context</button></div><div class="scroll-feel chrome"><div class="mode-switch" role="group" aria-label="Scroll mode"><button id="stepped" aria-pressed="false">Stepped</button><button id="direct" aria-pressed="true">Glide</button><button id="freewheel" aria-pressed="false">Freewheel</button></div><span id="scroll-help">Short glide, close control.</span></div><div class="speed-limits chrome" role="group" aria-label="Reading speed limits"><label>Min <input id="min-speed" aria-label="Minimum reading speed" type="number" min="50" max="1500" step="25" value="300"></label><span aria-hidden="true">—</span><label>Max <input id="max-speed" aria-label="Maximum reading speed" type="number" min="50" max="1500" step="25" value="900"></label><span>WPM</span></div><div class="preferences chrome"><span id="preferences-status" role="status">Loading preferences…</span><button class="quiet" id="clear-preferences">Clear saved preferences</button></div><div class="reading-position chrome"><p id="place-status" role="status"></p><button id="save-place" disabled>Save place</button><button id="resume-place" hidden>Resume saved place</button><button class="quiet" id="clear-place">Delete saved place</button></div><p class="hint chrome"><kbd>Scroll</kbd> to set the pace · <kbd>Space / Enter</kbd> for hands-off · <kbd>PgUp / PgDn</kbd> for pace · <kbd>← →</kbd> to step · <kbd>C</kbd> for context · <kbd>Esc</kbd> to leave</p></div>
     <footer class="chrome"><span>FLICK. READ. FIND YOUR PACE.</span><span>One word. Right here.</span></footer>
   </div>`;
   root.append(dialog); document.documentElement.append(host);
@@ -170,13 +170,46 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const nearestSection = index => sectionStarts.reduce((best, start) => Math.abs(start - index) < Math.abs(best - index) ? start : best);
   listen(progress, 'pointerdown', event => { timelineSnap = headings.length ? snapRadius[event.pointerType] || 0 : 0; });
   listen(progress, 'keydown', () => { timelineSnap = 0; });
-  listen(progress, 'input', () => {
-    const index = Number(progress.value), section = nearestSection(index);
+  const scrubTo = index => {
+    const section = nearestSection(index);
     const pixelsPerToken = Math.max(1, progress.getBoundingClientRect().width - 16) / Math.max(1, article.tokens.length - 1);
     if (!timelineSnap || Math.abs(section - index) * pixelsPerToken > timelineSnap) return seek(index);
     seek(section); progress.value = String(section);
     text('.section-preview', sectionAt(engine.index)?.text || 'Beginning');
     $('.section-preview').hidden = false;
+  };
+  listen(progress, 'input', () => scrubTo(Number(progress.value)));
+  // On touch screens a layer over the range takes taps and drags, so the native
+  // slider never tracks a finger. iOS WebKit's slider follows a touch until it
+  // sees that touch end; a host page that stops touch events (darioamodei.com)
+  // left it following, so every later tap moved the timeline instead of
+  // pressing a button. Mouse, keyboard, and VoiceOver still use the range.
+  const timelineTouch = $('.timeline-touch');
+  let timelineFinger = null;
+  const touchIndex = point => {
+    const rect = progress.getBoundingClientRect();
+    const fraction = Math.max(0, Math.min(1, (point.clientX - rect.left - 8) / Math.max(1, rect.width - 16)));
+    return Math.round(fraction * (article.tokens.length - 1));
+  };
+  const endTimelineTouch = () => { timelineFinger = null; $('.section-preview').hidden = true; };
+  listen(timelineTouch, 'touchstart', event => {
+    event.preventDefault();
+    const point = event.changedTouches[0];
+    timelineFinger = point.identifier; timelineSnap = headings.length ? snapRadius.touch : 0;
+    awake = performance.now(); scrubTo(touchIndex(point));
+  }, { passive: false });
+  listen(timelineTouch, 'touchmove', event => {
+    const point = [...event.changedTouches].find(item => item.identifier === timelineFinger);
+    if (!point) return;
+    event.preventDefault(); scrubTo(touchIndex(point));
+  }, { passive: false });
+  for (const type of ['touchend', 'touchcancel']) listen(timelineTouch, type, event => {
+    if ([...event.changedTouches].some(item => item.identifier === timelineFinger)) endTimelineTouch();
+  });
+  // If a host page swallows touch events, the tap still arrives as a click.
+  listen(timelineTouch, 'click', event => {
+    if (timelineFinger !== null) return;
+    timelineSnap = headings.length ? snapRadius.touch : 0; scrubTo(touchIndex(event)); $('.section-preview').hidden = true;
   });
   for (const type of ['pointerup', 'pointercancel']) listen(progress, type, event => { if (event.pointerType !== 'mouse') $('.section-preview').hidden = true; });
   listen(sections, 'focus', () => { engine.pause(); awake = performance.now(); render(); });
@@ -291,7 +324,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   };
   listen($('.frame'), 'touchstart', event => {
     const quiet = dialog.classList.contains('reading');
-    if (view === 'paragraphs' || event.target.closest(quiet ? 'input,select,textarea' : '.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
+    if (view === 'paragraphs' || event.target.closest(quiet ? 'input,select,textarea,.timeline-touch' : '.bottom,.paragraph-pane,button,a,input,select,textarea')) { touch = null; return; }
     if (event.touches.length !== 1) { touch = null; engine.pause(); return; }
     touch = event.touches[0].identifier; touchY = event.touches[0].clientY;
     touchOnControl = Boolean(event.target.closest('button,a')); touchMoved = false;
