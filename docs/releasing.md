@@ -6,7 +6,7 @@ Every pull request and main-branch push runs dependency installation from the lo
 
 1. Update package.json, both root version fields in package-lock.json, and public/manifest.json together. Update web asset cache versions, setup/About documentation and release notes where needed.
 2. Run `npm ci`, `npx playwright install --with-deps chromium webkit`, `npm run build:all`, `npm test`, every `test:*` browser script, and `npm run lint:extension`. Inspect warnings; a successful lint exit means no errors, not zero warnings.
-3. On a Mac with full Xcode, run `npm run package:safari` and verify both generated schemes. The converter regenerates its output, so never keep irreplaceable signing edits there.
+3. On a Mac with full Xcode, run `npm run package:safari` and verify both generated schemes. The converter regenerates its output, so never keep irreplaceable signing edits there. Xcode 27.2's converter writes `project.xcproj` instead of `project.pbxproj`; the script edits either.
 4. Manually test installed extensions, real iPhone Safari scrolling, headings, autoplay/sleep handling, local PDF import, preferences, and page reading. Automated WebKit runs mock extension APIs and do not replace this check.
 5. Commit and push, then create and push an annotated `vX.Y.Z` tag matching the package version. Tags should identify reviewed commits on main. Do not tag unreviewed changes.
 
