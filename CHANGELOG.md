@@ -4,8 +4,8 @@
 
 - Dragging along the timeline follows your finger or pointer. Once a press moves, a section tick only catches when you pass right over it (about 3 px), so positions between sections are reachable; a tap or click still lands on a nearby section start. On touch screens the label above the timeline names the section under your finger while you drag.
 - Play dims the controls at once instead of after 1.6 seconds.
-- Scrolling or swiping in Glide or Freewheel during Play no longer stops reading: the text follows your scroll, then Play carries on at your minimum speed. Stepped still stops.
-- The pause before a new section is 2.5 word intervals instead of 1.5: 0.5 seconds at 300 WPM instead of 0.3.
+- Scrolling or swiping in Glide or Freewheel during Play no longer stops reading: the text follows your scroll, then Play carries on at the speed you chose. Stepped still stops.
+- During Play a heading stays on screen for at least 0.8 seconds at any speed, so a short heading at a fast pace no longer flashes past. The word before a heading no longer gets an extra hold (0.3 seconds at 300 WPM), which looked like a stall.
 - `npm run package:safari` works with Xcode 27.2, whose converter writes the new `project.xcproj` project format.
 - On touch screens, the timeline handles taps and drags itself instead of the native slider. On some sites (darioamodei.com) one tap on the timeline in the iPhone extension made every later tap move the timeline instead of pressing the button under your finger; that can no longer happen, and timeline taps still work on pages that intercept touch events. Mouse, keyboard, and VoiceOver keep the native slider.
 - Save place works on plain `http:` pages in the extensions. Browsers withhold Web Crypto there, so the fingerprint failed and saved places were reported unavailable; Flickleaf now computes the same SHA-256 itself, so existing bookmarks still match.

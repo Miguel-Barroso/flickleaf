@@ -127,8 +127,6 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
       });
     }
     if (view === 'paragraphs') paragraphView.render(engine.index);
-    // A glide that interrupts hands-off reading hands back at the minimum pace.
-    if ($('#speed').value !== String(engine.speed) && root.activeElement !== $('#speed')) $('#speed').value = String(engine.speed);
     text('#play', view === 'paragraphs' ? 'Play words' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
     text('#state', engine.holding ? 'Holding at section · scroll to continue' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : engine.scrollMode === 'stepped' ? 'Stepping · word by word' : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
     dialog.classList.toggle('reading', (engine.mode !== 'paused' || engine.holding) && performance.now() - awake > 1600 && !context);
@@ -309,7 +307,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   });
   listen(dialog, 'keyup', event => { if (event.code === 'Space' && !event.target.closest('#save-place,#resume-place,#clear-place,#paste,#clear-preferences,#hold-sections,#theme,#word-view,#paragraph-view,#earlier-passage,#later-passage,summary,input,select,textarea,[contenteditable]')) event.preventDefault(); if (event.key === 'Shift') { context = false; showContext(); } });
   // A hand that lands during hands-off reading stops the text at once; if it
-  // then moves, the glide hands back to reading at the minimum pace.
+  // then moves, the glide hands back to reading at the chosen pace.
   let pointer = null, y = 0, pointerResume = false;
   listen($('.stage'), 'pointerdown', event => {
     if (event.pointerType === 'touch' || pointer !== null || event.button !== 0) return;
