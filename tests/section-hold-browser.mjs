@@ -115,5 +115,67 @@ export async function checkTouchTimeline(page) {
   assert.equal(await scrub('touch', between), between, 'a touch away from ticks keeps word precision');
   assert.equal(await scrub('mouse', middle - near(6)), middle, 'a mouse snaps only very close to a tick');
   assert.equal(await scrub('mouse', middle - near(20)), middle - near(20), 'otherwise mouse keeps word precision');
+  // Once a press drags, ticks only catch right at the tick.
+  const drag = (pointerType, value) => page.locator('.progress').evaluate((el, { pointerType, value }) => {
+    const x = el.getBoundingClientRect().left + 40;
+    el.dispatchEvent(new PointerEvent('pointerdown', { bubbles: true, pointerType, clientX: x, buttons: 1 }));
+    el.dispatchEvent(new PointerEvent('pointermove', { bubbles: true, pointerType, clientX: x + 20, buttons: 1 }));
+    el.value = String(value); el.dispatchEvent(new Event('input', { bubbles: true }));
+    return Number(el.value);
+  }, { pointerType, value });
+  assert.equal(await drag('touch', middle - near(20)), middle - near(20), 'a touch drag keeps word precision near a tick');
+  assert.equal(await drag('mouse', middle - near(6)), middle - near(6), 'so does a mouse drag');
+  assert.equal(await drag('touch', middle - near(2)), middle, 'a drag still catches right at a tick');
+  await page.locator('#close').click();
+}
+
+// On touch screens the timeline takes taps itself, so the native slider never
+// tracks a finger, and still works when the host page stops touch events.
+export async function checkTimelineTouchLayer(page) {
+  await page.locator('#source').fill('Opening words come first. '.repeat(20) + '\n\n# Middle\n\n' + 'Middle words follow. '.repeat(20) + '\n\n# End\n\n' + 'Closing words. '.repeat(20));
+  const open = () => page.getByRole('button', { name: 'Start reading' }).click();
+  const tapAt = async index => {
+    const box = await page.locator('.progress').boundingBox();
+    const max = Number(await page.locator('.progress').getAttribute('max'));
+    await page.touchscreen.tap(box.x + 8 + index / max * (box.width - 16), box.y + box.height / 2);
+  };
+  await open();
+  assert.ok(await page.locator('.timeline-touch').isVisible(), 'touch screens get the timeline layer');
+  const middle = await page.locator('.progress').evaluate(el => Math.round(parseFloat(el.closest('.timeline').querySelector('.section-ticks span').style.left) / 100 * Number(el.max)));
+  await tapAt(middle - 2);
+  assert.equal(Number(await page.locator('.progress').inputValue()), middle, 'a tap near a tick lands on that section');
+  const between = Math.round(middle / 2);
+  await tapAt(between);
+  assert.ok(Math.abs(Number(await page.locator('.progress').inputValue()) - between) <= 1, 'a tap away from ticks keeps word precision');
+  // A press that starts near a tick snaps; once it drags, it follows the finger
+  // past the tick, and the label names the section under the finger.
+  const dragged = await page.locator('.timeline-touch').evaluate((layer, middle) => {
+    const timeline = layer.closest('.timeline'), progress = timeline.querySelector('.progress'), preview = timeline.querySelector('.section-preview');
+    const rect = progress.getBoundingClientRect(), max = Number(progress.max), perToken = (rect.width - 16) / max;
+    const fire = (type, index) => {
+      const point = { identifier: 3, target: layer, clientX: rect.left + 8 + index / max * (rect.width - 16), clientY: rect.top + rect.height / 2 };
+      layer.dispatchEvent(Object.assign(new Event(type, { bubbles: true, cancelable: true }), { touches: type === 'touchend' ? [] : [point], changedTouches: [point] }));
+    };
+    const near = Math.ceil(12 / perToken), further = near + Math.ceil(10 / perToken), seen = [];
+    fire('touchstart', middle - near); seen.push(Number(progress.value));
+    fire('touchmove', middle - further); seen.push(Number(progress.value) - middle);
+    fire('touchmove', middle + near); seen.push(Number(progress.value) - middle, preview.hidden, preview.textContent);
+    fire('touchend', middle + near); seen.push(preview.hidden);
+    return [seen, near, further];
+  }, middle);
+  const [seen, near, further] = dragged;
+  assert.deepEqual(seen, [middle, -further, near, false, 'Middle', true], 'a timeline drag is not pulled to nearby ticks');
+  await page.locator('#play').tap();
+  assert.equal(await page.locator('#play').textContent(), 'Pause', 'a later tap presses the button under the finger');
+  await page.locator('#play').tap();
+  await page.locator('#close').click();
+  // A host page that stops every touch event before it reaches the reader.
+  await page.evaluate(() => { for (const type of ['touchstart', 'touchmove', 'touchend', 'touchcancel']) window.addEventListener(type, event => event.stopImmediatePropagation(), { capture: true }); });
+  await open();
+  await tapAt(middle + 2);
+  assert.equal(Number(await page.locator('.progress').inputValue()), middle, 'taps still seek when the page swallows touch events');
+  await page.locator('#play').tap();
+  assert.equal(await page.locator('#play').textContent(), 'Pause', 'buttons still work after a timeline tap on a hostile page');
+  await page.locator('#play').tap();
   await page.locator('#close').click();
 }

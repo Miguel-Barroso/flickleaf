@@ -187,7 +187,9 @@ test('headings stay intact with a section boundary and proportional reading time
   assert.equal(tokens[2].text, 'A new section to explore');
   assert.equal(tokens[2].wordCount, 5);
   assert.equal(tokens[2].weight, 7);
-  assert.equal(tokens[1].weight, 4);
+  assert.equal(tokens[1].weight, 2.5, 'a sentence end and a paragraph end, with no extra hold before the section');
+  const before = new Playback(tokens); before.seek(1); before.play();
+  run(before, 480); assert.equal(before.index, 1); run(before, 40); assert.equal(before.index, 2, 'the word before a heading keeps only its own time');
   assert.equal(tokens[3].text, 'Next');
   const engine = new Playback(tokens); engine.seek(2); engine.play();
   run(engine, 1200); assert.equal(engine.index, 2);
@@ -196,6 +198,40 @@ test('headings stay intact with a section boundary and proportional reading time
   engine.seek(3); assert.equal(engine.tokens[engine.index].text, 'Next');
 });
 
+test('a glide that interrupts autoplay hands back at the chosen pace; stepped input still stops', () => {
+  for (const mode of ['direct', 'freewheel']) for (const pixels of [240, 40, -100]) {
+    const engine = new Playback(Array.from({ length: 4000 }, () => ({ text: 'word', weight: 1 })));
+    engine.setLimits(250, 900); engine.setSpeed(600); engine.setScrollMode(mode);
+    engine.seek(2000); engine.play(); run(engine, 500);
+    engine.impulse(pixels); assert.equal(engine.mode, 'scrub');
+    let time = 0, slowest = Infinity;
+    for (; time < 30000 && engine.mode === 'scrub'; time += 10) { engine.tick(10); if (engine.mode === 'scrub') slowest = Math.min(slowest, Math.abs(engine.readingVelocity)); }
+    const label = `${mode} ${pixels > 0 ? 'forward' : 'rewind'} ${Math.abs(pixels)} px`;
+    assert.equal(engine.mode, 'play', `${label} carries on reading`);
+    assert.equal(engine.speed, 600, `${label} keeps the chosen pace`); assert.equal(engine.readingVelocity, 600);
+    if (pixels === 240) assert.ok(slowest > 600, `${label} slows to the chosen pace without dipping below it`);
+    if (pixels === 40) assert.ok(time <= 200, `${label} is slower than the chosen pace, so reading resumes once the hand rests`);
+    if (pixels < 0) assert.equal(slowest, 250, `${label} runs out at the minimum pace`);
+    const at = engine.index; run(engine, 1000);
+    assert.ok(Math.abs(engine.index - at - 10) <= 1, `${label} reads forward at the chosen pace`);
+  }
+  const idle = new Playback(plain()); idle.seek(50); idle.impulse(100); run(idle, 3000);
+  assert.equal(idle.mode, 'paused', 'a glide from a pause still comes to rest');
+  const stepped = new Playback(plain()); stepped.setScrollMode('stepped'); stepped.seek(20); stepped.play(); run(stepped, 500);
+  stepped.impulse(100); run(stepped, 5000); assert.equal(stepped.mode, 'paused', 'stepped input stops autoplay');
+  const tapped = new Playback(plain()); tapped.seek(20); tapped.play(); run(tapped, 500); tapped.pause();
+  tapped.impulse(100, false, true); run(tapped, 3000);
+  assert.equal(tapped.mode, 'play', 'a hand that stopped autoplay as it landed still hands back');
+  tapped.pause(); tapped.impulse(100); run(tapped, 3000); assert.equal(tapped.mode, 'paused', 'an explicit pause ends hands-off reading');
+});
+test('a section hold during autoplay keeps hands-off reading for the glide that leaves it', () => {
+  const engine = new Playback(Array.from({ length: 40 }, (_, index) => ({ text: `Token ${index}`, weight: [2, 30].includes(index) ? 5 : 1, heading: [2, 30].includes(index) })));
+  engine.setHoldAtSections(true); engine.setSpeed(400); engine.play(); run(engine, 1000);
+  assert.equal(engine.index, 2); assert.equal(engine.holding, true);
+  engine.impulse(40); assert.equal(engine.index, 3); run(engine, 2000);
+  assert.equal(engine.mode, 'play'); assert.equal(engine.speed, 400);
+  run(engine, 10000); assert.equal(engine.index, 30); assert.equal(engine.holding, true);
+});
 test('a heading passes like a sentence ending under the hand but keeps its time in autoplay', () => {
   const tokens = tokenize([{ text: 'The Adolescence of Technology', heading: true, level: 1 }, { text: 'Confronting the risks of powerful AI. '.repeat(10) }]);
   assert.ok(tokens[0].weight >= 5);
@@ -204,6 +240,18 @@ test('a heading passes like a sentence ending under the hand but keeps its time 
   run(scrub, 350); assert.ok(scrub.index > 0, 'one short swipe leaves the title card');
   const play = new Playback(tokens); play.play(); run(play, 1000);
   assert.equal(play.index, 0, 'autoplay still shows the title for its full time');
+});
+test('autoplay shows a heading for at least 0.8 s at any pace', () => {
+  const tokens = tokenize([{ text: 'Some prose.' }, { text: 'A new section to explore', heading: true }, { text: 'Next sentence.' }]);
+  for (const speed of [600, 900]) {
+    const engine = new Playback(tokens); engine.setSpeed(speed); engine.seek(1); engine.play();
+    run(engine, 2.5 * 60000 / speed - 20); assert.equal(engine.index, 1);
+    run(engine, 40); assert.equal(engine.index, 2, `${speed} WPM reaches the heading`);
+    run(engine, 760); assert.equal(engine.index, 2, `${speed} WPM still shows the heading`);
+    run(engine, 60); assert.equal(engine.index, 3, `${speed} WPM moves on after 0.8 s`);
+  }
+  const slow = new Playback(tokens); slow.seek(2); slow.play(); run(slow, 1380);
+  assert.equal(slow.index, 2, 'at 300 WPM the heading keeps its longer word-based time (1.4 s)');
 });
 test('navigation cleanup removes contents and forms but keeps linked prose and useful lists', () => {
   const dom = new JSDOM(`<nav>Home Work About</nav><main>

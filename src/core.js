@@ -12,6 +12,11 @@ export const REVERSAL_GRACE_MS = 300;
 // Hands-off playback gives a heading time to be read. When the hand moves the
 // text, a heading passes like a sentence ending instead of stalling the input.
 const SCRUB_HEADING_WEIGHT = 2;
+// Hands-off playback shows a heading for at least this long at any pace, so a
+// short title at a fast pace does not flash past.
+const HEADING_MIN_MS = 800;
+// A glide that interrupts hands-off reading hands back once input has rested this long.
+const RESUME_IDLE_MS = 150;
 
 // Safari on macOS reports each mouse-wheel notch with a fractional pixel delta
 // (4.000244 px when slow, accelerated beyond that) and no sideways motion.
@@ -42,8 +47,6 @@ export function tokenize(blocks, language = 'en') {
     if (prefix && local.length) { local.at(-1).text += prefix; local.at(-1).end = text.length; }
     if (block.heading && local.length) {
       // Headings stay together; weights follow the user's chosen WPM.
-      const previous = tokens.at(-1);
-      if (previous && !previous.heading) previous.weight += 1.5;
       tokens.push({ text, paragraph, heading: true, level: block.level || 2,
         start: 0, end: text.length, wordCount: local.length, weight: Math.max(5, local.length + 2) });
       return;
@@ -68,10 +71,13 @@ export class Playback {
     this.minSpeed = 300; this.maxSpeed = 900;
     this.holdAtSections = false; this.holding = false;
     this.moved = 0; this.grace = 0; this.graceSteps = 0;
+    // Set when a glide interrupts hands-off reading, which then carries on at
+    // the chosen pace instead of stopping. Stepped input still stops.
+    this.resume = false; this.sinceInput = 0;
   }
   pause() {
     this.mode = 'paused'; this.velocity = 0; this.elapsed = 0; this.stepCharge = 0; this.stepHold = 0; this.holding = false;
-    this.moved = 0; this.grace = 0; this.graceSteps = 0;
+    this.moved = 0; this.grace = 0; this.graceSteps = 0; this.resume = false;
   }
   play() {
     if (!this.tokens.length) return;
@@ -115,7 +121,8 @@ export class Playback {
     if (this.holdAtSections && steps > 0) {
       for (let next = this.index + 1; next <= target; next++) {
         if (this.tokens[next].heading) {
-          this.index = next; this.pause(); this.holding = true;
+          const resume = this.mode === 'play' || this.resume;
+          this.index = next; this.pause(); this.holding = true; this.resume = resume;
           return;
         }
       }
@@ -123,9 +130,13 @@ export class Playback {
     this.index = target;
   }
   // `notch` marks input known to be one discrete wheel notch, whatever its size.
-  impulse(pixels, notch = false) {
+  // `resume` marks input that began during hands-off reading, for callers that
+  // stop playback as the hand lands, before the first movement arrives.
+  impulse(pixels, notch = false, resume = false) {
     if (!Number.isFinite(pixels) || !pixels || !this.tokens.length) return;
     if (this.scrollMode === 'stepped') return this.step(clamp(pixels, -240, 240), notch);
+    if (this.mode === 'play' || resume) this.resume = true;
+    this.sinceInput = 0;
     const wasHolding = this.holding;
     this.holding = false;
     if (this.mode !== 'scrub') { this.velocity = 0; this.elapsed = 0; }
@@ -173,7 +184,8 @@ export class Playback {
   }
   weightAt(index) {
     const token = this.tokens[index];
-    return this.mode === 'scrub' && token.heading ? Math.min(token.weight, SCRUB_HEADING_WEIGHT) : token.weight;
+    if (!token.heading) return token.weight;
+    return this.mode === 'scrub' ? Math.min(token.weight, SCRUB_HEADING_WEIGHT) : Math.max(token.weight, HEADING_MIN_MS * this.speed / 60000);
   }
   tick(milliseconds) {
     if (this.mode === 'paused' || !this.tokens.length) return;
@@ -202,7 +214,17 @@ export class Playback {
         } else {
           const feel = SCROLL_MODES[this.scrollMode];
           this.velocity *= Math.exp(-step / feel.coastMs);
-          if (Math.abs(this.velocity) < feel.stopSpeed) { this.pause(); break; }
+          this.sinceInput += step;
+          // Once the hand rests, a forward glide that has slowed to the chosen
+          // pace carries straight on at it. A rewind runs out first, then the
+          // current word starts afresh.
+          const caughtUp = this.resume && direction > 0 && this.sinceInput >= RESUME_IDLE_MS && this.velocity <= this.speed;
+          if (caughtUp || Math.abs(this.velocity) < feel.stopSpeed) {
+            if (!this.resume) { this.pause(); break; }
+            this.resume = false; this.mode = 'play'; this.velocity = this.speed;
+            if (direction < 0) this.elapsed = 0;
+            continue;
+          }
         }
       }
       while (this.elapsed >= this.weightAt(this.index)) {

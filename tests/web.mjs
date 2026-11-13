@@ -1,4 +1,5 @@
-import { checkSectionHold, checkTouchTimeline } from './section-hold-browser.mjs';
+import { checkSectionHold, checkTouchTimeline, checkTimelineTouchLayer } from './section-hold-browser.mjs';
+import { checkPlaybackGlide } from './playback-glide-browser.mjs';
 import { checkReadingPosition } from './reading-position-browser.mjs';
 import { checkParagraphView } from './paragraph-browser.mjs';
 import { checkPreferences } from './preferences-browser.mjs';
@@ -59,6 +60,7 @@ try {
       assert.equal(await page.locator('#source').inputValue(), corpus);
       await checkHeadingFocus(page);
   await checkSectionHold(page, `.test-results/section-hold-${name}.png`);
+  await checkPlaybackGlide(page);
   await checkAutoplayWakeLock(page);
   await checkPDFInput(page);
   await checkPDFCleanup(page);
@@ -68,6 +70,7 @@ try {
       if (name === 'desktop') await checkPDFCancel(page);
       if (options.hasTouch) await checkTouchScroll(page, type === chromium);
       if (options.hasTouch) await checkTouchTimeline(page);
+      if (options.hasTouch) await checkTimelineTouchLayer(page);
       await page.getByRole('link', { name: 'About', exact: true }).click();
       assert.ok(await page.getByRole('heading', { name: 'Reading, at your pace.' }).isVisible());
       assert.equal(await page.getByRole('link', { name: 'View on GitHub' }).getAttribute('href'), 'https://github.com/Miguel-Barroso/flickleaf');

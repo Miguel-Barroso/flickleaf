@@ -89,7 +89,10 @@ export async function checkTouchScroll(page, nativeTouch = false) {
   await swipe(false, '.controls');
   assert.ok(Number(await page.locator('.progress').inputValue()) > reading, 'a swipe over dimmed controls reads');
   assert.equal(await page.locator('dialog').evaluate(el => el.scrollTop), overlayScroll, 'and does not pan the overlay');
-  await settled(); await page.locator('#play').click(); await quiet();
+  // A swipe during hands-off reading glides, then reading carries on at the chosen pace.
+  const pace = await page.locator('#speed').inputValue();
+  await page.waitForFunction(text => document.querySelector('[data-rsvp-reader]').shadowRoot.querySelector('#state').textContent === text, `Reading · ${pace} WPM`, { timeout: 4000 });
+  await quiet();
   await page.locator('#play').tap();
   assert.equal(await page.locator('#play').textContent(), 'Play', 'a tap on dimmed Pause pauses');
   assert.deepEqual(await page.evaluate(() => ({ x: scrollX, y: scrollY, top: document.body.getBoundingClientRect().top })), locked, 'background remains fixed');
