@@ -1,6 +1,6 @@
 # Changelog
 
-## Unreleased
+## 0.10.2
 
 - Dragging along the timeline follows your finger or pointer. Once a press moves, a section tick only catches when you pass right over it (about 3 px), so positions between sections are reachable; a tap or click still lands on a nearby section start. On touch screens the label above the timeline names the section under your finger while you drag.
 - Play dims the controls at once instead of after 1.6 seconds.

@@ -100,6 +100,21 @@ Suggested shots: the reader on a word, a section card with the timeline, Paragra
 
 App Store shows the developer account holder's name as the seller, which for an individual account is their full legal name rather than a chosen one; the owner wants only "Miguel Barroso" shown. Resolved: on 25 October 2026 Apple Developer Support changed the team name to "Miguel Barroso"; contracts in App Store Connect can take up to two weeks to show it, and earlier tax forms keep the previous name. (The legal name and the support case id are deliberately not recorded here: this repository is public.)
 
+## 0.10.2 update
+
+Prepared 13 November 2026 (build 1002, uploaded with `npm run submit:safari` from the `v0.10.2` tag). In App Store Connect, add version 0.10.2 to both the iOS and macOS apps, select build 1002 once it has processed, paste the text below into What's New in This Version, keep the review notes above (the sample page stays the About page), and submit both versions for review.
+
+```text
+• Timeline taps work on every page. On some sites, one tap on the timeline made every later tap move the timeline instead of pressing the button under your finger.
+• Drag along the timeline to move freely between sections. A tap still jumps to the nearest section start, and the label above the bar names the section under your finger.
+• Play dims the controls at once.
+• Swipe during Play to move the text; once you let go, reading carries on at your chosen speed. In Stepped, a swipe still stops Play.
+• Headings stay on screen for at least 0.8 seconds during Play, and the word before a heading no longer stalls.
+• Save place works on plain http pages.
+• Paragraphs view keeps long paragraphs in the passage, and selecting text no longer moves your place.
+• PDF cleanup removes lowercase roman page numbers and finds repeated headers and footers in two-page PDFs.
+```
+
 ## Upload and submission checklist
 
 1. `FLICKLEAF_APPLE_TEAM=Z7UA3YM9LU npm run package:safari` at the release tag.

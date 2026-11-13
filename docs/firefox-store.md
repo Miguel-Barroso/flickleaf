@@ -129,3 +129,7 @@ Submitted on 18 October 2026 with `npm run submit:firefox` from the `v0.10.0` ta
 ## 0.10.1 submission
 
 Submitted on 18 October 2026 with `npm run submit:firefox` from the `v0.10.1` tag; release notes added by the owner. 0.10.1 makes timeline section ticks magnetic and fixes words clipped in iPad Safari. Approved and published by 20 October 2026.
+
+## 0.10.2 submission
+
+Prepared 13 November 2026 for `npm run submit:firefox` from the `v0.10.2` tag. Suggested version notes: "Drag along the timeline to move freely between sections; a tap still jumps to the nearest section start. Play dims the controls at once. Scrolling during Play in Glide or Freewheel moves the text, then reading carries on at your chosen speed; in Stepped, scrolling still stops Play. Headings stay on screen for at least 0.8 seconds during Play, and the word before a heading no longer stalls. Save place works on plain http pages. Paragraphs view keeps long paragraphs in the passage, and selecting text no longer moves your place. PDF cleanup removes lowercase roman page numbers and finds repeated headers and footers in two-page PDFs."
