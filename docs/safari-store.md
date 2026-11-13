@@ -102,7 +102,7 @@ App Store shows the developer account holder's name as the seller, which for an 
 
 ## 0.10.2 update
 
-Prepared 13 November 2026 (build 1002, uploaded with `npm run submit:safari` from the `v0.10.2` tag). In App Store Connect, add version 0.10.2 to both the iOS and macOS apps, select build 1002 once it has processed, paste the text below into What's New in This Version, keep the review notes above (the sample page stays the About page), and submit both versions for review.
+Prepared 13 November 2026. Build 1002 for iOS and macOS was uploaded the same day with `npm run submit:safari` from the `v0.10.2` tag (the first attempt stopped at export until the owner signed in to Xcode → Settings → Accounts again). In App Store Connect, add version 0.10.2 to both the iOS and macOS apps, select build 1002 once it has processed, paste the text below into What's New in This Version, keep the review notes above (the sample page stays the About page), and submit both versions for review.
 
 ```text
 • Timeline taps work on every page. On some sites, one tap on the timeline made every later tap move the timeline instead of pressing the button under your finger.
