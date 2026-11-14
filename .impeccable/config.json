@@ -1,0 +1,44 @@
+{
+  "detector": {
+    "ignoreRules": [],
+    "ignoreFiles": [],
+    "ignoreValues": [
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "dist-safari/demo.html"
+        ],
+        "createdAt": "2026-11-14T12:27:11.285Z",
+        "reason": "Audit triage, 14 November 2026: demo.html is the extensions' playground and test host page (a stand-in article fixture), not a product surface; the cream is the established Flickleaf paper colour"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "dist-chrome/demo.html"
+        ],
+        "createdAt": "2026-11-14T12:27:11.300Z",
+        "reason": "Audit triage, 14 November 2026: demo.html is the extensions' playground and test host page (a stand-in article fixture), not a product surface; the cream is the established Flickleaf paper colour"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "dist/demo.html"
+        ],
+        "createdAt": "2026-11-14T12:27:11.314Z",
+        "reason": "Audit triage, 14 November 2026: demo.html is the extensions' playground and test host page (a stand-in article fixture), not a product surface; the cream is the established Flickleaf paper colour"
+      },
+      {
+        "rule": "cream-palette",
+        "value": "*",
+        "files": [
+          "public/demo.html"
+        ],
+        "createdAt": "2026-11-14T12:27:11.327Z",
+        "reason": "Audit triage, 14 November 2026: demo.html is the extensions' playground and test host page (a stand-in article fixture), not a product surface; the cream is the established Flickleaf paper colour"
+      }
+    ]
+  }
+}

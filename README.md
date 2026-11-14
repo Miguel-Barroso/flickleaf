@@ -166,7 +166,7 @@ The Safari target requests `activeTab`, `scripting`, and `storage`; its touch-fr
 
 ## Local preferences
 
-Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, theme, and Hold at sections on this device. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Preferences save only these settings—never document text, PDFs, filenames, or page URLs. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
+Flickleaf remembers playback pace, minimum/maximum speed, scroll mode, theme, and Hold at sections on this device. Until you choose a theme, the reader follows the device’s light or dark setting. Extensions use `storage.local` (not browser sync); the web app uses localStorage for its own origin. Preferences save only these settings—never document text, PDFs, filenames, or page URLs. Web and extension preferences are separate. Extension private browsing does not write preferences; if storage is unavailable, reading still works for the current session. Use the reader’s reset control to remove saved preferences and restore defaults.
 
 ## Roadmap and releases
 

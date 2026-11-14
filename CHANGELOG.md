@@ -1,5 +1,14 @@
 # Changelog
 
+## Unreleased
+- The reader's secondary text (status, word count, hints, speed limits, preferences) meets WCAG AA contrast in the light theme: 4.7:1, up from 4.05:1. No reader text is smaller than 12 px.
+- Section ticks on the timeline, the unread part of the timeline, and the borders of the speed-limit fields and Section menu reach 3:1 against the page, so they stay visible in both themes.
+- The reader follows the device's light or dark setting until you choose a theme with the theme button; that choice is still remembered. An already saved light or dark choice is kept. The web page, About page, extension paste page, and PDF cleanup panel follow the device setting too.
+- In desktop windows up to 820 px tall the reader tightens its spacing, so the scroll modes and the Min and Max speed limits stay in view without scrolling (a 1280 × 720 window included).
+- The Section menu is 36 px tall in Safari as in other browsers; WebKit had drawn it 20 px tall.
+- Small uppercase labels above titles are gone from the web page, About page, extension paste page, and reader. The About page reads in a narrower column at 17 px, about 75 characters a line, and paragraphs avoid a single word on the last line where the browser supports it.
+- The reader stops redrawing while nothing moves, instead of running a frame loop the whole time it is open, which saves battery when it sits paused.
+
 ## 0.10.2
 
 - Dragging along the timeline follows your finger or pointer. Once a press moves, a section tick only catches when you pass right over it (about 3 px), so positions between sections are reachable; a tap or click still lands on a nearby section start. On touch screens the label above the timeline names the section under your finger while you drag.

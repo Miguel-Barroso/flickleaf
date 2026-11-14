@@ -7,6 +7,10 @@ test('preferences whitelist and normalize damaged input without storing document
   assert.deepEqual(normalizePreferences({ minSpeed: 600, maxSpeed: 100, speed: Infinity, scrollMode: 'bogus', theme: 'dark', text: 'private', position: 17 }),
     { minSpeed: 600, maxSpeed: 600, speed: 600, scrollMode: 'direct', theme: 'dark', holdAtSections: false });
   assert.equal(normalizePreferences({ holdAtSections: true }).holdAtSections, true);
+  // No saved choice follows the device; an explicit light or dark choice is kept.
+  assert.equal(DEFAULT_PREFERENCES.theme, 'system');
+  for (const theme of ['light', 'dark']) assert.equal(normalizePreferences({ theme }).theme, theme);
+  for (const invalid of ['auto', 1, null]) assert.equal(normalizePreferences({ theme: invalid }).theme, 'system');
   for (const invalid of ['true', 1, null, {}, false]) assert.equal(normalizePreferences({ holdAtSections: invalid }).holdAtSections, false);
   assert.equal(normalizePreferences({ scrollMode: 'stepped' }).scrollMode, 'stepped');
   assert.equal(normalizePreferences({ scrollMode: 'freewheel' }).scrollMode, 'freewheel');
