@@ -1,5 +1,8 @@
 # Changelog
 
+## Unreleased
+- The Safari extension's menu on iPhone and iPad is centred in its sheet, with wider buttons; on the Mac it keeps its size and is centred too.
+
 ## 0.10.3
 Web-only release. The Firefox, Chrome, and App Store versions stay on 0.10.2 until a later release.
 
