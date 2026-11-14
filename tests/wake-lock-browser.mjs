@@ -22,8 +22,23 @@ export async function checkAutoplayWakeLock(page) {
   await page.waitForFunction(() => wakeTest.releases === 2);
   await page.locator('#play').click();
   await page.waitForFunction(() => wakeTest.requests === 3);
-  await page.locator('#close').click();
+  // Locking the phone or switching apps hides the page: reading pauses and the
+  // screen may sleep. It stays paused when the page comes back.
+  await page.evaluate(() => {
+    Object.defineProperty(document, 'hidden', { configurable: true, get: () => true });
+    document.dispatchEvent(new Event('visibilitychange'));
+  });
   await page.waitForFunction(() => wakeTest.releases === 3);
-  assert.equal(await page.evaluate(() => wakeTest.requests), 3);
+  assert.equal(await page.locator('#play').textContent(), 'Play', 'a hidden page pauses reading');
+  const word = await page.locator('.word').textContent();
+  await page.evaluate(() => { delete document.hidden; document.dispatchEvent(new Event('visibilitychange')); });
+  await page.waitForTimeout(400);
+  assert.equal(await page.locator('#play').textContent(), 'Play', 'reading stays paused after the page returns');
+  assert.equal(await page.locator('.word').textContent(), word);
+  await page.locator('#play').click();
+  await page.waitForFunction(() => wakeTest.requests === 4);
+  await page.locator('#close').click();
+  await page.waitForFunction(() => wakeTest.releases === 4);
+  assert.equal(await page.evaluate(() => wakeTest.requests), 4);
   await page.evaluate(() => { delete navigator.wakeLock; delete window.wakeTest; });
 }

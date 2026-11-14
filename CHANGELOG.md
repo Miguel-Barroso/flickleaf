@@ -1,6 +1,8 @@
 # Changelog
 
-## Unreleased
+## 0.10.3
+Web-only release. The Firefox, Chrome, and App Store versions stay on 0.10.2 until a later release.
+
 - The reader's secondary text (status, word count, hints, speed limits, preferences) meets WCAG AA contrast in the light theme: 4.7:1, up from 4.05:1. No reader text is smaller than 12 px.
 - Section ticks on the timeline, the unread part of the timeline, and the borders of the speed-limit fields and Section menu reach 3:1 against the page, so they stay visible in both themes.
 - The reader follows the device's light or dark setting until you choose a theme with the theme button; that choice is still remembered. An already saved light or dark choice is kept. The web page, About page, extension paste page, and PDF cleanup panel follow the device setting too.

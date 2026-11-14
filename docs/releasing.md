@@ -18,6 +18,10 @@ Manual workflow runs must select the matching existing version tag, not a branch
 
 Replace the release-note template with actual changes and manual checks. Review all packages and SHA256SUMS.txt, deploy the matching web files through the documented hosting process, and publish the draft only when ready. Firefox packages are unsigned, Chrome packages are for unpacked installation, and Safari packages contain unsigned Xcode source, not an installable iPhone application. Store submission and Apple signing remain separate deliberate steps.
 
+## Web-only releases
+
+A version may ship to the web only. Tag, build, and publish it as usual and deploy the web files, but skip store submission; the README and About page then say which version the web and the stores serve. Store releases wait until there are new features worth an update, and the next one carries every change since the last store version.
+
 ## Submit to Mozilla
 
 `npm run submit:firefox` performs the listed-channel Firefox submission as one deliberate local step. It verifies version consistency, refuses a dirty working tree or an untagged HEAD (the uploaded source archive comes from HEAD and must match the built package), rebuilds `dist`, recreates the source ZIP exactly as the release workflow does, then uploads both through Mozilla's submission API via `web-ext sign --channel listed`. It returns after AMO validation; human review still takes days and is tracked on the Developer Hub, where release notes are added. Credentials are a JWT issuer/secret pair generated once at the [Developer Hub API keys page](https://addons.mozilla.org/developers/addon/api/key/), exported as `WEB_EXT_API_KEY` and `WEB_EXT_API_SECRET` in your own terminal; they are never stored in the repository or CI. `npm run submit:firefox -- --dry-run` runs every check and build but submits nothing — the `--` separator is required, because npm consumes flags that come before it and the script would then submit for real. Chrome (`npm run submit:chrome`, below), Apple signing, and website deployment remain separate deliberate steps.
