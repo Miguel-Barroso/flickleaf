@@ -1,5 +1,5 @@
 * { -webkit-user-select: none; -webkit-user-drag: none; cursor: default; box-sizing: border-box; }
-:root { color-scheme: light dark; --paper: #f6f3ec; --ink: #263b33; --muted: #6b7268; --line: #dcded2; }
+:root { color-scheme: light dark; --paper: #f6f3ec; --ink: #263b33; --muted: #617067; --line: #dcded2; }
 @media (prefers-color-scheme: dark) { :root { --paper: #18211d; --ink: #ece8dc; --muted: #a3a99d; --line: #34403a; } }
 html { height: 100%; background: var(--paper); color: var(--ink); }
 body { margin: 0; min-height: 100%; display: flex; align-items: center; justify-content: center;

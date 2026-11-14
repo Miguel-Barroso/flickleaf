@@ -22,7 +22,7 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   // This template is static. Article strings are assigned only via textContent.
   dialog.innerHTML = `<div class="frame">
     <header class="chrome"><div class="brand"><span class="mark" aria-hidden="true"><svg viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M8 23C4 12 13 5 27 5c0 14-6 23-17 19" fill="currentColor"/><path d="M5 28 20 13" stroke="var(--paper)" stroke-width="2" stroke-linecap="round"/><path d="m5 28 5-5" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg></span> Flickleaf</div><div class="header-actions"><button id="paste" hidden>Paste text</button><button class="quiet" id="theme" aria-label="Switch to dark theme">◐</button><button id="close">Close <span aria-hidden="true">↗</span></button></div></header>
-    <section class="article chrome"><span class="eyebrow">Find your reading rhythm.</span><h1></h1><p id="meta"></p></section>
+    <section class="article chrome"><h1></h1><p id="meta"></p></section>
     <div class="view-switch chrome mode-switch" role="group" aria-label="Reading view"><button id="word-view" aria-pressed="true">Words</button><button id="paragraph-view" aria-pressed="false">Paragraphs</button></div>
     <main class="stage" aria-label="Reading area. Scroll or drag to control the pace."><div class="focus-line" aria-hidden="true"></div><div class="word-frame"><span class="heading-label eyebrow" hidden>Section</span><div class="word" aria-live="off"></div><div class="context" hidden></div></div><div class="focus-line lower" aria-hidden="true"></div></main>
     <section class="paragraph-pane" hidden tabindex="0" aria-label="Paragraph reading view" aria-describedby="paragraph-help"><p id="paragraph-help">Your current word is highlighted. Select a word to move your place; use ← and → to step. Play returns to Words.</p><button id="earlier-passage">Earlier passage</button><div class="paragraph-content"></div><button id="later-passage">Later passage</button></section>
@@ -34,8 +34,21 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   const text = (selector, value) => { const node = $(selector); if (node.textContent !== value) node.textContent = value; };
   const abort = new AbortController();
   const listen = (target, event, fn, options = {}) => target.addEventListener(event, fn, { ...options, signal: abort.signal });
+  const QUIET_MS = 1600;
+  // Starting from rest resets the clock, so a stale frame time is not read as elapsed.
+  const wake = () => { if (frame || closed) return; if (!ticking) last = performance.now(); frame = requestAnimationFrame(tick); };
   let view = 'words', paragraphView;
-  let frame, closed = false, engine, last = performance.now(), awake = performance.now(), context = false;
+  let frame = 0, ticking = false, closed = false, engine, last = performance.now(), awake = performance.now(), context = false;
+  // Follow the device's light or dark setting until the reader picks a theme.
+  let themeChoice = 'system';
+  const systemDark = globalThis.matchMedia?.('(prefers-color-scheme: dark)');
+  const applyTheme = () => {
+    const dark = themeChoice === 'dark' || (themeChoice === 'system' && Boolean(systemDark?.matches));
+    dialog.classList.toggle('dark', dark);
+    $('#theme').setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} theme`);
+  };
+  applyTheme();
+  if (systemDark) listen(systemDark, 'change', () => { if (themeChoice === 'system') applyTheme(); });
   const close = () => {
     if (closed) return; closed = true;
     wakeLock.dispose(); cancelAnimationFrame(frame); abort.abort(); dialog.close(); host.remove(); unlockScroll();
@@ -49,9 +62,8 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   }
   listen(dialog, 'cancel', event => { event.preventDefault(); close(); });
   listen($('#theme'), 'click', () => {
-    const dark = dialog.classList.toggle('dark');
-    $('#theme').setAttribute('aria-label', `Switch to ${dark ? 'light' : 'dark'} theme`);
-    savePreferences();
+    themeChoice = dialog.classList.contains('dark') ? 'light' : 'dark';
+    applyTheme(); savePreferences();
   });
   unlockScroll = lockPageScroll();
   try { dialog.showModal(); }
@@ -95,7 +107,8 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   let rendered = -1;
   const render = () => {
     wakeLock.setActive(engine.mode === 'play' && !document.hidden);
-    $('#play').title = wakeLock.status === 'active' ? 'Autoplay · keeping screen awake' : wakeLock.status === 'unavailable' ? 'Screen sleep prevention is unavailable in this browser or page' : 'Toggle autoplay';
+    const playTitle = wakeLock.status === 'active' ? 'Autoplay · keeping screen awake' : wakeLock.status === 'unavailable' ? 'Screen sleep prevention is unavailable in this browser or page' : 'Toggle autoplay';
+    if ($('#play').title !== playTitle) $('#play').title = playTitle;
     if (rendered !== engine.index) {
       rendered = engine.index;
       const token = article.tokens[engine.index];
@@ -129,7 +142,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     if (view === 'paragraphs') paragraphView.render(engine.index);
     text('#play', view === 'paragraphs' ? 'Play words' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'Replay' : 'Play') : 'Pause');
     text('#state', engine.holding ? 'Holding at section · scroll to continue' : engine.mode === 'paused' ? (engine.index === article.tokens.length - 1 ? 'End of article' : 'Paused · your pace, your place') : engine.mode === 'play' ? `Reading · ${engine.speed} WPM` : engine.scrollMode === 'stepped' ? 'Stepping · word by word' : `${engine.velocity < 0 ? 'Rewinding' : engine.scrollMode === 'freewheel' ? 'Coasting' : 'Following your scroll'} · ${Math.round(Math.abs(engine.readingVelocity))} WPM`);
-    dialog.classList.toggle('reading', (engine.mode !== 'paused' || engine.holding) && performance.now() - awake > 1600 && !context);
+    dialog.classList.toggle('reading', (engine.mode !== 'paused' || engine.holding) && performance.now() - awake > QUIET_MS && !context);
+    // Frames run only while the text moves or the controls are about to quiet.
+    if (engine.mode !== 'paused' || (engine.holding && !context && performance.now() - awake <= QUIET_MS)) wake();
   };
   const setView = mode => {
     engine.pause(); context = false; showContext(); view = mode;
@@ -375,14 +390,13 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
     $('#speed').min = String(engine.minSpeed); $('#speed').max = String(engine.maxSpeed);
     $('#speed').value = String(engine.speed);
     showScrollMode();
-    dialog.classList.toggle('dark', values.theme === 'dark');
-    $('#theme').setAttribute('aria-label', `Switch to ${values.theme === 'dark' ? 'light' : 'dark'} theme`);
+    themeChoice = values.theme; applyTheme();
     render();
   };
   savePreferences = () => {
     preferencesChanged = true;
     preferences.save({ speed: engine.speed, minSpeed: engine.minSpeed, maxSpeed: engine.maxSpeed,
-      holdAtSections: engine.holdAtSections, scrollMode: engine.scrollMode, theme: dialog.classList.contains('dark') ? 'dark' : 'light' }).then(result => {
+      holdAtSections: engine.holdAtSections, scrollMode: engine.scrollMode, theme: themeChoice }).then(result => {
       if (!closed) text('#preferences-status', preferences.temporary ? 'Private session: preference changes are temporary.' : result.ok ? 'Preferences saved on this device.' : 'Preferences are temporary; storage is unavailable.');
     });
   };
@@ -404,7 +418,9 @@ export function openReader(article, onClose = () => {}, onPaste = null) {
   paragraphView = setupParagraphView(article, $('.paragraph-pane'), seek, abort.signal);
   listen($('#word-view'), 'click', () => setView('words'));
   listen($('#paragraph-view'), 'click', () => setView('paragraphs'));
-  const tick = now => { engine.tick(now - last); last = now; render(); frame = requestAnimationFrame(tick); };
-  render(); frame = requestAnimationFrame(tick); dialog.tabIndex = -1; dialog.focus();
+  const tick = now => { frame = 0; ticking = true; engine.tick(now - last); last = now; render(); ticking = false; };
+  // Any input wakes one frame after its handlers run; render keeps going while needed.
+  for (const type of ['pointerdown', 'pointermove', 'wheel', 'keydown', 'keyup', 'touchstart', 'touchmove', 'touchend', 'touchcancel', 'input', 'change', 'focusin']) listen(dialog, type, wake, { capture: true, passive: true });
+  render(); dialog.tabIndex = -1; dialog.focus();
   return { close, engine };
 }
