@@ -65,4 +65,4 @@ Submitted on 18 October 2026 with `npm run submit:chrome` from the `v0.10.1` tag
 
 ## 0.10.2 submission
 
-Submitted on 13 November 2026 with `npm run submit:chrome` from the `v0.10.2` tag; the revision is pending review.
+Submitted on 13 November 2026 with `npm run submit:chrome` from the `v0.10.2` tag. Approved and published by 14 November 2026 (the public listing shows 0.10.2).
